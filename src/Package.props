@@ -1,0 +1,31 @@
+<Project>
+
+  <PropertyGroup>
+    <Product>{Placeholder}</Product>-
+    <Authors>Swiss Life authors and contributors</Authors>
+    <Company>Swiss Life</Company>
+    <Copyright>Copyright © 2019 Swiss Life</Copyright>
+    <PackageLicenseUrl>https://github.com/SwissLife-OSS/{Placeholder}/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SwissLife-OSS/{Placeholder}</PackageProjectUrl>
+    <PackageReleaseNotes>Release notes: https://github.com/SwissLife-OSS/{Placeholder}/releases/$(Version)</PackageReleaseNotes>
+    <PackageTags>{Placeholder}</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIconUrl>https://github.com/SwissLife-OSS/{Placeholder}/raw/master/logo.png</PackageIconUrl>
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <RepositoryUrl>https://github.com/SwissLife-OSS/{Placeholder}.git</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All"/>
+  </ItemGroup>
+
+</Project>

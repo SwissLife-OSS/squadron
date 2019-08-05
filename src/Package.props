@@ -1,23 +1,23 @@
 <Project>
 
   <PropertyGroup>
-    <Product>{Placeholder}</Product>-
+    <Product>Squadron</Product>
     <Authors>Swiss Life authors and contributors</Authors>
     <Company>Swiss Life</Company>
     <Copyright>Copyright © 2019 Swiss Life</Copyright>
-    <PackageLicenseUrl>https://github.com/SwissLife-OSS/{Placeholder}/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/SwissLife-OSS/{Placeholder}</PackageProjectUrl>
-    <PackageReleaseNotes>Release notes: https://github.com/SwissLife-OSS/{Placeholder}/releases/$(Version)</PackageReleaseNotes>
-    <PackageTags>{Placeholder}</PackageTags>
+    <PackageLicenseUrl>https://github.com/SwissLife-OSS/Squadron/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SwissLife-OSS/Squadron</PackageProjectUrl>
+    <PackageReleaseNotes>Release notes: https://github.com/SwissLife-OSS/Squadron/releases/$(Version)</PackageReleaseNotes>
+    <PackageTags>XUnit SwissLife Container Testing IntegrationTest Test .Net DatabaseTest MessagingTest Database Messaging</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageIconUrl>https://github.com/SwissLife-OSS/{Placeholder}/raw/master/logo.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/SwissLife-OSS/Squadron/raw/master/logo.png</PackageIconUrl>
 	  <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <RepositoryUrl>https://github.com/SwissLife-OSS/{Placeholder}.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/SwissLife-OSS/Squadron.git</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

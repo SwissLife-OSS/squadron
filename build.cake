@@ -15,9 +15,9 @@ var configuration = EnvironmentVariable<string>("Build_Configuration", "Release"
 var nugetToken = EnvironmentVariable<string>("Nuget_Token", default(string));
 var sonarLogin = EnvironmentVariable<string>("Sonar_Token", default(string));
 var sonarPrKey = EnvironmentVariable<string>("Sonar_Pr_Key", default(string));
-var sonarKey = EnvironmentVariable<string>("Sonar_Key", default(string));
+var sonarKey = EnvironmentVariable<string>("Sonar_Key", "SwissLife-OSS_Squadron");
 var sonarBranch = EnvironmentVariable<string>("Sonar_Branch", default(string));
-var repository = EnvironmentVariable<string>("Repository", default(string));
+var repository = EnvironmentVariable<string>("Repository", "SwissLife-OSS/Squadron");
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION

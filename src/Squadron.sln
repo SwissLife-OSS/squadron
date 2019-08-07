@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{CA387BA6-9CD2-4988-BF75-75D5DB15DA0F}"
 EndProject
@@ -9,10 +9,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mongo", "Mongo\Mongo.csproj", "{A46FA6B1-4521-4C53-9D38-5369470FB3D4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mongo.Tests", "Mongo.Tests\Mongo.Tests.csproj", "{9A9BBEA0-1206-423F-B62F-E4ADA728E472}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer", "SqlServer\SqlServer.csproj", "{22F59681-2487-4161-9693-B0FE45B3B658}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer.Tests", "SqlServer.Tests\SqlServer.Tests.csproj", "{108B7864-9A46-498C-9729-889B5E782D84}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elasticsearch", "Elasticsearch\Elasticsearch.csproj", "{0AF1B2A1-1BA5-478C-A18D-7481C7A1DAD7}"
 EndProject
@@ -76,30 +72,6 @@ Global
 		{9A9BBEA0-1206-423F-B62F-E4ADA728E472}.Release|x64.Build.0 = Release|Any CPU
 		{9A9BBEA0-1206-423F-B62F-E4ADA728E472}.Release|x86.ActiveCfg = Release|Any CPU
 		{9A9BBEA0-1206-423F-B62F-E4ADA728E472}.Release|x86.Build.0 = Release|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Debug|x64.Build.0 = Debug|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Debug|x86.Build.0 = Debug|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Release|Any CPU.Build.0 = Release|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Release|x64.ActiveCfg = Release|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Release|x64.Build.0 = Release|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Release|x86.ActiveCfg = Release|Any CPU
-		{22F59681-2487-4161-9693-B0FE45B3B658}.Release|x86.Build.0 = Release|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Debug|x64.Build.0 = Debug|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Debug|x86.Build.0 = Debug|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Release|x64.ActiveCfg = Release|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Release|x64.Build.0 = Release|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Release|x86.ActiveCfg = Release|Any CPU
-		{108B7864-9A46-498C-9729-889B5E782D84}.Release|x86.Build.0 = Release|Any CPU
 		{0AF1B2A1-1BA5-478C-A18D-7481C7A1DAD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0AF1B2A1-1BA5-478C-A18D-7481C7A1DAD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AF1B2A1-1BA5-478C-A18D-7481C7A1DAD7}.Debug|x64.ActiveCfg = Debug|Any CPU

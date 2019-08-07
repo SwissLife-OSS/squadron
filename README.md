@@ -1,4 +1,6 @@
-Work in Progress
+*Work in Progress*
+
+**Squadron is a container testing framework for external services.**
 
 ## Getting Started
 

@@ -141,6 +141,7 @@ Task("SonarBegin")
         Url = "https://sonarcloud.io",
         Login = sonarLogin,
         Key = sonarKey,
+        Name = productName,
         Organization = "swisslife",
         VsTestReportsPath = "**/*.trx",
         OpenCoverReportsPath = "**/*.opencover.xml",

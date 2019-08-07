@@ -10,6 +10,12 @@ variables:
   - group: Tokens
 
 steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core SDK'
+    inputs:
+      packageType: sdk
+      version: 2.2.401
+      installationPath: $(Agent.ToolsDirectory)/dotnet
   - bash: ./build.sh -target=sonar
     env:
       Sonar_Token: $(Sonar_Token)

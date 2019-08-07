@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////
 var target = Argument("target", "Default");
 
-var productName = EnvironmentVariable<string>("Product_Name", default(string));
+var productName = EnvironmentVariable<string>("Product_Name", "Squadron");
 var version = EnvironmentVariable<string>("Version", default(string));
 var configuration = EnvironmentVariable<string>("Build_Configuration", "Release");
 var nugetToken = EnvironmentVariable<string>("Nuget_Token", default(string));

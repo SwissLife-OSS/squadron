@@ -6,11 +6,11 @@
 
 ## Features
 
-For all services we try to provide container support when this exist, otherwise this will be implemented by targeting directly the service.
+For all services we try to provide container support when this exist, otherwise this will be implemented by targeting directly the service. All services are using Linux containers which automaticly requiers Docker with Linux containers.
 
 - [x] MongoDB
 - [x] Elasticsearch
-- [ ] SqlServer - needs update to .NetStandard 2.0
+- [x] SqlServer
 - [ ] Redis
 - [ ] Kafka
 - [ ] ServiceBus (Targets Azure ServiceBus)

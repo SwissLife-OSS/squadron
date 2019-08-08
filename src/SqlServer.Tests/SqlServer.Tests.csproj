@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <RootNamespace>Squadron</RootNamespace>
     <AssemblyName>Squadron.SqlServer.Tests</AssemblyName>
     <IsPackable>false</IsPackable>

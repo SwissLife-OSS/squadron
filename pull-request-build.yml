@@ -17,7 +17,7 @@ workspace:
 
 steps:
   - task: UseDotNet@2
-    displayName: 'Install .NET Core sdk'
+    displayName: 'Install .NET Core SDK'
     inputs:
       packageType: sdk
       version: 2.2.401

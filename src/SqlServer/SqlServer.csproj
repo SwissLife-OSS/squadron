@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>Squadron</RootNamespace>
     <AssemblyName>Squadron.SqlServer</AssemblyName>
     <IsPackable>true</IsPackable>
@@ -23,12 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="xunit.abstractions" Version="2.0.1" />    
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
     <PackageReference Include="xunit.core" Version="2.3.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
-    <PackageReference Include="Microsoft.SqlServer.DacFx.x86" Version="140.3881.1" />
+    <PackageReference Include="Microsoft.SqlServer.DacFx" Version="150.4505.1-preview" />
   </ItemGroup>
 
   <ItemGroup>

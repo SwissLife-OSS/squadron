@@ -5,17 +5,15 @@ pr:
       - master
 
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
-
-variables:
-  - group: Tokens
   
-workspace:
-    clean: all
-
 jobs:
 - job: ubuntu
   pool:
     vmImage: 'ubuntu-16.04'
+  workspace:
+    clean: all
+  variables:
+  - group: Tokens
   steps:
     - task: UseDotNet@2
       displayName: 'Install .NET Core SDK'
@@ -28,6 +26,10 @@ jobs:
 - job: macos
   pool:
     vmImage: 'macOS-10.14'
+  workspace:
+    clean: all
+  variables:
+  - group: Tokens
   steps:
     - task: UseDotNet@2
       displayName: 'Install .NET Core SDK'

@@ -31,6 +31,28 @@ jobs:
   variables:
   - group: Tokens
   steps:
+    - script: |
+       retries=0
+       brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/8ce4e89d10716666743b28c5a46cd54af59a9cc2/Casks/docker.rb
+       sudo /Applications/Docker.app/Contents/MacOS/Docker --quit-after-install --unattended
+       /Applications/Docker.app/Contents/MacOS/Docker --unattended &
+       while ! docker info 2>/dev/null ; do
+           sleep 5
+           retries=`expr $retries + 1`
+           if pgrep -xq -- "Docker"; then
+               echo 'docker is starting...'
+           else
+               echo 'docker not running, restart'
+               /Applications/Docker.app/Contents/MacOS/Docker --unattended &
+           fi
+           if [ $retries -gt 30 ]; then
+               >&2 echo 'Failed to run docker'
+               exit 1
+           fi;
+
+           echo 'Waiting for docker service to be in the running state'
+       done
+      displayName: 'Install Docker'
     - task: UseDotNet@2
       displayName: 'Install .NET Core SDK'
       inputs:

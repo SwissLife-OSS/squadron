@@ -12,7 +12,7 @@ using Version = System.Version;
 
 namespace Squadron
 {
-    internal class DockerManager
+    internal static class DockerManager
     {
         private static readonly AuthConfig _authConfig =
             new AuthConfig();
@@ -75,7 +75,8 @@ namespace Squadron
             }
 
             var logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
-            var success = await ResolveContainerIp(settings);
+            var success = await ResolveContainerAddress(settings) &&
+                await ResolveHostPort(settings);
 
             if (!success)
             {
@@ -129,19 +130,56 @@ namespace Squadron
             return $"Container exited, please check logs for container {settings.ContainerId}";
         }
 
-        private static async Task<bool> ResolveContainerIp(IImageSettings settings)
+        private static async Task<bool> ResolveContainerAddress(IImageSettings settings)
         {
             ContainerInspectResponse inspectResponse = await _client
                 .Containers
                 .InspectContainerAsync(settings.ContainerId);
 
-            settings.ContainerIp = inspectResponse.NetworkSettings.IPAddress;
+            settings.ContainerAddress = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ?
+                "localhost" :
+                inspectResponse.NetworkSettings.IPAddress;
+
+            return inspectResponse.State.Running;
+        }
+
+        private static async Task<bool> ResolveHostPort(IImageSettings settings)
+        {
+            ContainerInspectResponse inspectResponse = await _client
+                .Containers
+                .InspectContainerAsync(settings.ContainerId);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                string containerPort = $"{settings.ContainerPort}/tcp";
+                if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
+                {
+                    throw new Exception($"Failed to resolve host port for {containerPort}");
+                }
+
+                PortBinding binding = inspectResponse
+                    .NetworkSettings
+                    .Ports[containerPort]
+                    .FirstOrDefault();
+
+                if (binding == null || string.IsNullOrEmpty(binding.HostPort))
+                {
+                    throw new Exception($"The resolved port binding is empty");
+                }
+
+                settings.HostPort = long.Parse(binding.HostPort);
+            }
+            else
+            {
+                settings.HostPort = settings.ContainerPort;
+            }
+
             return inspectResponse.State.Running;
         }
 
         private static async Task<IList<ContainerListResponse>> GetAllContainers()
         {
-            var listOption = new ContainersListParameters() { All = true };
+            var listOption = new ContainersListParameters { All = true };
             IList<ContainerListResponse> containers =
                 await _client.Containers.ListContainersAsync(listOption);
 

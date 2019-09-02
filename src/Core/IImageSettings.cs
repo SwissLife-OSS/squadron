@@ -6,11 +6,12 @@ namespace Squadron
     {
         string Name { get; }
         string Image { get; }
-        long DefaultPort { get; }
+        long ContainerPort { get; }
+        long HostPort { set; get; }
         string Username { get; }
         string Password { get; }
         List<string> EnvironmentVariable { get; }
         string ContainerId { get; set; }
-        string ContainerIp { get; set; }
+        string ContainerAddress { get; set; }
     }
 }

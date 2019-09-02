@@ -20,7 +20,7 @@ namespace Squadron
         {
             await StartContainerAsync();
 
-            Uri uri = new Uri($"http://{Settings.ContainerIp}:{Settings.DefaultPort}");
+            Uri uri = new Uri($"http://{Settings.ContainerAddress}:{Settings.HostPort}");
             ConnectionSettings connectionSettings = new ConnectionSettings(uri);
             connectionSettings.EnableDebugMode();
             connectionSettings.DisableDirectStreaming();

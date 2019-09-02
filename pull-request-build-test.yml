@@ -36,17 +36,7 @@ jobs:
        retries=0
        brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/8ce4e89d10716666743b28c5a46cd54af59a9cc2/Casks/docker.rb
        sudo /Applications/Docker.app/Contents/MacOS/Docker --quit-after-install --unattended
-       /Applications/Docker.app/Contents/MacOS/Docker --unattended
-      displayName: 'Install Docker'
-    - task: UseDotNet@2
-      displayName: 'Install .NET Core SDK'
-      inputs:
-        packageType: sdk
-        version: 2.2.401
-        installationPath: $(Agent.ToolsDirectory)/dotnet
-    - script: |
-       #!/bin/bash
-       retries=0
+       /Applications/Docker.app/Contents/MacOS/Docker --unattended &
        while ! docker info 2>/dev/null ; do
            sleep 5
            retries=`expr $retries + 1`
@@ -63,6 +53,12 @@ jobs:
 
            echo 'Waiting for docker service to be in the running state'
        done
-      displayName: 'Wait Docker to start'
+      displayName: 'Install Docker'
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: sdk
+        version: 2.2.401
+        installationPath: $(Agent.ToolsDirectory)/dotnet
     - bash: ./build.sh -target=Tests
       displayName: 'Tests on MacOS'

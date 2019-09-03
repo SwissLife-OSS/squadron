@@ -13,5 +13,6 @@ namespace Squadron
         List<string> EnvironmentVariable { get; }
         string ContainerId { get; set; }
         string ContainerAddress { get; set; }
+        string Logs { get; set; }
     }
 }

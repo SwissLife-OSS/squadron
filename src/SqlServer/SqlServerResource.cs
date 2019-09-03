@@ -26,7 +26,7 @@ namespace Squadron
             _serverConnectionString = CreateServerConnectionString(Settings);
 
             await Initializer.WaitAsync(
-                new SqlServerStatus(_serverConnectionString));
+                new SqlServerStatus(_serverConnectionString), Settings);
         }
 
         /// <summary>

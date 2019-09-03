@@ -23,5 +23,6 @@ namespace Squadron
         public string Username { get; } = string.Empty;
         public string Password { get; } = string.Empty;
         public List<string> EnvironmentVariable { get; }
+        public string Logs { get; set; }
     }
 }

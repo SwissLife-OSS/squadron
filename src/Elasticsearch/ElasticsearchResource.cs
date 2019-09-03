@@ -28,7 +28,7 @@ namespace Squadron
             Client = new ElasticClient(connectionSettings);
 
             await Initializer.WaitAsync(
-                new ElasticsearchStatus(Client));
+                new ElasticsearchStatus(Client), Settings);
         }
 
         /// <summary>

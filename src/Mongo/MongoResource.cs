@@ -30,7 +30,7 @@ namespace Squadron
             });
 
             await Initializer.WaitAsync(
-                new MongoStatus(Client));
+                new MongoStatus(Client), Settings);
         }
 
         /// <summary>

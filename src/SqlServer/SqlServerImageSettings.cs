@@ -24,5 +24,6 @@ namespace Squadron
         public string Username { get; } = "sa";
         public string Password { get; } = "_Qtp" + Guid.NewGuid().ToString("N");
         public List<string> EnvironmentVariable { get; }
+        public string Logs { get; set; }
     }
 }

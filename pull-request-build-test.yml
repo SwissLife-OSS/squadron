@@ -75,7 +75,6 @@ jobs:
   variables:
   - group: Tokens
   dependsOn:
-    - Windows
     - Ubuntu
     - MacOS
   steps:

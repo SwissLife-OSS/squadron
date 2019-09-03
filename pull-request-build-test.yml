@@ -7,7 +7,25 @@ pr:
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
   
 jobs:
-- job: ubuntu
+- job: Windows
+  displayName: 'Tests on Windows'
+  pool:
+    vmImage: 'windows-latest'
+  workspace:
+    clean: all
+  variables:
+  - group: Tokens
+  steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: sdk
+        version: 2.2.401
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+    - bash: ./build.sh -target=Tests
+      displayName: 'Tests on Windows'
+- job: Ubuntu
+  displayName: 'Tests on Ubuntu'
   pool:
     vmImage: 'ubuntu-16.04'
   workspace:
@@ -23,7 +41,8 @@ jobs:
         installationPath: $(Agent.ToolsDirectory)/dotnet
     - bash: ./build.sh -target=Tests
       displayName: 'Tests on Ubuntu'
-- job: macos
+- job: MacOS
+  displayName: 'Tests on MacOS'
   pool:
     vmImage: 'macOS-10.14'
   workspace:
@@ -62,3 +81,24 @@ jobs:
         installationPath: $(Agent.ToolsDirectory)/dotnet
     - bash: ./build.sh -target=Tests
       displayName: 'Tests on MacOS'
+- job: Build
+  displayName: 'Build'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  workspace:
+    clean: all
+  variables:
+  - group: Tokens
+  dependsOn:
+    - Windows
+    - Ubuntu
+    - MacOS
+  steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: sdk
+        version: 2.2.401
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+    - bash: ./build.sh -target=Tests
+      displayName: 'Build'

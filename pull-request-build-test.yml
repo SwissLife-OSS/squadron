@@ -7,30 +7,9 @@ pr:
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
   
 jobs:
-- job: Windows
-  displayName: 'Tests on Windows'
-  pool:
-    vmImage: 'windows-latest'
-  workspace:
-    clean: all
-  variables:
-  - group: Tokens
-  steps:
-    - task: UseDotNet@2
-      displayName: 'Install .NET Core SDK'
-      inputs:
-        packageType: sdk
-        version: 2.2.401
-        installationPath: $(Agent.ToolsDirectory)/dotnet
-    - powershell: |
-       dotnet tool install Cake.Tool -g --version 0.33.0
-       dotnet tool list -g
-      displayName: 'Install Cake'
-    - powershell: |
-       dotnet cake -target=Tests
-      displayName: 'Run Build'
 - job: Ubuntu
   displayName: 'Tests on Ubuntu'
+  continueOnError: false
   pool:
     vmImage: 'ubuntu-16.04'
   workspace:
@@ -48,6 +27,7 @@ jobs:
       displayName: 'Tests on Ubuntu'
 - job: MacOS
   displayName: 'Tests on MacOS'
+  continueOnError: false
   pool:
     vmImage: 'macOS-10.14'
   workspace:

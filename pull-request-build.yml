@@ -5,26 +5,84 @@ pr:
       - master
 
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
-
-pool:
-  vmImage: ubuntu-16.04
-
-variables:
-  - group: Tokens
   
-workspace:
+jobs:
+- job: Ubuntu
+  displayName: 'Tests on Ubuntu'
+  continueOnError: false
+  pool:
+    vmImage: 'ubuntu-16.04'
+  workspace:
     clean: all
+  variables:
+  - group: Tokens
+  steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: sdk
+        version: 2.2.401
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+    - bash: ./build.sh -target=Tests
+      displayName: 'Tests on Ubuntu'
+- job: MacOS
+  displayName: 'Tests on MacOS'
+  continueOnError: false
+  pool:
+    vmImage: 'macOS-10.14'
+  workspace:
+    clean: all
+  variables:
+  - group: Tokens
+  steps:
+    - script: |
+       #!/bin/bash
+       retries=0
+       brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/8ce4e89d10716666743b28c5a46cd54af59a9cc2/Casks/docker.rb
+       sudo /Applications/Docker.app/Contents/MacOS/Docker --quit-after-install --unattended
+       /Applications/Docker.app/Contents/MacOS/Docker --unattended &
+       while ! docker info 2>/dev/null ; do
+           sleep 5
+           retries=`expr $retries + 1`
+           if pgrep -xq -- "Docker"; then
+               echo 'docker is starting...'
+           else
+               echo 'docker not running, restart'
+               /Applications/Docker.app/Contents/MacOS/Docker --unattended &
+           fi
+           if [ $retries -gt 30 ]; then
+               >&2 echo 'Failed to run docker'
+               exit 1
+           fi;
 
-steps:
-  - task: UseDotNet@2
-    displayName: 'Install .NET Core SDK'
-    inputs:
-      packageType: sdk
-      version: 2.2.401
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-  - bash: ./build.sh -target=sonar
-    env:
-      Sonar_Token: $(Sonar_Token)
-      Sonar_Pr_Key: $(System.PullRequest.PullRequestNumber)
-      Sonar_Branch: $(System.PullRequest.SourceBranch)
-    displayName: Sonar Build
+           echo 'Waiting for docker service to be in the running state'
+       done
+      displayName: 'Install Docker'
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: sdk
+        version: 2.2.401
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+    - bash: ./build.sh -target=Tests
+      displayName: 'Tests on MacOS'
+- job: Build
+  displayName: 'Build'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  workspace:
+    clean: all
+  variables:
+  - group: Tokens
+  dependsOn:
+    - Ubuntu
+    - MacOS
+  steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: sdk
+        version: 2.2.401
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+    - bash: ./build.sh -target=Tests
+      displayName: 'Build'

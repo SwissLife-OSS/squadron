@@ -74,7 +74,7 @@ namespace Squadron
                     "Docker container creation/startup failed.");
             }
 
-            settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
+            settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(15));
             var success = await ResolveContainerAddress(settings) &&
                 await ResolveHostPort(settings);
 
@@ -120,14 +120,7 @@ namespace Squadron
                     containerStatsParameters,
                     CancellationToken.None);
 
-            Task<string> logsTask = ReadAsync(logStream);
-            Task timeoutTask = Task.Delay(timeout);
-            if (await Task.WhenAny(logsTask, timeoutTask) == logsTask)
-            {
-                return await logsTask;
-            }
-
-            return $"Container exited, please check logs for container {settings.ContainerId}";
+            return await ReadAsync(logStream, timeout);
         }
 
         private static async Task<bool> ResolveContainerAddress(IImageSettings settings)
@@ -291,9 +284,12 @@ namespace Squadron
             }
         }
 
-        private static async Task<string> ReadAsync(Stream logStream)
+        private static async Task<string> ReadAsync(
+            Stream logStream,
+            TimeSpan timeout)
         {
             var result = new StringBuilder();
+            var timeoutTask = Task.Delay(timeout);
             using (logStream)
             {
                 const int size = 256;
@@ -301,9 +297,16 @@ namespace Squadron
 
                 while (true)
                 {
-                    int read = await logStream.ReadAsync(
+                    Task<int> readTask = logStream.ReadAsync(
                         buffer, 0, size);
 
+                    if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
+                    {
+                        logStream.Close();
+                        break;
+                    }
+
+                    var read = await readTask;
                     if (read <= 0)
                     {
                         break;

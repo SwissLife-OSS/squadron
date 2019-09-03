@@ -22,8 +22,13 @@ jobs:
         packageType: sdk
         version: 2.2.401
         installationPath: $(Agent.ToolsDirectory)/dotnet
-    - bash: ./build.sh -target=Tests
-      displayName: 'Tests on Windows'
+    - powershell: |
+       dotnet tool install Cake.Tool -g --version 0.32.1
+       dotnet tool list -g
+      displayName: 'Install Cake'
+    - powershell: |
+       dotnet cake -target=Tests
+      displayName: 'Run Build'
 - job: Ubuntu
   displayName: 'Tests on Ubuntu'
   pool:

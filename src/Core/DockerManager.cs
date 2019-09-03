@@ -12,7 +12,7 @@ using Version = System.Version;
 
 namespace Squadron
 {
-    internal class DockerManager
+    internal static class DockerManager
     {
         private static readonly AuthConfig _authConfig =
             new AuthConfig();
@@ -74,13 +74,14 @@ namespace Squadron
                     "Docker container creation/startup failed.");
             }
 
-            var logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
-            var success = await ResolveContainerIp(settings);
+            settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(15));
+            var success = await ResolveContainerAddress(settings) &&
+                await ResolveHostPort(settings);
 
             if (!success)
             {
                 throw new ContainerException(
-                    $"Container exited with following logs: \r\n {logs}");
+                    $"Container exited with following logs: \r\n {settings.Logs}");
             }
         }
 
@@ -119,29 +120,59 @@ namespace Squadron
                     containerStatsParameters,
                     CancellationToken.None);
 
-            Task<string> logsTask = ReadAsync(logStream);
-            Task timeoutTask = Task.Delay(timeout);
-            if (await Task.WhenAny(logsTask, timeoutTask) == logsTask)
-            {
-                return await logsTask;
-            }
-
-            return $"Container exited, please check logs for container {settings.ContainerId}";
+            return await ReadAsync(logStream, timeout);
         }
 
-        private static async Task<bool> ResolveContainerIp(IImageSettings settings)
+        private static async Task<bool> ResolveContainerAddress(IImageSettings settings)
         {
             ContainerInspectResponse inspectResponse = await _client
                 .Containers
                 .InspectContainerAsync(settings.ContainerId);
 
-            settings.ContainerIp = inspectResponse.NetworkSettings.IPAddress;
+            settings.ContainerAddress = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ?
+                "localhost" :
+                inspectResponse.NetworkSettings.IPAddress;
+
+            return inspectResponse.State.Running;
+        }
+
+        private static async Task<bool> ResolveHostPort(IImageSettings settings)
+        {
+            ContainerInspectResponse inspectResponse = await _client
+                .Containers
+                .InspectContainerAsync(settings.ContainerId);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                string containerPort = $"{settings.ContainerPort}/tcp";
+                if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
+                {
+                    throw new Exception($"Failed to resolve host port for {containerPort}");
+                }
+
+                PortBinding binding = inspectResponse
+                    .NetworkSettings
+                    .Ports[containerPort]
+                    .FirstOrDefault();
+
+                if (binding == null || string.IsNullOrEmpty(binding.HostPort))
+                {
+                    throw new Exception($"The resolved port binding is empty");
+                }
+
+                settings.HostPort = long.Parse(binding.HostPort);
+            }
+            else
+            {
+                settings.HostPort = settings.ContainerPort;
+            }
+
             return inspectResponse.State.Running;
         }
 
         private static async Task<IList<ContainerListResponse>> GetAllContainers()
         {
-            var listOption = new ContainersListParameters() { All = true };
+            var listOption = new ContainersListParameters { All = true };
             IList<ContainerListResponse> containers =
                 await _client.Containers.ListContainersAsync(listOption);
 
@@ -253,9 +284,12 @@ namespace Squadron
             }
         }
 
-        private static async Task<string> ReadAsync(Stream logStream)
+        private static async Task<string> ReadAsync(
+            Stream logStream,
+            TimeSpan timeout)
         {
             var result = new StringBuilder();
+            var timeoutTask = Task.Delay(timeout);
             using (logStream)
             {
                 const int size = 256;
@@ -263,9 +297,16 @@ namespace Squadron
 
                 while (true)
                 {
-                    int read = await logStream.ReadAsync(
+                    Task<int> readTask = logStream.ReadAsync(
                         buffer, 0, size);
 
+                    if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
+                    {
+                        logStream.Close();
+                        break;
+                    }
+
+                    var read = await readTask;
                     if (read <= 0)
                     {
                         break;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Moq;
 using Xunit;
 
 namespace Squadron
@@ -14,7 +15,7 @@ namespace Squadron
             // arrange
             Task initializerTask = Initializer.WaitAsync(
                 new NotReadyStatusProvider(),
-                TimeSpan.FromSeconds(5));
+                TimeSpan.FromSeconds(5), Mock.Of<IImageSettings>());
             Task timeout = Task.Delay(TimeSpan.FromSeconds(10));
 
             // act
@@ -33,7 +34,7 @@ namespace Squadron
             // arrange
             Task<Status> initializerTask = Initializer.WaitAsync(
                 new OneThrowStatusProvider(),
-                TimeSpan.FromSeconds(5));
+                TimeSpan.FromSeconds(5), Mock.Of<IImageSettings>());
             Task timeout = Task.Delay(TimeSpan.FromSeconds(10));
 
             // act

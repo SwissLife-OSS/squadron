@@ -17,20 +17,20 @@ namespace Squadron
         {
             await StartContainerAsync();
 
-            ConnectionString = $"mongodb://{Settings.ContainerIp}:{Settings.DefaultPort}";
+            ConnectionString = $"mongodb://{Settings.ContainerAddress}:{Settings.HostPort}";
             Client = new MongoClient(new MongoClientSettings
             {
                 ConnectionMode = ConnectionMode.Direct,
                 ReadConcern = ReadConcern.Majority,
                 WriteConcern = WriteConcern.Acknowledged,
-                Server = new MongoServerAddress(Settings.ContainerIp, (int)Settings.DefaultPort),
+                Server = new MongoServerAddress(Settings.ContainerAddress, (int)Settings.HostPort),
                 ConnectTimeout = TimeSpan.FromSeconds(5),
                 ServerSelectionTimeout = TimeSpan.FromSeconds(5),
                 SocketTimeout = TimeSpan.FromSeconds(5)
             });
 
             await Initializer.WaitAsync(
-                new MongoStatus(Client));
+                new MongoStatus(Client), Settings);
         }
 
         /// <summary>

@@ -13,14 +13,17 @@ namespace Squadron
         /// Waits a specific resource to initialize by checking his status.
         /// </summary>
         public static async Task<Status> WaitAsync(
-            IResourceStatusProvider statusProvider)
+            IResourceStatusProvider statusProvider,
+            IImageSettings settings)
         {
             return await WaitAsync(
-                statusProvider, TimeSpan.FromSeconds(30));
+                statusProvider, TimeSpan.FromSeconds(30), settings);
         }
 
         internal static async Task<Status> WaitAsync(
-            IResourceStatusProvider statusProvider, TimeSpan timeout)
+            IResourceStatusProvider statusProvider,
+            TimeSpan timeout,
+            IImageSettings settings)
         {
             Stopwatch timer = Stopwatch.StartNew();
             Status status = Status.NotReady;
@@ -42,7 +45,7 @@ namespace Squadron
             if (!status.IsReady)
             {
                 throw new InvalidOperationException(
-                    $"Initialize sequence timed-out. {status.Message}");
+                    $"Initialize sequence timed-out. {status.Message}\r\n{settings.Logs}");
             }
 
             return status;

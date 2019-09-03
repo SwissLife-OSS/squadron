@@ -29,6 +29,10 @@ namespace Squadron
                 AttachStderr = true,
                 AttachStdin = false,
                 Tty = false,
+                HostConfig = new HostConfig
+                {
+                    PublishAllPorts = true
+                },
                 Env = imageSettings.EnvironmentVariable
             };
         }

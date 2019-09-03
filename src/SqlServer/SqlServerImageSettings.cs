@@ -17,11 +17,13 @@ namespace Squadron
 
         public string Name { get; } = ContainerName.Create();
         public string Image { get; } = "microsoft/mssql-server-linux:latest";
-        public long DefaultPort { get; } = 1433;
+        public long ContainerPort { get; } = 1433;
+        public long HostPort { get; set; }
         public string ContainerId { get; set; }
-        public string ContainerIp { get; set; }
+        public string ContainerAddress { get; set; }
         public string Username { get; } = "sa";
         public string Password { get; } = "_Qtp" + Guid.NewGuid().ToString("N");
         public List<string> EnvironmentVariable { get; }
+        public string Logs { get; set; }
     }
 }

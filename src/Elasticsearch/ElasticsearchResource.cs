@@ -20,7 +20,7 @@ namespace Squadron
         {
             await StartContainerAsync();
 
-            Uri uri = new Uri($"http://{Settings.ContainerIp}:{Settings.DefaultPort}");
+            Uri uri = new Uri($"http://{Settings.ContainerAddress}:{Settings.HostPort}");
             ConnectionSettings connectionSettings = new ConnectionSettings(uri);
             connectionSettings.EnableDebugMode();
             connectionSettings.DisableDirectStreaming();
@@ -28,7 +28,7 @@ namespace Squadron
             Client = new ElasticClient(connectionSettings);
 
             await Initializer.WaitAsync(
-                new ElasticsearchStatus(Client));
+                new ElasticsearchStatus(Client), Settings);
         }
 
         /// <summary>

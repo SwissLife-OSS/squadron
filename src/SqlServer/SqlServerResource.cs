@@ -26,7 +26,7 @@ namespace Squadron
             _serverConnectionString = CreateServerConnectionString(Settings);
 
             await Initializer.WaitAsync(
-                new SqlServerStatus(_serverConnectionString));
+                new SqlServerStatus(_serverConnectionString), Settings);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Squadron
 
         private string CreateServerConnectionString(IImageSettings settings)
             => new StringBuilder()
-                .Append($"Data Source={settings.ContainerIp},{settings.DefaultPort};")
+                .Append($"Data Source={settings.ContainerAddress},{settings.HostPort};")
                 .Append("Integrated Security=False;")
                 .Append($"User ID={settings.Username};")
                 .Append($"Password={settings.Password};")

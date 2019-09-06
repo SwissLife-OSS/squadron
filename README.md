@@ -6,7 +6,7 @@
 
 ## Features
 
-For all services we try to provide container support when this exist, otherwise this will be implemented by targeting directly the service. All services are using Linux containers which automaticly requiers Docker with Linux containers.
+For all services we try to provide container support when this exist, otherwise this will be implemented by targeting directly the service. All services are using Linux containers which automaticly requires Docker with Linux containers.
 
 - [x] MongoDB
 - [x] Elasticsearch

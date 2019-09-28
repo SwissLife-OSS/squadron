@@ -15,7 +15,6 @@ namespace Squadron
     public class AzureStorageResource
         : ResourceBase<AzureStorageImageSettings>, IAsyncLifetime
     {
-
         CloudStorageAccount _storageAccount = null;
 
         public async Task InitializeAsync()

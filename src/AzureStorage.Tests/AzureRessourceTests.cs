@@ -38,7 +38,7 @@ namespace AzureStorage.Tests
 
 
         [Fact]
-        public async Task CreateQueueClient__OK()
+        public async Task CreateQueueClient_AddMessage_Peeked()
         {
             //Arrange
             CloudQueueClient queueClient = _azureStorageResource.CreateQueueClient();

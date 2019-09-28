@@ -45,14 +45,14 @@ namespace AzureStorage.Tests
             CloudQueue queue = queueClient.GetQueueReference("foo");
             string messageText = "Hello_AzureStorage";
 
-            queue.CreateIfNotExists();
+            await queue.CreateIfNotExistsAsync();
             var message = new CloudQueueMessage(messageText);
 
             //Act
             queue.AddMessage(message);
 
             //Assert
-            CloudQueueMessage peekedMessage = queue.PeekMessage();
+            CloudQueueMessage peekedMessage = await queue.PeekMessageAsync();
             peekedMessage.AsString.Should().Be(messageText);
         }
     }

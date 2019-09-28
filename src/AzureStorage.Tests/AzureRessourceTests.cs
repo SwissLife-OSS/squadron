@@ -8,6 +8,7 @@ using Xunit;
 
 namespace AzureStorage.Tests
 {
+    #if !IsOSX
     public class AzureRessourceTests : IClassFixture<AzureStorageResource>
     {
         private readonly AzureStorageResource _azureStorageResource;
@@ -36,7 +37,6 @@ namespace AzureStorage.Tests
             downloaded.Should().Be(inputText);
         }
 
-
         [Fact]
         public async Task CreateQueueClient_AddMessage_Peeked()
         {
@@ -56,4 +56,5 @@ namespace AzureStorage.Tests
             peekedMessage.AsString.Should().Be(messageText);
         }
     }
+    #endif
 }

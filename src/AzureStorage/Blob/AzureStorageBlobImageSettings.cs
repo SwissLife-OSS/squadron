@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Squadron
 {
-    public class AzureStorageImageSettings : IImageSettings
+    public class AzureStorageBlobImageSettings : IImageSettings
     {
-        public AzureStorageImageSettings()
+        public AzureStorageBlobImageSettings()
         {
             EnvironmentVariable =
                 new List<string>(); 

@@ -6,6 +6,7 @@
     <AssemblyName>Squadron</AssemblyName>
     <PackageId>Squadron.Core</PackageId>
     <IsPackable>true</IsPackable>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>

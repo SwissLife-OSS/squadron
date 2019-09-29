@@ -12,8 +12,8 @@ namespace Squadron
     /// Currenty Blob and Queues are supported by this resource
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class AzureStorageResource
-        : ResourceBase<AzureStorageImageSettings>, IAsyncLifetime
+    public class AzureStorageQueueResource
+        : ResourceBase<AzureStorageQueueImageSettings>, IAsyncLifetime
     {
         CloudStorageAccount _storageAccount = null;
 
@@ -21,26 +21,12 @@ namespace Squadron
         {
             await StartContainerAsync();
 
-            var connectionString =
-                "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;" +
-                "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4" +
-                "I6tq/K1SZFPTOtr/KBHBeksoGMGw==;" +
-                $"BlobEndpoint=http://{Settings.ContainerAddress}:10000/devstoreaccount1;" +
-                $"QueueEndpoint=http://{Settings.ContainerAddress}:10001/devstoreaccount1;";
+            _storageAccount = CloudStorageAccountBuilder.GetForQueue(Settings);
 
-            _storageAccount = CloudStorageAccount.Parse(connectionString);
             await Initializer.WaitAsync(
-                new AzureStorageStatus(_storageAccount), Settings);
+                new AzureStorageQueueStatus(_storageAccount), Settings);
         }
 
-        /// <summary>
-        /// Creates a Blob client
-        /// </summary>
-        /// <returns></returns>
-        public CloudBlobClient CreateBlobClient()
-        {
-            return _storageAccount.CreateCloudBlobClient();
-        }
 
         /// <summary>
         /// Creates a Queue client

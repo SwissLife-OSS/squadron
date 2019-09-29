@@ -6,17 +6,17 @@ using Microsoft.Azure.Storage.Shared.Protocol;
 namespace Squadron
 {
     /// <summary>
-    /// Status checker for AzureStorage
+    /// Status checker for AzureStorage Blob
     /// </summary>
     /// <seealso cref="IResourceStatusProvider" />
-    public class AzureStorageStatus : IResourceStatusProvider
+    public class AzureStorageBlobStatus : IResourceStatusProvider
     {
         private readonly CloudStorageAccount _account;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureStorageStatus"/> class.
+        /// Initializes a new instance of the <see cref="AzureStorageBlobStatus"/> class.
         /// </summary>
-        public AzureStorageStatus(CloudStorageAccount account)
+        public AzureStorageBlobStatus(CloudStorageAccount account)
         {
             _account = account;
         }
@@ -34,7 +34,7 @@ namespace Squadron
             return new Status
             {
                 IsReady = serviceProperties != null,
-                Message = serviceProperties.DefaultServiceVersion
+                Message = _account.BlobStorageUri.ToString()
             };
         }
     }

@@ -22,7 +22,7 @@ namespace Squadron
             return CloudStorageAccount.Parse(
                 $"DefaultEndpointsProtocol=http;AccountName={dev.Credentials.AccountName};" +
                 $"AccountKey={dev.Credentials.ExportBase64EncodedKey()};" +
-                $"{endpoint}=http://{settings.ContainerAddress}:{settings.ContainerPort}/" +
+                $"{endpoint}=http://{settings.ContainerAddress}:{settings.HostPort}/" +
                 $"{dev.Credentials.AccountName};");
         }
     }

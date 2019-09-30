@@ -11,7 +11,10 @@ For all services we try to provide container support when this exist, otherwise 
 - [x] MongoDB
 - [x] Elasticsearch
 - [x] SqlServer
+- [ ] Azure Blob and Queues ([Work](https://github.com/SwissLife-OSS/squadron/pull/13) in progress)
 - [ ] Redis
+- [ ] PostgresSQL
+- [ ] RabittMQ
 - [ ] Kafka
 - [ ] ServiceBus (Targets Azure ServiceBus)
 

@@ -1,10 +1,5 @@
 trigger:
-  tags:
-    include:
-    - '*'
-  branches:
-    exclude:
-    - '*'
+  - refs/tags/*
 
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
@@ -16,11 +11,13 @@ variables:
 
 steps:
   - task: UseDotNet@2
-    displayName: 'Install .NET Core SDK'
+    displayName: "Use .Net Core SDK global.json"
     inputs:
-      packageType: sdk
-      version: 2.2.401
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+      useGlobalJson: true
+  - task: UseDotNet@2
+    displayName: "Use .Net Core SDK 2.1.801"
+    inputs:
+      version: 2.1.801
   - bash: ./build.sh -target=sonar
     env:
       Sonar_Token: $(Sonar_Token)

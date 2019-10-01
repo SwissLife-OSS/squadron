@@ -38,8 +38,8 @@ namespace Squadron
                 {
                     // We are not interested in any client errors
                 }
-
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                if (!status.IsReady)
+                    await Task.Delay(TimeSpan.FromSeconds(2));
             }
 
             if (!status.IsReady)

@@ -74,7 +74,7 @@ namespace Squadron
                     "Docker container creation/startup failed.");
             }
 
-            settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(15));
+            settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
             var success = await ResolveContainerAddress(settings) &&
                 await ResolveHostPort(settings);
 

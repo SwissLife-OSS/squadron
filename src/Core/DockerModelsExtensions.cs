@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Docker.DotNet.Models;
 
 namespace Squadron

@@ -33,5 +33,16 @@ namespace Squadron.AzureStorage.Tests
             string downloaded = await textFile.DownloadTextAsync();
             downloaded.Should().Be(inputText);
         }
+
+        [Fact]
+        public async Task ConnectionString_NotNull()
+        {
+            //Arrange & Act
+            string connectionString = _azureStorageResource.ConnectionString;
+
+            //Assert
+            connectionString.Should().NotBeNull();
+            connectionString.Should().Contain("BlobEndpoint");
+        }
     }
 }

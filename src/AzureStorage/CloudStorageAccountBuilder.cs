@@ -4,26 +4,26 @@ namespace Squadron
 {
     internal static class CloudStorageAccountBuilder
     {
-        internal static CloudStorageAccount GetForBlob(IImageSettings settings)
+        internal static string GetForBlob(IImageSettings settings)
         {
-            return GetAccountByEndpoint("BlobEndpoint", settings);
+            return BuildConnectionString("BlobEndpoint", settings);
         }
 
-        internal static CloudStorageAccount GetForQueue(IImageSettings settings)
+        internal static string GetForQueue(IImageSettings settings)
         {
-            return GetAccountByEndpoint("QueueEndpoint", settings);
+            return BuildConnectionString("QueueEndpoint", settings);
         }
 
-        private static CloudStorageAccount GetAccountByEndpoint(
-                string endpoint,
-                IImageSettings settings)
+
+        private static string BuildConnectionString(string endpoint, IImageSettings settings)
         {
             CloudStorageAccount dev = CloudStorageAccount.DevelopmentStorageAccount;
-            return CloudStorageAccount.Parse(
+            return 
                 $"DefaultEndpointsProtocol=http;AccountName={dev.Credentials.AccountName};" +
                 $"AccountKey={dev.Credentials.ExportBase64EncodedKey()};" +
                 $"{endpoint}=http://{settings.ContainerAddress}:{settings.HostPort}/" +
-                $"{dev.Credentials.AccountName};");
+                $"{dev.Credentials.AccountName};";
         }
+
     }
 }

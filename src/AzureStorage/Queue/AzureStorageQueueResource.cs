@@ -17,11 +17,18 @@ namespace Squadron
     {
         CloudStorageAccount _storageAccount = null;
 
+        /// <summary>
+        /// Connection string to access to queue
+        /// </summary>
+        public string ConnectionString { get; private set; }
+
+        /// <inheritdoc cref="IAsyncLifetime"/>
         public async Task InitializeAsync()
         {
             await StartContainerAsync();
 
-            _storageAccount = CloudStorageAccountBuilder.GetForQueue(Settings);
+            ConnectionString = CloudStorageAccountBuilder.GetForQueue(Settings);
+            _storageAccount = CloudStorageAccount.Parse(ConnectionString);
 
             await Initializer.WaitAsync(
                 new AzureStorageQueueStatus(_storageAccount), Settings);

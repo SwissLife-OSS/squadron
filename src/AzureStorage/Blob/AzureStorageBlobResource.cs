@@ -16,11 +16,17 @@ namespace Squadron
     {
         CloudStorageAccount _storageAccount = null;
 
+        /// <summary>
+        /// Connection string to the blob
+        /// </summary>
+        public string ConnectionString { get; private set; }
+
+        /// <inheritdoc cref="IAsyncLifetime"/>
         public async Task InitializeAsync()
         {
             await StartContainerAsync();
-
-            _storageAccount = CloudStorageAccountBuilder.GetForBlob(Settings);
+            ConnectionString = CloudStorageAccountBuilder.GetForBlob(Settings);
+            _storageAccount = CloudStorageAccount.Parse(ConnectionString);
 
             await Initializer.WaitAsync(
                 new AzureStorageBlobStatus(_storageAccount), Settings);
@@ -34,6 +40,8 @@ namespace Squadron
         {
             return _storageAccount.CreateCloudBlobClient();
         }
+
+
 
         /// <inheritdoc cref="IAsyncLifetime"/>
         public async Task DisposeAsync()

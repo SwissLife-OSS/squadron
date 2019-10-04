@@ -18,9 +18,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer", "SqlServer\SqlS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer.Tests", "SqlServer.Tests\SqlServer.Tests.csproj", "{20780AE0-885D-41C9-9451-3C7946CCC279}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorage", "AzureStorage\AzureStorage.csproj", "{5FBD7383-0AA3-4C25-A4CF-AE884BF4221E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorage", "AzureStorage\AzureStorage.csproj", "{5FBD7383-0AA3-4C25-A4CF-AE884BF4221E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorage.Tests", "AzureStorage.Tests\AzureStorage.Tests.csproj", "{AB4DC29E-2F8A-410A-8BFF-CD120515BA80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorage.Tests", "AzureStorage.Tests\AzureStorage.Tests.csproj", "{AB4DC29E-2F8A-410A-8BFF-CD120515BA80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ", "RabbitMQ\RabbitMQ.csproj", "{F5718594-A112-4A69-AE33-F239EA9AC021}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.Tests", "RabbitMQ.Tests\RabbitMQ.Tests.csproj", "{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +156,30 @@ Global
 		{AB4DC29E-2F8A-410A-8BFF-CD120515BA80}.Release|x64.Build.0 = Release|Any CPU
 		{AB4DC29E-2F8A-410A-8BFF-CD120515BA80}.Release|x86.ActiveCfg = Release|Any CPU
 		{AB4DC29E-2F8A-410A-8BFF-CD120515BA80}.Release|x86.Build.0 = Release|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Debug|x64.Build.0 = Debug|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Debug|x86.Build.0 = Debug|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Release|x64.ActiveCfg = Release|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Release|x64.Build.0 = Release|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5718594-A112-4A69-AE33-F239EA9AC021}.Release|x86.Build.0 = Release|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Debug|x64.Build.0 = Debug|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Debug|x86.Build.0 = Debug|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Release|x64.Build.0 = Release|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Release|x86.ActiveCfg = Release|Any CPU
+		{AB66BA48-D9FE-4A08-A9ED-E65CD4AB3B1C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

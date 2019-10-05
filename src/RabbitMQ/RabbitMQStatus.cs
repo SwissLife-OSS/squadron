@@ -39,13 +39,14 @@ namespace Squadron
         private static IConnection CreateConnection(
             IConnectionFactory connectionFactory)
         {
+            string hostname = ((ConnectionFactory)connectionFactory).HostName;
             return connectionFactory
                 .CreateConnection(new List<AmqpTcpEndpoint>
                 {
                     new AmqpTcpEndpoint(
                     connectionFactory.Uri,
                     new SslOption(
-                        serverName: "localhost",
+                        serverName:hostname,
                         enabled: false))
                 });
         }

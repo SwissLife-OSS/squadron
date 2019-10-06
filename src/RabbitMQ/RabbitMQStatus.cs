@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 
@@ -24,7 +25,7 @@ namespace Squadron
         }
 
         /// <inheritdoc/>
-        public Task<Status> IsReadyAsync()
+        public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             var factory = new ConnectionFactory()
             {

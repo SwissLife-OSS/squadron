@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squadron
@@ -24,7 +25,7 @@ namespace Squadron
         /// <summary>
         /// Determines whether SQLServer is ready.
         /// </summary>
-        public async Task<Status> IsReadyAsync()
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             using (var connection = new SqlConnection(_serverConnectionString))
             {

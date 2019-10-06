@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using StackExchange.Redis;
 
@@ -24,7 +25,7 @@ namespace Squadron
         }
 
         /// <inheritdoc/>
-        public async Task<Status> IsReadyAsync()
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             ConnectionMultiplexer redis = null;
             try

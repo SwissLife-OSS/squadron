@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squadron
@@ -40,15 +41,18 @@ namespace Squadron
             {
                 try
                 {
-                    status = await statusProvider.IsReadyAsync();
+                    var cts = new CancellationTokenSource();
+                    cts.CancelAfter(TimeSpan.FromSeconds(5));
+                    status = await statusProvider.IsReadyAsync(cts.Token);
                 }
                 catch ( Exception ex)
                 {
-                    Trace.TraceWarning($"Container {_settings.Name} not ready: {ex.Message}");
+                    Trace.TraceWarning($"Container status error. {_settings.Name} -> {ex.Message}");
                 }
                 if (!status.IsReady)
                 {
                     await _manager.ConsumeLogsAsync(TimeSpan.FromSeconds(intervallInSeconds));
+                    Trace.TraceWarning($"Container is not yet {_settings.Name} not ready. --> {status.Message}");
                 }
             }
 

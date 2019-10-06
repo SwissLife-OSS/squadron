@@ -108,7 +108,7 @@ namespace Squadron
         /// </summary>
         /// <param name="seconds">The seconds.</param>
         /// <returns></returns>
-        public ContainerResourceBuilder WaitTimout(int seconds)
+        public ContainerResourceBuilder WaitTimemout(int seconds)
         {
             _options.WaitTimeout = TimeSpan.FromSeconds(seconds);
             return this;

@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -26,11 +27,13 @@ namespace Squadron
         /// <summary>
         /// Determines whether MongoDB is ready.
         /// </summary>
-        public async Task<Status> IsReadyAsync()
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             BsonDocument result = await _client
                 .GetDatabase(_systemDatabase)
-                .RunCommandAsync<BsonDocument>(_pingCommand);
+                .RunCommandAsync<BsonDocument>(_pingCommand,
+                                               readPreference: null,
+                                               cancellationToken);
 
             return new Status
             {

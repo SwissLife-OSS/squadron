@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
@@ -20,7 +21,7 @@ namespace Squadron
             var initilizer = new ContainerInitializer(
                 managerMock.Object,
                 ContainerResourceBuilder.New()
-                .WaitTimout(3)
+                .WaitTimemout(3)
                 .Build());
 
             // act
@@ -40,7 +41,7 @@ namespace Squadron
             var initilizer = new ContainerInitializer(
                 managerMock.Object,
                 ContainerResourceBuilder.New()
-                .WaitTimout(7)
+                .WaitTimemout(7)
                 .Build());
 
             // act
@@ -67,7 +68,7 @@ namespace Squadron
         private class NotReadyStatusProvider
             : IResourceStatusProvider
         {
-            public Task<Status> IsReadyAsync()
+            public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
             {
                 return Task.FromResult(Status.NotReady);
             }
@@ -78,7 +79,7 @@ namespace Squadron
         {
             private int _runs;
 
-            public Task<Status> IsReadyAsync()
+            public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
             {
                 if (_runs <= 0)
                 {

@@ -7,27 +7,17 @@ using Xunit;
 
 namespace Squadron
 {
-    /// <summary>
-    /// Represents a Redis resource that can be used by unit tests.
-    /// </summary>
-    /// <seealso cref="IDisposable"/>
-    public class RedisResource
-        : ResourceBase<RedisImageSettings>, IAsyncLifetime
+    public class RedisResource : RedisResource<RedisDefaultOptions> { }
+
+    public class RedisResource<TOptions>
+        : ContainerResource<TOptions>,
+          IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
     {
         /// <summary>
         /// Connection string to access to queue
         /// </summary>
         public string ConnectionString { get; private set; }
-
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task InitializeAsync()
-        {
-            await StartContainerAsync();
-            ConnectionString = $"{Settings.ContainerAddress}:{Settings.HostPort}";
-
-            await Initializer.WaitAsync(
-                new RedisStatus(ConnectionString), Settings);
-        }
 
         /// <summary>
         /// Gets the Redix connection
@@ -39,20 +29,12 @@ namespace Squadron
                 .Connect(ConnectionString);
         }
 
-        /// <summary>
-        /// Gets the Redix connection async
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ConnectionMultiplexer> GetConnectionAsync()
-        {
-            return await ConnectionMultiplexer
-                        .ConnectAsync(ConnectionString);
-        }
-
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task DisposeAsync()
+        public async override Task InitializeAsync()
         {
-            await StopContainerAsync();
+            await base.InitializeAsync();
+            ConnectionString = $"{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+            await Initializer.WaitAsync(new RedisStatus(ConnectionString));
         }
     }
 }

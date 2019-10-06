@@ -14,11 +14,16 @@ namespace Squadron
     {
         private readonly string _connectionString;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RabbitMQStatus"/> class.
+        /// </summary>
+        /// <param name="connectionString">The ConnectionString</param>
         public RabbitMQStatus(string connectionString)
         {
             _connectionString = connectionString;
         }
 
+        /// <inheritdoc/>
         public Task<Status> IsReadyAsync()
         {
             var factory = new ConnectionFactory()

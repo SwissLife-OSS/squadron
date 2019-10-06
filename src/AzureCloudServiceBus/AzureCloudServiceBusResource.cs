@@ -16,8 +16,11 @@ namespace Squadron
     /// Defines a Azure Cloud ServiceBus namespace 
     /// </summary>
     /// <typeparam name="TOptions">Option to initialize the resource</typeparam>
-    public class AzureCloudServiceBusResource<TOptions> : AzureResource<TOptions>, IAsyncLifetime
-        where TOptions : AzureCloudServiceBusOptions, IAzureResourceConfigurationProvider, new()
+    public class AzureCloudServiceBusResource<TOptions>
+            : AzureResource<TOptions>, IAsyncLifetime
+        where TOptions : AzureCloudServiceBusOptions,
+                         IAzureResourceConfigurationProvider,
+                         new()
     {
         private ServiceBusManager _serviceBusManager;
 

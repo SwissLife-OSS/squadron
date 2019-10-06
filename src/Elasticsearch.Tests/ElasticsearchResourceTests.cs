@@ -27,7 +27,7 @@ namespace Elasticsearch.Tests
             await _elasticsearchResource.CreateIndexAsync<Foo>();
 
             // assert
-            var catIndices = _elasticsearchResource.Client.CatIndices();
+            ICatResponse<CatIndicesRecord> catIndices = _elasticsearchResource.Client.CatIndices();
             catIndices.IsValid.Should().BeTrue();
             catIndices.Records.Count.Should().BeGreaterOrEqualTo(1);
         }
@@ -46,7 +46,7 @@ namespace Elasticsearch.Tests
             await _elasticsearchResource.CreateDocumentsAsync(index, firstDocumentRequest, secondDocumentRequest);
 
             // assert
-            var searchResponse = await _elasticsearchResource.Client.LowLevel.SearchAsync<SearchResponse<Foo>>(
+            SearchResponse<Foo> searchResponse = await _elasticsearchResource.Client.LowLevel.SearchAsync<SearchResponse<Foo>>(
                 index, typeof(Foo).Name.ToLowerInvariant(), PostData.String(string.Empty));
             searchResponse.IsValid.Should().BeTrue();
             searchResponse.Documents.Should().HaveCount(2);
@@ -71,7 +71,7 @@ namespace Elasticsearch.Tests
             var mergedIndex = await _elasticsearchResource.MergeIndicesAsync(firstIndex, secondIndex);
 
             // assert
-            var searchResponse = await _elasticsearchResource.Client.LowLevel.SearchAsync<SearchResponse<Foo>>(
+            SearchResponse<Foo> searchResponse = await _elasticsearchResource.Client.LowLevel.SearchAsync<SearchResponse<Foo>>(
                 mergedIndex, typeof(Foo).Name.ToLowerInvariant(), PostData.String(string.Empty));
             searchResponse.IsValid.Should().BeTrue();
             searchResponse.Documents.Should().HaveCount(2);

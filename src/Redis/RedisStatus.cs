@@ -14,11 +14,16 @@ namespace Squadron
     {
         private readonly string _host;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisStatus"/> class.
+        /// </summary>
+        /// <param name="host">Hostname</param>
         public RedisStatus(string host)
         {
             _host = host;
         }
 
+        /// <inheritdoc/>
         public async Task<Status> IsReadyAsync()
         {
             ConnectionMultiplexer redis = null;

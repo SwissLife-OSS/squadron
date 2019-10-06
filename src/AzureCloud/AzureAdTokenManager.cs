@@ -8,8 +8,16 @@ using Squadron.AzureCloud;
 
 namespace Squadron.AzureCloud
 {
+    /// <summary>
+    /// Wraps Azure Active Directory authentication
+    /// </summary>
     public partial class AzureAdTokenManager
     {
+        /// <summary>
+        /// Requests a Token using the <see cref="AzureCredentials"/>
+        /// </summary>
+        /// <param name="azureCredentials"></param>
+        /// <returns>Token</returns>
         public async Task<TokenCredentials> RequestTokenAsync(AzureCredentials azureCredentials)
         {
             var context = new AuthenticationContext(

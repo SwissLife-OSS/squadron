@@ -30,7 +30,7 @@ namespace Squadron
             {
                 await connection.OpenAsync();
 
-                using (var command = connection.CreateCommand())
+                using (System.Data.SqlClient.SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = "SELECT Count(name) FROM sys.databases";
                     return new Status

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,12 +13,14 @@ using Version = System.Version;
 
 namespace Squadron
 {
-    internal static class DockerManager
+    public class DockerContainerManager : IDockerContainerManager
     {
-        private static readonly AuthConfig _authConfig =
-            new AuthConfig();
+        public ContainerInstance Instance { get; } = new ContainerInstance();
 
-        private static readonly DockerClient _client =
+        private readonly ContainerResourceSettings _settings;
+        private readonly AuthConfig _authConfig = new AuthConfig();
+
+        private readonly DockerClient _client =
             new DockerClientConfiguration(
                     LocalDockerUri(),
                     null,
@@ -36,115 +39,134 @@ namespace Squadron
 #endif
         }
 
-        public static async Task<bool> StopAndRemoveContainer(string containerName)
+        public DockerContainerManager(ContainerResourceSettings settings)
         {
-            try
-            {
-                ContainerListResponse container = await GetContainer(containerName);
-                if (container == null)
-                {
-                    return false;
-                }
-
-                bool success = await StopContainer(container);
-                if (success)
-                {
-                    await RemoveContainer(container);
-                }
-
-                return success;
-            }
-            catch
-            {
-                // Should not fail tests if cannot stop container.
-                return false;
-            }
+            _settings = settings;
         }
 
-        public static async Task CreateAndStartContainer(
-            IImageSettings settings)
-        {
-            await PullImage(settings);
-            await CreateContainer(settings);
 
-            bool startSuccessful = await StartContainer(settings.ContainerId);
-            if (!startSuccessful)
+        public async Task CreateAndStartContainerAsync()
+        {
+            await PullImageAsync();
+            await CreateContainerAsync();
+            await StartContainerAsync();
+            await ResolveHostAddressAsync();
+
+            if (!Instance.IsRunning)
+            {
+                var logs = await ConsumeLogsAsync(TimeSpan.FromSeconds(5));
+                throw new ContainerException(
+                    $"Container exited with following logs: \r\n {logs}");
+            }
+
+            ////settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
+            //var success = await ResolveContainerAddress(settings) &&
+            //    await ResolveHostPort(settings);
+
+            //if (!success)
+            //{
+
+            //}
+        }
+
+        private async Task StartContainerAsync()
+        {
+            var containerStartParameters = new ContainerStartParameters();
+
+            bool started = await _client.Containers.StartContainerAsync(
+                Instance.Id,
+                containerStartParameters);
+
+            if (!started)
             {
                 throw new ContainerException(
                     "Docker container creation/startup failed.");
             }
-
-            settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
-            var success = await ResolveContainerAddress(settings) &&
-                await ResolveHostPort(settings);
-
-            if (!success)
-            {
-                throw new ContainerException(
-                    $"Container exited with following logs: \r\n {settings.Logs}");
-            }
         }
 
-        private static async Task PullImage(IImageSettings settings)
+        private async Task CreateContainerAsync()
+        {
+            var startParams = new CreateContainerParameters
+            {
+                Name = _settings.UniqueContainerName,
+                Image = _settings.ImageFullname,
+                AttachStdout = true,
+                AttachStderr = true,
+                AttachStdin = false,
+                Tty = false,
+                HostConfig = new HostConfig
+                {
+                    PublishAllPorts = true
+                },
+                Env = _settings.EnvironmentVariables
+            };
+
+            CreateContainerResponse response = await _client
+                .Containers
+                .CreateContainerAsync(startParams);
+
+            if (string.IsNullOrEmpty(response.ID))
+            {
+                throw new ContainerException(
+                    "Could not create the container");
+            }
+            Instance.Id = response.ID;
+        }
+
+
+        private async Task PullImageAsync()
         {
             void Handler(JSONMessage message)
             {
                 if (!string.IsNullOrEmpty(message.ErrorMessage))
                 {
                     throw new ContainerException(
-                        $"Could not pull the image: {settings.Image}. " +
+                        $"Could not pull the image: {_settings.ImageFullname}. " +
                         $"Error: {message.ErrorMessage}");
                 }
             }
 
             await _client.Images.CreateImageAsync(
-                new ImagesCreateParameters { FromImage = settings.Image },
+                new ImagesCreateParameters { FromImage = _settings.ImageFullname },
                 _authConfig,
                 new Progress<JSONMessage>(Handler));
         }
 
-        private static async Task<string> ConsumeLogs(
-            IImageSettings settings, TimeSpan timeout)
+        public async Task<bool> StopContainerAsync()
         {
-            var containerStatsParameters = new ContainerLogsParameters
+            var stopOptions = new ContainerStopParameters
             {
-                Follow = true,
-                ShowStderr = true,
-                ShowStdout = true
+                WaitBeforeKillSeconds = 5
             };
 
-            Stream logStream = await _client
-                .Containers
-                .GetContainerLogsAsync(
-                    settings.ContainerId,
-                    containerStatsParameters,
-                    CancellationToken.None);
+            bool stopped = await _client.Containers
+                .StopContainerAsync(Instance.Id, stopOptions, default);
 
-            return await ReadAsync(logStream, timeout);
+            return stopped;
         }
 
-        private static async Task<bool> ResolveContainerAddress(IImageSettings settings)
+        public async Task RemoveContainerAsync()
+        {
+            var removeOptions = new ContainerRemoveParameters
+            {
+                Force = true,
+                RemoveVolumes = true
+            };
+
+            await _client.Containers
+                .RemoveContainerAsync(Instance.Id, removeOptions);
+        }
+
+        private async Task ResolveHostAddressAsync()
         {
             ContainerInspectResponse inspectResponse = await _client
                 .Containers
-                .InspectContainerAsync(settings.ContainerId);
-
-            settings.ContainerAddress = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ?
-                "localhost" :
-                inspectResponse.NetworkSettings.IPAddress;
-
-            return inspectResponse.State.Running;
-        }
-
-        private static async Task<bool> ResolveHostPort(IImageSettings settings)
-        {
-            ContainerInspectResponse inspectResponse = await _client
-                .Containers
-                .InspectContainerAsync(settings.ContainerId);
+                .InspectContainerAsync(Instance.Id);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                string containerPort = $"{settings.ContainerPort}/tcp";
+                Instance.Address = "localhost";
+                string containerPort = $"{_settings.InternalPort}/tcp";
                 if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
                 {
                     throw new Exception($"Failed to resolve host port for {containerPort}");
@@ -160,92 +182,22 @@ namespace Squadron
                     throw new Exception($"The resolved port binding is empty");
                 }
 
-                settings.HostPort = long.Parse(binding.HostPort);
+                Instance.HostPort = int.Parse(binding.HostPort);
             }
             else
             {
-                settings.HostPort = settings.ContainerPort;
+                Instance.Address = inspectResponse.NetworkSettings.IPAddress;
+                Instance.HostPort = _settings.InternalPort;
             }
-
-            return inspectResponse.State.Running;
+            Instance.IsRunning = inspectResponse.State.Running;
         }
 
-        private static async Task<IList<ContainerListResponse>> GetAllContainers()
-        {
-            var listOption = new ContainersListParameters { All = true };
-            IList<ContainerListResponse> containers =
-                await _client.Containers.ListContainersAsync(listOption);
-
-            return containers;
-        }
-
-        private static async Task<ContainerListResponse> GetContainer(string containerName)
-        {
-            IList<ContainerListResponse> containers = await GetAllContainers();
-
-            ContainerListResponse container = containers
-                .SingleOrDefault(c => c.Names.Select(n => n.Trim('/'))
-                    .Any(n => n == containerName));
-
-            return container;
-        }
-
-        private static async Task<bool> StopContainer(ContainerListResponse container)
-        {
-            var stopOptions = new ContainerStopParameters
-            {
-                WaitBeforeKillSeconds = 5
-            };
-
-            bool stopped = await _client.Containers
-                .StopContainerAsync(container.ID, stopOptions, CancellationToken.None);
-
-            return stopped;
-        }
-
-        private static async Task RemoveContainer(ContainerListResponse container)
-        {
-            var removeOptions = new ContainerRemoveParameters
-            {
-                Force = true,
-                RemoveVolumes = true
-            };
-
-            await _client.Containers
-                .RemoveContainerAsync(container.ID, removeOptions);
-        }
-
-        private static async Task CreateContainer(
-            IImageSettings settings)
-        {
-            CreateContainerResponse response = await _client
-                .Containers
-                .CreateContainerAsync(settings.ToCreateContainerParameters());
-
-            if (string.IsNullOrEmpty(response.ID))
-            {
-                throw new ContainerException(
-                    "Could not create the container");
-            }
-
-            settings.ContainerId = response.ID;
-        }
-
-        private static async Task<bool> StartContainer(string containerId)
-        {
-            var containerStartParameters = new ContainerStartParameters();
-
-            return await _client.Containers.StartContainerAsync(
-                containerId,
-                containerStartParameters);
-        }
-
-        public static async Task CopyToContainer(CopyContext context, IImageSettings settings)
+        public async Task CopyToContainer(CopyContext context)
         {
             using (var archiver = new TarArchiver(context.Source))
             {
                 await _client.Containers.ExtractArchiveToContainerAsync(
-                    settings.ContainerId,
+                    Instance.Id,
                     new ContainerPathStatParameters
                     {
                         AllowOverwriteDirWithFile = true,
@@ -254,13 +206,12 @@ namespace Squadron
             }
         }
 
-        public static async Task InvokeCommand(
-            ContainerExecCreateParameters parameters,
-            IImageSettings settings)
+        public async Task InvokeCommandAsync(
+                ContainerExecCreateParameters parameters)
         {
             ContainerExecCreateResponse response = await _client.Containers
                 .ExecCreateContainerAsync(
-                    settings.ContainerId,
+                    Instance.Id,
                     parameters);
 
             if (!string.IsNullOrEmpty(response.ID))
@@ -284,7 +235,29 @@ namespace Squadron
             }
         }
 
-        private static async Task<string> ReadAsync(
+        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
+        {
+            var containerStatsParameters = new ContainerLogsParameters
+            {
+                Follow = true,
+                ShowStderr = true,
+                ShowStdout = true
+            };
+
+            Stream logStream = await _client
+                .Containers
+                .GetContainerLogsAsync(
+                    Instance.Id,
+                    containerStatsParameters,
+                    default);
+
+            var logs = await ReadAsync(logStream, timeout);
+            Instance.Logs.Add(logs);
+            Trace.TraceInformation(logs);
+            return logs;
+        }
+
+        private async Task<string> ReadAsync(
             Stream logStream,
             TimeSpan timeout)
         {
@@ -338,7 +311,6 @@ namespace Squadron
                     result.Append(chunk);
                 }
             }
-
             return result.ToString();
         }
     }

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Squadron.AzureCloud
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AzureResourceIdentifier
     {
         public string SubscriptionId { get; set; }

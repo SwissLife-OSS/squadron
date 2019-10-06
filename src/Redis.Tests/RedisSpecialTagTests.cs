@@ -1,21 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
 using StackExchange.Redis;
 using Xunit;
 
 namespace Squadron
 {
-    public class RedisResourceTests : IClassFixture<RedisResource>
+    public class RedisSpecialTagTests : IClassFixture<RedisResource<RedisSpecialTagOptions>>
     {
-        private readonly RedisResource _redisResource;
+        private readonly RedisResource<RedisSpecialTagOptions> _redisResource;
 
-        public RedisResourceTests(RedisResource redisResource)
+        public RedisSpecialTagTests(RedisResource<RedisSpecialTagOptions> redisResource)
         {
             _redisResource = redisResource;
         }
-
 
         [Fact]
         public void GetConnection_NoError()
@@ -30,7 +27,16 @@ namespace Squadron
             //Assert
             action.Should().NotThrow();
         }
-
-
     }
+
+
+    public class RedisSpecialTagOptions : RedisDefaultOptions
+    {
+        public override void Configure(ContainerResourceBuilder builder)
+        {
+            base.Configure(builder);
+            builder.Tag("alpine");
+        }
+    }
+
 }

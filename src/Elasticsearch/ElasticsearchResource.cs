@@ -8,10 +8,8 @@ using Xunit;
 
 namespace Squadron
 {
-    /// <summary>
-    /// Represents a elasticsearch database resource that can be used by unit tests.
-    /// </summary>
-    /// <seealso cref="IDisposable"/>
+
+    /// <inheritdoc/>
     public class ElasticsearchResource
         : ElasticsearchResource<ElasticsearchDefaultOptions>
     {

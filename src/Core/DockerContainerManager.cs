@@ -13,8 +13,13 @@ using Version = System.Version;
 
 namespace Squadron
 {
+    /// <summary>
+    /// Manager to work with docker containers
+    /// </summary>
+    /// <seealso cref="Squadron.IDockerContainerManager" />
     public class DockerContainerManager : IDockerContainerManager
     {
+        /// <inheritdoc/>
         public ContainerInstance Instance { get; } = new ContainerInstance();
 
         private readonly ContainerResourceSettings _settings;
@@ -39,12 +44,17 @@ namespace Squadron
 #endif
         }
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
+        /// </summary>
+        /// <param name="settings">The settings.</param>
         public DockerContainerManager(ContainerResourceSettings settings)
         {
             _settings = settings;
         }
 
-
+        /// <inheritdoc/>
         public async Task CreateAndStartContainerAsync()
         {
             await PullImageAsync();
@@ -58,15 +68,103 @@ namespace Squadron
                 throw new ContainerException(
                     $"Container exited with following logs: \r\n {logs}");
             }
+        }
 
-            ////settings.Logs = await ConsumeLogs(settings, TimeSpan.FromSeconds(10));
-            //var success = await ResolveContainerAddress(settings) &&
-            //    await ResolveHostPort(settings);
+        /// <inheritdoc/>
+        public async Task<bool> StopContainerAsync()
+        {
+            var stopOptions = new ContainerStopParameters
+            {
+                WaitBeforeKillSeconds = 5
+            };
 
-            //if (!success)
-            //{
+            bool stopped = await _client.Containers
+                .StopContainerAsync(Instance.Id, stopOptions, default);
 
-            //}
+            return stopped;
+        }
+
+        /// <inheritdoc/>
+        public async Task RemoveContainerAsync()
+        {
+            var removeOptions = new ContainerRemoveParameters
+            {
+                Force = true,
+                RemoveVolumes = true
+            };
+
+            await _client.Containers
+                .RemoveContainerAsync(Instance.Id, removeOptions);
+        }
+
+        /// <inheritdoc/>
+        public async Task CopyToContainer(CopyContext context)
+        {
+            using (var archiver = new TarArchiver(context.Source))
+            {
+                await _client.Containers.ExtractArchiveToContainerAsync(
+                    Instance.Id,
+                    new ContainerPathStatParameters
+                    {
+                        AllowOverwriteDirWithFile = true,
+                        Path = context.DestinationFolder.Replace("\\", "/")
+                    }, archiver.Stream);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public async Task InvokeCommandAsync(
+                ContainerExecCreateParameters parameters)
+        {
+            ContainerExecCreateResponse response = await _client.Containers
+                .ExecCreateContainerAsync(
+                    Instance.Id,
+                    parameters);
+
+            if (!string.IsNullOrEmpty(response.ID))
+            {
+                using (MultiplexedStream stream = await _client.Containers
+                    .StartAndAttachContainerExecAsync(
+                        response.ID, false))
+                {
+                    (string stdout, string stderr) output = await stream
+                        .ReadOutputToEndAsync(CancellationToken.None);
+
+                    if (!string.IsNullOrEmpty(output.stderr) && output.stderr.Contains("error"))
+                    {
+                        var error = new StringBuilder();
+                        error.AppendLine($"Error when invoking command \"{string.Join(" ", parameters.Cmd)}\"");
+                        error.AppendLine(output.stderr);
+
+                        throw new ContainerException(error.ToString());
+                    }
+                }
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
+        {
+            var containerStatsParameters = new ContainerLogsParameters
+            {
+                Follow = true,
+                ShowStderr = true,
+                ShowStdout = true
+            };
+
+            Stream logStream = await _client
+                .Containers
+                .GetContainerLogsAsync(
+                    Instance.Id,
+                    containerStatsParameters,
+                    default);
+
+            var logs = await ReadAsync(logStream, timeout);
+            Instance.Logs.Add(logs);
+            Trace.TraceInformation(logs);
+            return logs;
         }
 
         private async Task StartContainerAsync()
@@ -132,30 +230,7 @@ namespace Squadron
                 new Progress<JSONMessage>(Handler));
         }
 
-        public async Task<bool> StopContainerAsync()
-        {
-            var stopOptions = new ContainerStopParameters
-            {
-                WaitBeforeKillSeconds = 5
-            };
 
-            bool stopped = await _client.Containers
-                .StopContainerAsync(Instance.Id, stopOptions, default);
-
-            return stopped;
-        }
-
-        public async Task RemoveContainerAsync()
-        {
-            var removeOptions = new ContainerRemoveParameters
-            {
-                Force = true,
-                RemoveVolumes = true
-            };
-
-            await _client.Containers
-                .RemoveContainerAsync(Instance.Id, removeOptions);
-        }
 
         private async Task ResolveHostAddressAsync()
         {
@@ -192,70 +267,7 @@ namespace Squadron
             Instance.IsRunning = inspectResponse.State.Running;
         }
 
-        public async Task CopyToContainer(CopyContext context)
-        {
-            using (var archiver = new TarArchiver(context.Source))
-            {
-                await _client.Containers.ExtractArchiveToContainerAsync(
-                    Instance.Id,
-                    new ContainerPathStatParameters
-                    {
-                        AllowOverwriteDirWithFile = true,
-                        Path = context.DestinationFolder.Replace("\\", "/")
-                    }, archiver.Stream);
-            }
-        }
 
-        public async Task InvokeCommandAsync(
-                ContainerExecCreateParameters parameters)
-        {
-            ContainerExecCreateResponse response = await _client.Containers
-                .ExecCreateContainerAsync(
-                    Instance.Id,
-                    parameters);
-
-            if (!string.IsNullOrEmpty(response.ID))
-            {
-                using (MultiplexedStream stream = await _client.Containers
-                    .StartAndAttachContainerExecAsync(
-                        response.ID, false))
-                {
-                    (string stdout, string stderr) output = await stream
-                        .ReadOutputToEndAsync(CancellationToken.None);
-
-                    if (!string.IsNullOrEmpty(output.stderr) && output.stderr.Contains("error"))
-                    {
-                        var error = new StringBuilder();
-                        error.AppendLine($"Error when invoking command \"{string.Join(" ", parameters.Cmd)}\"");
-                        error.AppendLine(output.stderr);
-
-                        throw new ContainerException(error.ToString());
-                    }
-                }
-            }
-        }
-
-        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
-        {
-            var containerStatsParameters = new ContainerLogsParameters
-            {
-                Follow = true,
-                ShowStderr = true,
-                ShowStdout = true
-            };
-
-            Stream logStream = await _client
-                .Containers
-                .GetContainerLogsAsync(
-                    Instance.Id,
-                    containerStatsParameters,
-                    default);
-
-            var logs = await ReadAsync(logStream, timeout);
-            Instance.Logs.Add(logs);
-            Trace.TraceInformation(logs);
-            return logs;
-        }
 
         private async Task<string> ReadAsync(
             Stream logStream,

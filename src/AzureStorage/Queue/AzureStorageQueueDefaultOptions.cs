@@ -1,7 +1,14 @@
-﻿namespace Squadron
+namespace Squadron
 {
+    /// <summary>
+    /// Default AzureStorage queue resource options
+    /// </summary>
     public class AzureStorageQueueDefaultOptions : ContainerResourceOptions
     {
+        /// <summary>
+        /// Configure resource options
+        /// </summary>
+        /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
             var name = "azurite_queue";

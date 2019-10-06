@@ -7,8 +7,12 @@ using Xunit;
 
 namespace Squadron
 {
+    /// <inheritdoc/>
     public class RedisResource : RedisResource<RedisDefaultOptions> { }
-
+    
+    /// <summary>
+    /// Represents a redis resource that can be used by unit tests.
+    /// </summary>
     public class RedisResource<TOptions>
         : ContainerResource<TOptions>,
           IAsyncLifetime

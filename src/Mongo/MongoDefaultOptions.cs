@@ -1,9 +1,9 @@
-namespace Squadron
+﻿namespace Squadron
 {
     /// <summary>
-    /// Default Redis resource options
+    /// Default Mongo resource options
     /// </summary>
-    public class RedisDefaultOptions : ContainerResourceOptions
+    public class MongoDefaultOptions : ContainerResourceOptions
     {
         /// <summary>
         /// Configure resource options
@@ -12,9 +12,10 @@ namespace Squadron
         public override void Configure(ContainerResourceBuilder builder)
         {
             builder
-                .Name("redis")
-                .Image("redis:latest")
-                .InternalPort(6379);
+                .Name("mongodb")
+                .Image("mongo:latest")
+                .InternalPort(27017);
         }
     }
 }
+

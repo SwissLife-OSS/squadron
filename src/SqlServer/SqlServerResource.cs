@@ -8,9 +8,7 @@ using Xunit;
 
 namespace Squadron
 {
-    /// <summary>
-    /// Represents a SqlServer database resource that can be used by unit tests.
-    /// </summary>
+    /// <inheritdoc/>
     public class SqlServerResource : SqlServerResource<SqlServerDefaultOptions> { }
 
 

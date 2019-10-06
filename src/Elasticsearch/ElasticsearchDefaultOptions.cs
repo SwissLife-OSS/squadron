@@ -1,7 +1,14 @@
 namespace Squadron
 {
+    /// <summary>
+    /// Default Elasticsearch resource options
+    /// </summary>
     public class ElasticsearchDefaultOptions : ContainerResourceOptions
     {
+        /// <summary>
+        /// Configure resource options
+        /// </summary>
+        /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
             var name = "elastic";

@@ -7,11 +7,9 @@ using Xunit;
 namespace Squadron
 {
 
-    /// <summary>
-    /// Represents a AzureStorage blob resource that can be used by unit tests.
-    /// </summary>
-    /// <seealso cref="IDisposable"/>
-    public class AzureStorageBlobResource : AzureStorageBlobResource<AzureStorageBlobDefaultOptions>
+    /// <inheritdoc/>
+    public class AzureStorageBlobResource
+        : AzureStorageBlobResource<AzureStorageBlobDefaultOptions>
     {
     }
 

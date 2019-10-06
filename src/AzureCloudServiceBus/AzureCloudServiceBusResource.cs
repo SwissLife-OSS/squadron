@@ -27,6 +27,10 @@ namespace Squadron
         private ServiceBusModel _serviceBusOptions;
         private readonly IMessageSink _messageSink;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureCloudServiceBusResource{TOptions}"/> class.
+        /// </summary>
+        /// <param name="messageSink">The message sink.</param>
         public AzureCloudServiceBusResource(IMessageSink messageSink)
         {
             _messageSink = messageSink;
@@ -51,6 +55,11 @@ namespace Squadron
         }
 
 
+        /// <summary>
+        /// Creates a new topic
+        /// </summary>
+        /// <param name="configure">The builder.</param>
+        /// <returns>Client to access the created topic</returns>
         public async Task<ITopicClient> CreateTopicAsync(Action<ServiceBusTopicBuilder> configure)
         {
             var builder = ServiceBusTopicBuilder.New();
@@ -125,6 +134,9 @@ namespace Squadron
             return queue.CreatedName;
         }
 
+        /// <summary>
+        /// Initialize the resource
+        /// </summary>
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
@@ -207,6 +219,9 @@ namespace Squadron
             return topic.CreatedName;
         }
 
+        /// <summary>
+        /// Cleans up the resource
+        /// </summary>
         public async Task DisposeAsync()
         {
             try

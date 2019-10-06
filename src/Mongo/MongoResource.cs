@@ -8,21 +8,17 @@ using Xunit;
 
 namespace Squadron
 {
+
+    /// <inheritdoc/>
     public class MongoResource : MongoResource<MongoDefaultOptions>
     {
-        ///// <inheritdoc cref="IAsyncLifetime"/>
-        //public async Task InitializeAsync()
-        //{
-        //    await base.InitializeAsync();
-        //}
 
-        ///// <inheritdoc cref="IAsyncLifetime"/>
-        //public async Task DisposeAsync()
-        //{
-        //    await base.DisposeAsync();
-        //}
     }
 
+    /// <summary>
+    /// Represents a mongo database resource that can be used by unit tests.
+    /// </summary>
+    /// <seealso cref="IDisposable"/>
     public class MongoResource<TOptions>
         : ContainerResource<TOptions>,
           IAsyncLifetime
@@ -260,23 +256,6 @@ namespace Squadron
 
             return database
                 .GetCollection<T>(options.CollectionName);
-        }
-
-        ///// <inheritdoc cref="IAsyncLifetime"/>
-        //public async Task DisposeAsync()
-        //{
-        //    await base.DisposeAsync();
-        //}
-    }
-
-    public class MongoDefaultOptions : ContainerResourceOptions
-    {
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            builder
-                .Name("mongodb")
-                .Image("mongo:latest")
-                .InternalPort(27017);
         }
     }
 }

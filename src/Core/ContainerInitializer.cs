@@ -4,12 +4,19 @@ using System.Threading.Tasks;
 
 namespace Squadron
 {
+    /// <summary>
+    /// Class which is responsible to initialize containers
+    /// </summary>
     public class ContainerInitializer
     {
         private readonly IDockerContainerManager _manager;
         private readonly ContainerResourceSettings _settings;
         private readonly int intervallInSeconds = 3;
 
+
+        /// <summary>Initializes a new instance of the <see cref="ContainerInitializer"/> class.</summary>
+        /// <param name="manager">The manager.</param>
+        /// <param name="settings">The settings.</param>
         public ContainerInitializer(
             IDockerContainerManager manager,
             ContainerResourceSettings settings)
@@ -18,6 +25,11 @@ namespace Squadron
             _settings = settings;
         }
 
+
+        /// <summary>Waits for a container to be ready</summary>
+        /// <param name="statusProvider">The status provider.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Initialize sequence timed-out.</exception>
         public async Task<Status> WaitAsync(
                 IResourceStatusProvider statusProvider)
         {

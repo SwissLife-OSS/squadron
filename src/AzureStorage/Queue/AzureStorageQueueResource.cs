@@ -7,10 +7,7 @@ using Xunit;
 
 namespace Squadron
 {
-    /// <summary>
-    /// Represents a AzureStorage queue resource that can be used by unit tests.
-    /// </summary>
-    /// <seealso cref="IDisposable"/>
+    /// <inheritdoc/>
     public class AzureStorageQueueResource
         : AzureStorageQueueResource<AzureStorageQueueDefaultOptions>
     {

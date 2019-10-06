@@ -2,8 +2,15 @@ using System;
 
 namespace Squadron
 {
+    /// <summary>
+    /// Default SqlServer resource options
+    /// </summary>
     public class SqlServerDefaultOptions : ContainerResourceOptions
     {
+        /// <summary>
+        /// Configure resource options
+        /// </summary>
+        /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
             var password = "_Qtp" + Guid.NewGuid().ToString("N");

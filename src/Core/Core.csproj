@@ -9,9 +9,9 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
-  <!--<PropertyGroup>
+  <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>-->
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>Full</DebugType>

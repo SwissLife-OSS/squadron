@@ -1,7 +1,14 @@
-﻿namespace Squadron
+namespace Squadron
 {
+    /// <summary>
+    /// Default RabbitMQ resource options
+    /// </summary>
     public class RabbitMQDefaultOptions : ContainerResourceOptions
     {
+        /// <summary>
+        /// Configure resource options
+        /// </summary>
+        /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
             builder

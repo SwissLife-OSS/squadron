@@ -23,6 +23,11 @@ jobs:
         packageType: sdk
         version: 2.2.401
         installationPath: $(Agent.ToolsDirectory)/dotnet
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: 'sdk'
+        useGlobalJson: true
     - bash: ./build.sh -target=Tests
       displayName: 'Tests on Ubuntu'
 - job: MacOS
@@ -64,6 +69,11 @@ jobs:
         packageType: sdk
         version: 2.2.401
         installationPath: $(Agent.ToolsDirectory)/dotnet
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: 'sdk'
+        useGlobalJson: true
     - bash: ./build.sh -target=Tests
       displayName: 'Tests on MacOS'
 - job: Build
@@ -84,5 +94,10 @@ jobs:
         packageType: sdk
         version: 2.2.401
         installationPath: $(Agent.ToolsDirectory)/dotnet
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
+      inputs:
+        packageType: 'sdk'
+        useGlobalJson: true
     - bash: ./build.sh -target=Tests
       displayName: 'Build'

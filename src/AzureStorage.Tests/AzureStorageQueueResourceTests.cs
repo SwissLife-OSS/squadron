@@ -34,7 +34,7 @@ namespace Squadron.AzureStorage.Tests
         }
 
         [Fact]
-        public async Task ConnectionString_NotNull()
+        public void ConnectionString_NotNull()
         {
             //Arrange & Act
             string connectionString = _azureStorageResource.ConnectionString;

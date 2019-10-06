@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -9,48 +11,64 @@ namespace Squadron
 {
     public class InitializerTests
     {
+
         [Fact]
-        public async Task GivenNotReadyStatus_WhenWaitToInitialize_Throws()
+        public async Task WaitAsync_NotReady_Throws()
         {
-            // arrange
-            Task initializerTask = Initializer.WaitAsync(
-                new NotReadyStatusProvider(),
-                TimeSpan.FromSeconds(5), Mock.Of<IImageSettings>());
-            Task timeout = Task.Delay(TimeSpan.FromSeconds(10));
+            //act
+            Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
+
+            var initilizer = new ContainerInitializer(
+                managerMock.Object,
+                ContainerResourceBuilder.New()
+                .WaitTimemout(3)
+                .Build());
 
             // act
+            Func<Task> action = async ()
+                => await initilizer.WaitAsync(new NotReadyStatusProvider());
+
             // assert
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await Task
-                    .WhenAny(initializerTask, timeout)
-                    .Unwrap();
-            });
+            await action.Should().ThrowAsync<InvalidOperationException>();
         }
 
         [Fact]
-        public async Task GivenReadyStatusWithOneThrow_WhenWaitToInitialize_IsReady()
+        public async Task WaitAsync_Ready_IsReadyAndConsumeLogsCalledOnce()
         {
-            // arrange
-            Task<Status> initializerTask = Initializer.WaitAsync(
-                new OneThrowStatusProvider(),
-                TimeSpan.FromSeconds(5), Mock.Of<IImageSettings>());
-            Task timeout = Task.Delay(TimeSpan.FromSeconds(10));
+            //act
+            Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
+
+            var initilizer = new ContainerInitializer(
+                managerMock.Object,
+                ContainerResourceBuilder.New()
+                .WaitTimemout(7)
+                .Build());
 
             // act
-            Task result = await Task
-                .WhenAny(initializerTask, timeout);
+            Status result = await initilizer.WaitAsync(new OneThrowStatusProvider());
+
 
             // assert
-            Assert.Equal(result, initializerTask);
-            Status status = await initializerTask;
-            Assert.True(status.IsReady);
+            result.IsReady.Should().BeTrue();
+            managerMock.Verify(m => m.ConsumeLogsAsync(It.IsAny<TimeSpan>()),
+                            Times.Once);
+        }
+
+        private static Mock<IDockerContainerManager> ArrangeContainerManagerMock()
+        {
+            var mock = new Mock<IDockerContainerManager>(MockBehavior.Strict);
+            mock.Setup(m => m.ConsumeLogsAsync(It.IsAny<TimeSpan>()))
+                    .ReturnsAsync("Some Logs...");
+            mock.SetupGet(p => p.Instance)
+                    .Returns(new ContainerInstance { Logs = new List<string> { "Bang!" } });
+
+            return mock;
         }
 
         private class NotReadyStatusProvider
             : IResourceStatusProvider
         {
-            public Task<Status> IsReadyAsync()
+            public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
             {
                 return Task.FromResult(Status.NotReady);
             }
@@ -61,7 +79,7 @@ namespace Squadron
         {
             private int _runs;
 
-            public Task<Status> IsReadyAsync()
+            public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
             {
                 if (_runs <= 0)
                 {

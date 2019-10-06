@@ -10,6 +10,6 @@ namespace Squadron
         /// Default name is generated if is not set.
         /// </summary>
         public string DatabaseName { get; set; } =
-            MongoUtils.CreateName("db");
+            UniqueNameGenerator.Create("db");
     }
 }

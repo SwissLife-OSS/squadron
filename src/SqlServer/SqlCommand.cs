@@ -1,4 +1,5 @@
 using System.Text;
+using Docker.DotNet.Models;
 
 namespace Squadron
 {
@@ -8,22 +9,24 @@ namespace Squadron
 
         private SqlCommand(
             string command,
-            IImageSettings settings)
+            ContainerResourceSettings settings)
         {
             _command.Append("/opt/mssql-tools/bin/sqlcmd ");
             _command.Append($"-S localhost -U {settings.Username} -P {settings.Password} ");
             _command.Append(command);
         }
 
-        internal static SqlCommand ExecuteFile(
+        internal static ContainerExecCreateParameters ExecuteFile(
             string inputFile,
-            IImageSettings settings)
-            => new SqlCommand($"-i {inputFile}", settings);
+            ContainerResourceSettings settings)
+            => new SqlCommand($"-i {inputFile}", settings)
+             .ToContainerExecCreateParameters();
 
-        internal static SqlCommand ExecuteQuery(
+        internal static ContainerExecCreateParameters ExecuteQuery(
             string query,
-            IImageSettings settings)
-            => new SqlCommand($"-q '{query}'", settings);
+            ContainerResourceSettings settings)
+            => new SqlCommand($"-q '{query}'", settings)
+                .ToContainerExecCreateParameters();
 
         public string Command => _command.ToString();
     }

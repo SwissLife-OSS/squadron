@@ -8,27 +8,35 @@ using Xunit;
 
 namespace Squadron
 {
+
+    /// <inheritdoc/>
+    public class ElasticsearchResource
+        : ElasticsearchResource<ElasticsearchDefaultOptions>
+    {
+    }
+
     /// <summary>
     /// Represents a elasticsearch database resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class ElasticsearchResource
-        : ResourceBase<ElasticsearchImageSettings>, IAsyncLifetime
+    public class ElasticsearchResource<TOptions>
+        : ContainerResource<TOptions>,
+          IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
     {
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
-            await StartContainerAsync();
-
-            Uri uri = new Uri($"http://{Settings.ContainerAddress}:{Settings.HostPort}");
-            ConnectionSettings connectionSettings = new ConnectionSettings(uri);
+            await base.InitializeAsync();
+            Uri uri = new Uri($"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}");
+            var connectionSettings = new ConnectionSettings(uri);
             connectionSettings.EnableDebugMode();
             connectionSettings.DisableDirectStreaming();
 
             Client = new ElasticClient(connectionSettings);
 
             await Initializer.WaitAsync(
-                new ElasticsearchStatus(Client), Settings);
+                new ElasticsearchStatus(Client));
         }
 
         /// <summary>
@@ -138,14 +146,7 @@ namespace Squadron
             }
 
             await Client.RefreshAsync(Indices.All);
-
             return alias;
-        }
-
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task DisposeAsync()
-        {
-            await StopContainerAsync();
         }
     }
 }

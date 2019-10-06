@@ -1,36 +1,48 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Xunit;
 
 namespace Squadron
 {
+
+    /// <inheritdoc/>
+    public class MongoResource : MongoResource<MongoDefaultOptions>
+    {
+
+    }
+
     /// <summary>
     /// Represents a mongo database resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MongoResource
-        : ResourceBase<MongoImageSettings>, IAsyncLifetime
+    public class MongoResource<TOptions>
+        : ContainerResource<TOptions>,
+          IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
     {
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task InitializeAsync()
-        {
-            await StartContainerAsync();
 
-            ConnectionString = $"mongodb://{Settings.ContainerAddress}:{Settings.HostPort}";
+        /// <inheritdoc cref="IAsyncLifetime"/>
+        public async override Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+
+            ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
             Client = new MongoClient(new MongoClientSettings
             {
                 ConnectionMode = ConnectionMode.Direct,
                 ReadConcern = ReadConcern.Majority,
                 WriteConcern = WriteConcern.Acknowledged,
-                Server = new MongoServerAddress(Settings.ContainerAddress, (int)Settings.HostPort),
+                Server = new MongoServerAddress(Manager.Instance.Address, Manager.Instance.HostPort),
                 ConnectTimeout = TimeSpan.FromSeconds(5),
                 ServerSelectionTimeout = TimeSpan.FromSeconds(5),
                 SocketTimeout = TimeSpan.FromSeconds(5)
             });
 
-            await Initializer.WaitAsync(
-                new MongoStatus(Client), Settings);
+            await Initializer.WaitAsync(new MongoStatus(Client));
         }
 
         /// <summary>
@@ -56,6 +68,7 @@ namespace Squadron
         {
             return CreateDatabase(new CreateDatabaseOptions());
         }
+
 
         /// <summary>
         /// Creates a new test databases with specified <paramref name="options"/>.
@@ -147,12 +160,30 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
-            await MongoUtils.DeployAndImport(
-                options, Settings);
+
+            await DeployAndImportAsync(options);
 
             return database
                 .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
+
+        private async Task DeployAndImportAsync(
+                CreateCollectionFromFileOptions options)
+        {
+            var copyContext = new CopyContext(
+                options.File.FullName,
+                Path.Combine(options.Destination, options.File.Name));
+
+            await Manager.CopyToContainer(copyContext);
+
+            await Manager.InvokeCommandAsync(new MongoImportCommand(
+                    copyContext.Destination,
+                    options.CollectionOptions.DatabaseOptions.DatabaseName,
+                    options.CollectionOptions.CollectionName,
+                    options.CustomImportArgs)
+                .ToContainerExecCreateParameters());
+        }
+
 
         /// <summary>
         /// Creates a new test collection with dafault options
@@ -226,11 +257,6 @@ namespace Squadron
             return database
                 .GetCollection<T>(options.CollectionName);
         }
-
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task DisposeAsync()
-        {
-            await StopContainerAsync();
-        }
     }
 }
+

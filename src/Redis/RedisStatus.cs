@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using StackExchange.Redis;
 
@@ -14,12 +15,17 @@ namespace Squadron
     {
         private readonly string _host;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisStatus"/> class.
+        /// </summary>
+        /// <param name="host">Hostname</param>
         public RedisStatus(string host)
         {
             _host = host;
         }
 
-        public async Task<Status> IsReadyAsync()
+        /// <inheritdoc/>
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             ConnectionMultiplexer redis = null;
             try

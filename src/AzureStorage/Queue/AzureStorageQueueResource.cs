@@ -7,13 +7,21 @@ using Xunit;
 
 namespace Squadron
 {
+    /// <inheritdoc/>
+    public class AzureStorageQueueResource
+        : AzureStorageQueueResource<AzureStorageQueueDefaultOptions>
+    {
+
+    }
+
     /// <summary>
     /// Represents a AzureStorage queue resource that can be used by unit tests.
-    /// Currenty Blob and Queues are supported by this resource
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class AzureStorageQueueResource
-        : ResourceBase<AzureStorageQueueImageSettings>, IAsyncLifetime
+    public class AzureStorageQueueResource<TOptions>
+        : ContainerResource<TOptions>,
+          IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
     {
         CloudStorageAccount _storageAccount = null;
 
@@ -23,15 +31,15 @@ namespace Squadron
         public string ConnectionString { get; private set; }
 
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
-            await StartContainerAsync();
+            await base.InitializeAsync();
 
-            ConnectionString = CloudStorageAccountBuilder.GetForQueue(Settings);
+            ConnectionString = CloudStorageAccountBuilder.GetForQueue(Manager.Instance);
             _storageAccount = CloudStorageAccount.Parse(ConnectionString);
 
             await Initializer.WaitAsync(
-                new AzureStorageQueueStatus(_storageAccount), Settings);
+                new AzureStorageQueueStatus(_storageAccount));
         }
 
 
@@ -42,12 +50,6 @@ namespace Squadron
         public CloudQueueClient CreateQueueClient()
         {
             return _storageAccount.CreateCloudQueueClient();
-        }
-
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task DisposeAsync()
-        {
-            await StopContainerAsync();
         }
     }
 }

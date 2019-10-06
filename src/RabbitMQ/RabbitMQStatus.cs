@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 
@@ -14,12 +15,17 @@ namespace Squadron
     {
         private readonly string _connectionString;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RabbitMQStatus"/> class.
+        /// </summary>
+        /// <param name="connectionString">The ConnectionString</param>
         public RabbitMQStatus(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public Task<Status> IsReadyAsync()
+        /// <inheritdoc/>
+        public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             var factory = new ConnectionFactory()
             {

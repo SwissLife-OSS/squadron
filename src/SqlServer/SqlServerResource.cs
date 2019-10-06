@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,26 +8,41 @@ using Xunit;
 
 namespace Squadron
 {
+    /// <inheritdoc/>
+    public partial class SqlServerResource : SqlServerResource<SqlServerDefaultOptions> { }
+
+
     /// <summary>
     /// Represents a SqlServer database resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public partial class SqlServerResource
-        : ResourceBase<SqlServerImageSettings>, IAsyncLifetime
+    public partial class SqlServerResource<TOptions>
+        : ContainerResource<TOptions>,
+          IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
     {
-        private readonly SemaphoreSlim _sync = new SemaphoreSlim(1,1);
-        private readonly HashSet<string> _databases = new HashSet<string>();
-        private string _serverConnectionString;
+        /// <summary>
+        /// Sync lock
+        /// </summary>
+        protected readonly SemaphoreSlim _sync = new SemaphoreSlim(1,1);
+        /// <summary>
+        /// The databases
+        /// </summary>
+        protected readonly HashSet<string> _databases = new HashSet<string>();
+        /// <summary>
+        /// The SqlServer connection string
+        /// </summary>
+        protected string _serverConnectionString;
 
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
-            await StartContainerAsync();
+            await base.InitializeAsync();
 
-            _serverConnectionString = CreateServerConnectionString(Settings);
+            _serverConnectionString = CreateServerConnectionString();
 
             await Initializer.WaitAsync(
-                new SqlServerStatus(_serverConnectionString), Settings);
+                new SqlServerStatus(_serverConnectionString));
         }
 
         /// <summary>
@@ -51,12 +67,14 @@ namespace Squadron
         {
             if (string.IsNullOrEmpty(sqlScript))
             {
-                throw new ArgumentException("The sql script cannot be null or empty.", nameof(sqlScript));
+                throw new ArgumentException(
+                    "The sql script cannot be null or empty.", nameof(sqlScript));
             }
 
             if (string.IsNullOrEmpty(databaseName))
             {
-                throw new ArgumentException("The database name cannot be null or empty.", nameof(databaseName));
+                throw new ArgumentException(
+                    "The database name cannot be null or empty.", nameof(databaseName));
             }
 
             return CreateDatabaseInternalAsync(sqlScript, databaseName);
@@ -67,7 +85,14 @@ namespace Squadron
             await _sync.WaitAsync();
             try
             {
-                await SqlScript.DeployAndExecute(sqlScript, Settings);
+                FileInfo scriptFile = CreateSqlFile(sqlScript);
+                var copyContext = new CopyContext(scriptFile.FullName, $"/tmp/{scriptFile.Name}");
+
+                await Manager.CopyToContainer(copyContext);
+
+                await Manager.InvokeCommandAsync(
+                    SqlCommand.ExecuteFile(copyContext.Destination, Settings));
+
                 _databases.Add(databaseName);
 
                 return CreateDatabaseConnectionString(databaseName);
@@ -110,7 +135,8 @@ namespace Squadron
             await _sync.WaitAsync();
             try
             {
-                await Container.InvokeCommand(SqlCommand.ExecuteQuery(sql, Settings), Settings);
+                await Manager.InvokeCommandAsync(
+                    SqlCommand.ExecuteQuery(sql, Settings));
             }
             finally
             {
@@ -118,22 +144,43 @@ namespace Squadron
             }
         }
 
-        private string CreateDatabaseConnectionString(string databaseName)
+
+        /// <summary>
+        /// Creates the database connection string.
+        /// </summary>
+        /// <param name="databaseName">Name of the database.</param>
+        /// <returns></returns>
+        protected string CreateDatabaseConnectionString(string databaseName)
             => $"{_serverConnectionString}Database={databaseName}";
 
-        private string CreateServerConnectionString(IImageSettings settings)
+        private string CreateServerConnectionString()
             => new StringBuilder()
-                .Append($"Data Source={settings.ContainerAddress},{settings.HostPort};")
+                .Append($"Data Source={Manager.Instance.Address},{Manager.Instance.HostPort};")
                 .Append("Integrated Security=False;")
-                .Append($"User ID={settings.Username};")
-                .Append($"Password={settings.Password};")
+                .Append($"User ID={Settings.Username};")
+                .Append($"Password={Settings.Password};")
                 .Append($"MultipleActiveResultSets=True;")
                 .ToString();
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task DisposeAsync()
+
+        internal async Task DeployAndExecute(string sqlScript)
         {
-            await StopContainerAsync();
+            FileInfo scriptFile = CreateSqlFile(sqlScript);
+            var copyContext = new CopyContext(scriptFile.FullName, $"/tmp/{scriptFile.Name}");
+
+            await Manager.CopyToContainer(copyContext);
+            await Manager.InvokeCommandAsync(
+                SqlCommand.ExecuteFile(copyContext.Destination, Settings));
+
+            File.Delete(scriptFile.FullName);
         }
+
+        private FileInfo CreateSqlFile(string content)
+        {
+            var scriptFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".sql");
+            File.WriteAllText(scriptFile, content);
+            return new FileInfo(scriptFile);
+        }
+
     }
 }

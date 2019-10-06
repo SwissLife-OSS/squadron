@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Squadron;
 using StackExchange.Redis;
 using Xunit;
 
-namespace Redis.Tests
+namespace Squadron
 {
     public class RedisResourceTests : IClassFixture<RedisResource>
     {
@@ -33,20 +31,6 @@ namespace Redis.Tests
             action.Should().NotThrow();
         }
 
-        [Fact]
-        public async Task GetConnectionAsync_NoError()
-        {
-            //Act
-            Func<Task> action = async () =>
-            {
-                ConnectionMultiplexer redis = await
-                    _redisResource.GetConnectionAsync();
-                IDatabase db = redis.GetDatabase();
-            };
-
-            //Assert
-            await action.Should().NotThrowAsync();
-        }
 
     }
 }

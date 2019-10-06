@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squadron
@@ -24,13 +25,13 @@ namespace Squadron
         /// <summary>
         /// Determines whether SQLServer is ready.
         /// </summary>
-        public async Task<Status> IsReadyAsync()
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             using (var connection = new SqlConnection(_serverConnectionString))
             {
                 await connection.OpenAsync();
 
-                using (var command = connection.CreateCommand())
+                using (System.Data.SqlClient.SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = "SELECT Count(name) FROM sys.databases";
                     return new Status

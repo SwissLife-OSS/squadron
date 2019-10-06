@@ -16,6 +16,6 @@ namespace Squadron
         /// Default name is generated if is not set.
         /// </summary>
         public string CollectionName { get; set; } =
-            MongoUtils.CreateName("col");
+            UniqueNameGenerator.Create("col");
     }
 }

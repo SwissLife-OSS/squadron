@@ -7,28 +7,36 @@ using Xunit;
 
 namespace Squadron
 {
+    /// <inheritdoc/>
+    public class RabbitMQResource : RabbitMQResource<RabbitMQDefaultOptions>
+    {
+
+    }
+
+
     /// <summary>
     /// Represents a RabbitMQ resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class RabbitMQResource
-        : ResourceBase<RabbitMQImageSettings>, IAsyncLifetime
-    {
+    public class RabbitMQResource<TOptions>
+        : ContainerResource<TOptions>,
+          IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
+    { 
         /// <summary>
         /// Connection string to access to queue
         /// </summary>
-        public string ConnectionString { get; private set; }
+    public string ConnectionString { get; private set; }
 
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
-            await StartContainerAsync();
-
+            await base.InitializeAsync();
             ConnectionString = $"amqp://{Settings.Username}:{Settings.Password}@" +
-                               $"{Settings.ContainerAddress}:{Settings.HostPort}/";
+                               $"{Manager.Instance.Address}:{Manager.Instance.HostPort}/";
 
             await Initializer.WaitAsync(
-                new RabbitMQStatus(ConnectionString), Settings);
+                new RabbitMQStatus(ConnectionString));
         }
 
         /// <summary>
@@ -41,12 +49,6 @@ namespace Squadron
             {
                 Uri = new Uri(ConnectionString),
             };
-        }
-
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public async Task DisposeAsync()
-        {
-            await StopContainerAsync();
         }
     }
 }

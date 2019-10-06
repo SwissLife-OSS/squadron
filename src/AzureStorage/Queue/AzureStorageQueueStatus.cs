@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -25,7 +26,7 @@ namespace Squadron
         /// <summary>
         /// Determines whether Azure Queue is ready
         /// </summary>
-        public async Task<Status> IsReadyAsync()
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             CloudQueueClient blobClient = _account.CreateCloudQueueClient();
             ServiceProperties serviceProperties =

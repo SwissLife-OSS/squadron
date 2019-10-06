@@ -18,24 +18,5 @@ namespace Squadron
                 Tty = false
             };
         }
-
-        public static CreateContainerParameters ToCreateContainerParameters(
-            this IImageSettings imageSettings)
-        {
-            return new CreateContainerParameters
-            {
-                Name = imageSettings.Name,
-                Image = imageSettings.Image,
-                AttachStdout = true,
-                AttachStderr = true,
-                AttachStdin = false,
-                Tty = false,
-                HostConfig = new HostConfig
-                {
-                    PublishAllPorts = true
-                },
-                Env = imageSettings.EnvironmentVariable
-            };
-        }
     }
 }

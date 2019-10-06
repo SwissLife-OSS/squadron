@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squadron
@@ -10,7 +11,7 @@ namespace Squadron
         /// <summary>
         /// Determines whether a resource is ready.
         /// </summary>
-        Task<Status> IsReadyAsync();
+        Task<Status> IsReadyAsync(CancellationToken cancellationToken);
     }
 
     /// <summary>

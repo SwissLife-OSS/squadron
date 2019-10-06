@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudServiceBus", "Azu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudServiceBus.Tests", "AzureCloudServiceBus.Tests\AzureCloudServiceBus.Tests.csproj", "{7B569704-0166-49DB-A7EC-93DF3A3C9C5F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cloud", "Cloud", "{5E244D5B-B032-458A-BBD2-0A403BBA61F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -253,6 +255,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A98B7527-6D64-4A7A-A1E2-3D8427EDD41A} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
+		{2354DBB6-5B58-4B50-9DE8-AC28AFDBFF30} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
+		{7B569704-0166-49DB-A7EC-93DF3A3C9C5F} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68767DE6-FA2A-4A9F-A7D3-AF07328CB620}

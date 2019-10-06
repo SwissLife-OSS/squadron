@@ -8,10 +8,10 @@
     <PackageLicenseUrl>https://github.com/SwissLife-OSS/Squadron/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SwissLife-OSS/Squadron</PackageProjectUrl>
     <PackageReleaseNotes>Release notes: https://github.com/SwissLife-OSS/Squadron/releases/$(Version)</PackageReleaseNotes>
-    <PackageTags>XUnit SwissLife Container Testing IntegrationTest Test .Net DatabaseTest MessagingTest Database Messaging</PackageTags>
+    <PackageTags>xUnit SwissLife Container Testing IntegrationTest Test .Net DatabaseTest MessagingTest Database Messaging</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIconUrl>https://github.com/SwissLife-OSS/Squadron/raw/master/logo.png</PackageIconUrl>
-	  <IsPackable>false</IsPackable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup>

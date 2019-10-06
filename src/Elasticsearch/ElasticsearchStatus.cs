@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
@@ -23,14 +24,14 @@ namespace Squadron
         /// <summary>
         /// Determines whether Elasticsearch cluster is ready.
         /// </summary>
-        public async Task<Status> IsReadyAsync()
+        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
             var healthRequest = new ClusterHealthRequest
             {
                 WaitForStatus = WaitForStatus.Green
             };
             IClusterHealthResponse healthResponse = await _client
-                .ClusterHealthAsync(healthRequest);
+                .ClusterHealthAsync(healthRequest, cancellationToken);
 
             return new Status
             {

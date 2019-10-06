@@ -1,35 +1,18 @@
-  <Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
-    <PropertyGroup>
-      <TargetFrameworks>netstandard2.0</TargetFrameworks>
-      <RootNamespace>Squadron</RootNamespace>
-      <AssemblyName>Squadron.RabbitMQ</AssemblyName>
-      <IsPackable>true</IsPackable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>Squadron.RabbitMQ</AssemblyName>
+  </PropertyGroup>
 
-    <PropertyGroup>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+  </ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <DebugType>Full</DebugType>
-      <DebugSymbols>true</DebugSymbols>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-      <DebugType>pdbonly</DebugType>
-      <DebugSymbols>true</DebugSymbols>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="RabbitMQ.Client" Version="5.1.1" />
-      <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
-      <PackageReference Include="xunit.core" Version="2.3.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
 
 
-  </Project>
+</Project>

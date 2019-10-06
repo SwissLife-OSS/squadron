@@ -9,7 +9,7 @@ using Xunit;
 namespace Squadron
 {
     /// <inheritdoc/>
-    public class SqlServerResource : SqlServerResource<SqlServerDefaultOptions> { }
+    public partial class SqlServerResource : SqlServerResource<SqlServerDefaultOptions> { }
 
 
     /// <summary>
@@ -21,9 +21,18 @@ namespace Squadron
           IAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
-        private readonly SemaphoreSlim _sync = new SemaphoreSlim(1,1);
-        private readonly HashSet<string> _databases = new HashSet<string>();
-        private string _serverConnectionString;
+        /// <summary>
+        /// Sync lock
+        /// </summary>
+        protected readonly SemaphoreSlim _sync = new SemaphoreSlim(1,1);
+        /// <summary>
+        /// The databases
+        /// </summary>
+        protected readonly HashSet<string> _databases = new HashSet<string>();
+        /// <summary>
+        /// The SqlServer connection string
+        /// </summary>
+        protected string _serverConnectionString;
 
         /// <inheritdoc cref="IAsyncLifetime"/>
         public override async Task InitializeAsync()
@@ -135,7 +144,13 @@ namespace Squadron
             }
         }
 
-        private string CreateDatabaseConnectionString(string databaseName)
+
+        /// <summary>
+        /// Creates the database connection string.
+        /// </summary>
+        /// <param name="databaseName">Name of the database.</param>
+        /// <returns></returns>
+        protected string CreateDatabaseConnectionString(string databaseName)
             => $"{_serverConnectionString}Database={databaseName}";
 
         private string CreateServerConnectionString()

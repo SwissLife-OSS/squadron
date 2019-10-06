@@ -1,4 +1,4 @@
-﻿#if NET46
+#if NET46
 namespace Squadron
 {
     internal class DeployScript

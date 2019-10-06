@@ -1,4 +1,4 @@
-﻿#if NET46
+#if NET46
 using Microsoft.SqlServer.Dac;
 
 namespace Squadron

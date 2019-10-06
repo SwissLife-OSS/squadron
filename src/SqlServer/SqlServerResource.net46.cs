@@ -5,7 +5,7 @@ using Microsoft.SqlServer.Dac;
 
 namespace Squadron
 {
-    public partial class SqlServerResource
+    public partial class SqlServerResource : SqlServerResource<SqlServerDefaultOptions>
     {
         /// <summary>
         /// Clone an existing database schema and deploy.
@@ -38,7 +38,8 @@ namespace Squadron
                     extractService.Extract(stream, databaseName, "SqlServer.Test",
                         Version.Parse("0.0.1"), "SqlServer.Test", null, DacpacOptions.Extract);
 
-                    DacPackage.Deploy(stream, _serverConnectionString, databaseName, Settings);
+                    Manager.DeployAsync(Settings, stream, _serverConnectionString, databaseName)
+                            .Wait();
                 }
 
                 _databases.Add(databaseName);
@@ -82,7 +83,8 @@ namespace Squadron
             {
                 using (FileStream stream = File.OpenRead(dacpacFile))
                 {
-                    DacPackage.Deploy(stream, _serverConnectionString, databaseName, Settings);
+                    Manager.DeployAsync(Settings, stream, _serverConnectionString, databaseName)
+                            .Wait();
                 }
 
                 _databases.Add(databaseName);

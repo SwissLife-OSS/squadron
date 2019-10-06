@@ -1,22 +1,72 @@
-*Work in Progress*
+<div style="text-align:center"><img src="https://raw.github.com/swissLife-oss/squadron-docs/master/website/static/img/logo_sl_squadron.png" height="200" /></div>
 
-**Squadron is a container testing framework for external services.**
+**Squadron is a testing framework for containerized and cloud services.**
 
-## Getting Started
+Squadron is a helpful framework which enables you to write tests against dependent services without any overhead. Squadron can provide you isolation in tests through Container Providers or support for all other services through Cloud Providers.
 
 ## Features
 
-For all services we try to provide container support when this exist, otherwise this will be implemented by targeting directly the service. All services are using Linux containers which automaticly requires Docker with Linux containers.
+### Container Providers
 
-- [x] MongoDB
-- [x] Elasticsearch
-- [x] SqlServer
-- [ ] Azure Blob and Queues ([Work](https://github.com/SwissLife-OSS/squadron/pull/13) in progress)
-- [ ] Redis
+- [x] [MongoDB](https://swisslife-oss.github.io/squadron/docs/mongodb-getstarted)
+- [x] [SQL Server](https://swisslife-oss.github.io/squadron/docs/sqlserver-getstarted)
+- [x] [Elasticsearch](https://swisslife-oss.github.io/squadron/docs/elasticsearch-getstarted)
+- [x] Azure Blob and Queues
+- [x] RabittMQ
+- [x] Redis
 - [ ] PostgresSQL
-- [ ] RabittMQ
 - [ ] Kafka
-- [ ] ServiceBus (Targets Azure ServiceBus)
+
+### Cloud Providers
+- [ ] Azure Service Bus
+
+## Getting Started
+
+As getting started we've prepared a simple example how to use Squadron with *MongoDB*.
+
+### Install
+Install the Squadron nuget package for MongoDB within your test project:
+
+```bash
+dotnet add package Squadron.Mongo
+```
+
+### Access
+Inject the MongoResource into your test class constructor:
+
+```csharp
+public class AccountRepositoryTests
+    : IClassFixture<MongoResource>
+{
+    private readonly MongoResource _mongoResource;
+
+    public AccountRepositoryTests(
+        MongoResource mongoResource)
+    {
+        _mongoResource = mongoResource;
+    }
+}
+```
+
+### Use
+Use MongoResources to create a database and initialize your repository:
+
+```csharp
+[Fact]
+public void CreateAccount_AccountExists()
+{
+    // arrange
+    var database = _mongoResource.CreateDatabase();
+    var accountRepository = new AccountRepository(database);
+    var account = new Account();
+
+    // act
+    var addedAccount = accountRepository.Add(account);
+
+    // assert
+    Snapshot.Match(addedAccount);
+}
+```
 
 ## Community
 

@@ -1,8 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>$(ResourceProjectTargetFramework)</TargetFramework>
-    <!--<TargetFrameworks>$(ResourceProjectTargetFrameworks)</TargetFrameworks>-->
+    <TargetFrameworks>$(ResourceProjectTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Squadron</RootNamespace>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
@@ -24,7 +23,6 @@
   <ItemGroup>
     <PackageReference Include="xunit.core" Version="$(xUnitVersion)" />
   </ItemGroup>
-
 
   <ItemGroup>
 

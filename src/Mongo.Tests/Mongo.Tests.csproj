@@ -15,10 +15,14 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
+
+  
   <ItemGroup>
     <None Update="__snapshots__\*.*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      ctory>
     </None>
+
+  
     <None Update="__resources__\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -15,7 +15,7 @@ namespace RabbitMQ.Tests
             _rabbitMQResource = rabbitMQResource;
         }
 
-        [Fact( Skip ="MacOS troubles")]
+        [Fact]
         public void CreateConnectionFactory_SendMessage_NoError()
         {
             //Act

@@ -14,6 +14,7 @@ namespace Squadron
             builder
                 .Name("rabbit")
                 .Image("rabbitmq:3")
+                .WaitTimemout(60)
                 .InternalPort(5672)
                 .Username("guest")
                 .Password("guest");

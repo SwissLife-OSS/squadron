@@ -15,6 +15,7 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
+
   <ItemGroup>
     <None Update="__snapshots__\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

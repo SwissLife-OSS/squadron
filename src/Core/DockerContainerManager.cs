@@ -34,7 +34,7 @@ namespace Squadron
 
         private static Uri LocalDockerUri()
         {
-#if NET46
+#if NET461
             return new Uri("npipe://./pipe/docker_engine");
 #else
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -237,7 +237,7 @@ namespace Squadron
             ContainerInspectResponse inspectResponse = await _client
                 .Containers
                 .InspectContainerAsync(Instance.Id);
-
+#if !NET461
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 Instance.Address = "localhost";
@@ -264,6 +264,10 @@ namespace Squadron
                 Instance.Address = inspectResponse.NetworkSettings.IPAddress;
                 Instance.HostPort = _settings.InternalPort;
             }
+#else
+            Instance.Address = inspectResponse.NetworkSettings.IPAddress;
+            Instance.HostPort = _settings.InternalPort;
+#endif
             Instance.IsRunning = inspectResponse.State.Running;
         }
 

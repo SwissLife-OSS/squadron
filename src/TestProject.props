@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>$(TestProjectTargetFramework)</TargetFramework>
+    <TargetFrameworks>$(TestProjectTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Squadron</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -21,4 +21,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+
+
+
 </Project>

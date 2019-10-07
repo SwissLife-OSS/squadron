@@ -16,13 +16,10 @@
   </PropertyGroup>
 
 
-  
   <ItemGroup>
     <None Update="__snapshots__\*.*">
-      ctory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-
-  
     <None Update="__resources__\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

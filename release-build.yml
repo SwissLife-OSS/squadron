@@ -15,6 +15,10 @@ steps:
     inputs:
       useGlobalJson: true
   - task: UseDotNet@2
+    displayName: "Use .Net Core SDK 2.2.401"
+    inputs:
+      version: 2.2.401      
+  - task: UseDotNet@2
     displayName: "Use .Net Core SDK 2.1.801"
     inputs:
       version: 2.1.801

@@ -40,12 +40,22 @@ namespace Squadron
             var options = new TOptions();
             var builder = ContainerResourceBuilder.New();
             options.Configure(builder);
-
             Settings = builder.Build();
+            OnSettingsBuilded(Settings);
+
             Manager = new DockerContainerManager(Settings);
             Initializer = new ContainerInitializer(Manager, Settings);
             await Manager.CreateAndStartContainerAsync();
         }
+
+
+        /// <summary>
+        /// Called when after settings are build
+        /// </summary>
+        /// <param name="settings">The settings.</param>
+        protected virtual void OnSettingsBuilded(ContainerResourceSettings settings)
+        { }
+
 
         /// <summary>
         /// Cleans up the resource

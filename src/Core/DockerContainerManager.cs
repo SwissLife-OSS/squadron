@@ -98,7 +98,7 @@ namespace Squadron
         }
 
         /// <inheritdoc/>
-        public async Task CopyToContainer(CopyContext context)
+        public async Task CopyToContainerAsync(CopyContext context)
         {
             using (var archiver = new TarArchiver(context.Source))
             {

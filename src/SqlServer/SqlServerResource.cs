@@ -88,7 +88,7 @@ namespace Squadron
                 FileInfo scriptFile = CreateSqlFile(sqlScript);
                 var copyContext = new CopyContext(scriptFile.FullName, $"/tmp/{scriptFile.Name}");
 
-                await Manager.CopyToContainer(copyContext);
+                await Manager.CopyToContainerAsync(copyContext);
 
                 await Manager.InvokeCommandAsync(
                     SqlCommand.ExecuteFile(copyContext.Destination, Settings));
@@ -168,7 +168,7 @@ namespace Squadron
             FileInfo scriptFile = CreateSqlFile(sqlScript);
             var copyContext = new CopyContext(scriptFile.FullName, $"/tmp/{scriptFile.Name}");
 
-            await Manager.CopyToContainer(copyContext);
+            await Manager.CopyToContainerAsync(copyContext);
             await Manager.InvokeCommandAsync(
                 SqlCommand.ExecuteFile(copyContext.Destination, Settings));
 

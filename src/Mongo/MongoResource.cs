@@ -174,7 +174,7 @@ namespace Squadron
                 options.File.FullName,
                 Path.Combine(options.Destination, options.File.Name));
 
-            await Manager.CopyToContainer(copyContext);
+            await Manager.CopyToContainerAsync(copyContext);
 
             await Manager.InvokeCommandAsync(new MongoImportCommand(
                     copyContext.Destination,

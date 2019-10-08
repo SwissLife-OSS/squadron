@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace Squadron
@@ -30,5 +31,17 @@ namespace Squadron
         public string Destination { get; }
 
         internal string DestinationFolder { get; }
+
+        public static CopyContext CreateFromFileContent(string content,
+                                                        string fileExtension,
+                                                        string destinationDir)
+        {
+
+            var filename = Guid.NewGuid().ToString("N") + $".{fileExtension}";
+            var scriptFile = Path.Combine(
+                Path.GetTempPath(), filename);
+            File.WriteAllText(scriptFile, content);
+            return new CopyContext(scriptFile, $"{destinationDir}/{filename}");
+        }
     }
 }

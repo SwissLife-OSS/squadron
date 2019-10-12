@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Squadron
 {
-
     /// <summary>
     /// Base resource for container based resources
     /// </summary>
@@ -20,7 +19,6 @@ namespace Squadron
         /// </value>
         protected ContainerResourceSettings Settings { get; set; }
 
-
         /// <summary>
         /// The container manager
         /// </summary>
@@ -33,19 +31,39 @@ namespace Squadron
         protected ContainerInitializer Initializer = null;
 
         /// <summary>
+        /// The resource options
+        /// </summary>
+        protected TOptions ResourceOptions = null;
+
+        /// <summary>
         /// Initializes the resources
         /// </summary>
         public async virtual Task InitializeAsync()
         {
-            var options = new TOptions();
+            ResourceOptions = new TOptions();
             var builder = ContainerResourceBuilder.New();
-            options.Configure(builder);
+            ResourceOptions.Configure(builder);
             Settings = builder.Build();
             OnSettingsBuilded(Settings);
+            ValidateSettings(Settings);
 
-            Manager = new DockerContainerManager(Settings);
+            DockerConfiguration dockerConfig = ResourceOptions.GetDockerConfiguration();
+
+            Manager = new DockerContainerManager(Settings, dockerConfig);
             Initializer = new ContainerInitializer(Manager, Settings);
             await Manager.CreateAndStartContainerAsync();
+        }
+
+        private void ValidateSettings(ContainerResourceSettings settings)
+        {
+            if (string.IsNullOrEmpty(settings.Name))
+                throw new ArgumentException("Can not be null or empty.", nameof(settings.Name));
+
+            if (string.IsNullOrEmpty(settings.Image))
+                throw new ArgumentException("Can not be null or empty.", nameof(settings.Image));
+
+            if (settings.InternalPort == 0)
+                throw new ArgumentException("Can not be 0", nameof(settings.InternalPort));
         }
 
 

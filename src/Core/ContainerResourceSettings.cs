@@ -28,6 +28,15 @@ namespace Squadron
         public string Tag { get; internal set; }
 
         /// <summary>
+        /// Gets or sets the name of the Container registry as defined in configuation
+        /// Defauls is DockerHub
+        /// </summary>
+        /// <value>
+        /// The name of the registry.
+        /// </value>
+        public string RegistryName { get; set; }
+
+        /// <summary>
         /// Environment variables
         /// </summary>
         public IList<string> EnvironmentVariables { get; internal set; }

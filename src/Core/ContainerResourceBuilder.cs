@@ -47,6 +47,18 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Container registry name as defined in configurations
+        /// Default is DockerHub
+        /// </summary>
+        /// <param name="registryName">Name of the registry.</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder Registry(string registryName)
+        {
+            _options.RegistryName = registryName;
+            return this;
+        }
+
+        /// <summary>
         /// Adds an environment variable.
         /// </summary>
         /// <param name="variable">The variable.</param>

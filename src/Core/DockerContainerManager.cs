@@ -23,14 +23,54 @@ namespace Squadron
         public ContainerInstance Instance { get; } = new ContainerInstance();
 
         private readonly ContainerResourceSettings _settings;
-        private readonly AuthConfig _authConfig = new AuthConfig();
+        private readonly DockerConfiguration _dockerConfiguration;
+        private readonly AuthConfig _authConfig = null;
 
-        private readonly DockerClient _client =
-            new DockerClientConfiguration(
-                    LocalDockerUri(),
-                    null,
-                    TimeSpan.FromMinutes(5))
-                .CreateClient(Version.Parse("1.25"));
+        private readonly DockerClient _client = null;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
+        /// </summary>
+        /// <param name="settings">The settings.</param>
+        /// <param name="dockerConfiguration"></param>
+        public DockerContainerManager(ContainerResourceSettings settings,
+                                      DockerConfiguration dockerConfiguration)
+        {
+            _settings = settings;
+            _dockerConfiguration = dockerConfiguration;
+            _client = new DockerClientConfiguration(
+                 LocalDockerUri(),
+                 null,
+                 TimeSpan.FromMinutes(5))
+             .CreateClient(Version.Parse("1.25"));
+            _authConfig = GetAuthConfig();
+        }
+        
+        private AuthConfig GetAuthConfig()
+        {
+            if (_settings.RegistryName != null)
+            {
+                DockerRegistryConfiguration registryConfig = _dockerConfiguration.Registries
+                    .FirstOrDefault(x => x.Name.Equals(
+                        _settings.RegistryName,
+                        StringComparison.InvariantCultureIgnoreCase));
+
+                if (registryConfig == null)
+                {
+                    throw new InvalidOperationException(
+                        $"No container egistry with name '{_settings.RegistryName}'" +
+                         "found in configuration");
+                }
+
+                return new AuthConfig
+                {
+                    ServerAddress = registryConfig.Address,
+                    Username = registryConfig.Username,
+                    Password = registryConfig.Password
+                };
+            }
+            return new AuthConfig();
+        }
 
         private static Uri LocalDockerUri()
         {
@@ -45,14 +85,6 @@ namespace Squadron
         }
 
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
-        /// </summary>
-        /// <param name="settings">The settings.</param>
-        public DockerContainerManager(ContainerResourceSettings settings)
-        {
-            _settings = settings;
-        }
 
         /// <inheritdoc/>
         public async Task CreateAndStartContainerAsync()

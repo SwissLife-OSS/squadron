@@ -32,6 +32,14 @@ namespace Squadron
 
         internal string DestinationFolder { get; }
 
+
+        /// <summary>
+        /// Creates the content of from file.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="fileExtension">The file extension.</param>
+        /// <param name="destinationDir">The destination dir.</param>
+        /// <returns></returns>
         public static CopyContext CreateFromFileContent(string content,
                                                         string fileExtension,
                                                         string destinationDir)

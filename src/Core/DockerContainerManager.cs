@@ -45,7 +45,7 @@ namespace Squadron
              .CreateClient(Version.Parse("1.25"));
             _authConfig = GetAuthConfig();
         }
-        
+
         private AuthConfig GetAuthConfig()
         {
             if (_settings.RegistryName != null)
@@ -216,6 +216,24 @@ namespace Squadron
 
         private async Task CreateContainerAsync()
         {
+            var hostConfig = new HostConfig
+            {
+                PublishAllPorts = true
+            };
+
+            if (_settings.ExternalPort > 0)
+            {
+                hostConfig.PublishAllPorts = false;
+                hostConfig.PortBindings = new Dictionary<string, IList<PortBinding>> {
+                {
+                    _settings.InternalPort + "/tcp", new List<PortBinding> {
+                        new PortBinding {
+                            HostPort = _settings.ExternalPort.ToString()
+                        }
+                    }
+                }};
+            }
+
             var startParams = new CreateContainerParameters
             {
                 Name = _settings.UniqueContainerName,
@@ -224,10 +242,7 @@ namespace Squadron
                 AttachStderr = true,
                 AttachStdin = false,
                 Tty = false,
-                HostConfig = new HostConfig
-                {
-                    PublishAllPorts = true
-                },
+                HostConfig = hostConfig,
                 Env = _settings.EnvironmentVariables
             };
 
@@ -263,14 +278,15 @@ namespace Squadron
         }
 
 
-
         private async Task ResolveHostAddressAsync()
         {
             ContainerInspectResponse inspectResponse = await _client
                 .Containers
                 .InspectContainerAsync(Instance.Id);
-#if !NET461
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+
+            ContainerAddressMode addressMode = GetAddressMode();
+
+            if (addressMode == ContainerAddressMode.Port)
             {
                 Instance.Address = "localhost";
                 string containerPort = $"{_settings.InternalPort}/tcp";
@@ -296,14 +312,31 @@ namespace Squadron
                 Instance.Address = inspectResponse.NetworkSettings.IPAddress;
                 Instance.HostPort = _settings.InternalPort;
             }
-#else
-            Instance.Address = inspectResponse.NetworkSettings.IPAddress;
-            Instance.HostPort = _settings.InternalPort;
-#endif
             Instance.IsRunning = inspectResponse.State.Running;
         }
 
-
+        private ContainerAddressMode GetAddressMode()
+        {
+            ContainerAddressMode addressMode = _dockerConfiguration.DefaultAddressMode;
+            if (_settings.AddressMode != ContainerAddressMode.Auto)
+            {
+                //Overide by user setting
+                addressMode = _settings.AddressMode;
+            }
+            if (addressMode == ContainerAddressMode.Auto)
+            {
+                //Default to port when not defined
+                addressMode = ContainerAddressMode.Port;
+            }
+#if !NET461
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                //OSX can only handle Port
+                addressMode = ContainerAddressMode.Port;
+            }
+#endif
+            return addressMode;
+        }
 
         private async Task<string> ReadAsync(
             Stream logStream,

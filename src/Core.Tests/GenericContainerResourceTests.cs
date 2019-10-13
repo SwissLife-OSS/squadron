@@ -43,21 +43,12 @@ namespace Squadron
             builder
                 .Name("login-samples")
                 .InternalPort(4200)
+                .ExternalPort(4200)
                 .Image("spcasquadron.azurecr.io/fusion-login-samples:v2")
                 .Registry("myPrivate");
+
+
         }
 
-        public async Task<Status> IsReadyAsync(ContainerAddress containerAddress, CancellationToken cancellationToken)
-        {
-            var httpClient = new HttpClient();
-            HttpResponseMessage res = await httpClient
-                .GetAsync($"http://{containerAddress.Address}:{containerAddress.Port}");
-
-            return new Status
-            {
-                IsReady = true,
-                Message = $"{res.StatusCode} -> {res.RequestMessage.RequestUri}"
-            };
-        }
     }
 }

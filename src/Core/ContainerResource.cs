@@ -47,7 +47,7 @@ namespace Squadron
             OnSettingsBuilded(Settings);
             ValidateSettings(Settings);
 
-            DockerConfiguration dockerConfig = ResourceOptions.GetDockerConfiguration();
+            DockerConfiguration dockerConfig = Settings.DockerConfigResolver();
 
             Manager = new DockerContainerManager(Settings, dockerConfig);
             Initializer = new ContainerInitializer(Manager, Settings);

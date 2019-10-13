@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +8,7 @@ namespace Squadron
     /// <summary>
     /// Abstract base class for container resource options
     /// </summary>
-    public abstract class ContainerResourceOptions : IDockerConfigurationProvider
+    public abstract class ContainerResourceOptions
     {
         /// <summary>
         /// Configures the resource
@@ -15,11 +16,8 @@ namespace Squadron
         /// <param name="builder">The builder.</param>
         public abstract void Configure(ContainerResourceBuilder builder);
 
-        /// <summary>
-        /// Gets the docker configuration from appsettings and environment variables
-        /// </summary>
-        /// <returns></returns>
-        public DockerConfiguration GetDockerConfiguration()
+
+        internal static DockerConfiguration DefaultDockerConfigResolver()
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)

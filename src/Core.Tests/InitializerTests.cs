@@ -21,7 +21,7 @@ namespace Squadron
             var initilizer = new ContainerInitializer(
                 managerMock.Object,
                 ContainerResourceBuilder.New()
-                .WaitTimemout(3)
+                .WaitTimeout(3)
                 .Build());
 
             // act
@@ -41,7 +41,7 @@ namespace Squadron
             var initilizer = new ContainerInitializer(
                 managerMock.Object,
                 ContainerResourceBuilder.New()
-                .WaitTimemout(7)
+                .WaitTimeout(7)
                 .Build());
 
             // act

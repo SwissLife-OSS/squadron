@@ -58,6 +58,12 @@ namespace Squadron
             return this;
         }
 
+        public ContainerResourceBuilder AddressMode(ContainerAddressMode mode)
+        {
+            _options.AddressMode = mode;
+            return this;
+        }
+
         /// <summary>
         /// Adds an environment variable.
         /// </summary>
@@ -116,13 +122,38 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Static external port
+        /// Use this setting only when a static port is required
+        /// When the port is allready in use container creation will fail
+        /// </summary>
+        /// <param name="port">The port.</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder ExternalPort(int port)
+        {
+            _options.ExternalPort = port;
+            return this;
+        }
+
+        /// <summary>
         /// Wait timeout in seconds
         /// </summary>
         /// <param name="seconds">The seconds.</param>
         /// <returns></returns>
-        public ContainerResourceBuilder WaitTimemout(int seconds)
+        public ContainerResourceBuilder WaitTimeout(int seconds)
         {
             _options.WaitTimeout = TimeSpan.FromSeconds(seconds);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the docker configuration resolver.
+        /// </summary>
+        /// <param name="resolver">The resolver.</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder SetDockerConfigResolver(
+            Func<DockerConfiguration> resolver)
+        {
+            _options.DockerConfigResolver = resolver;
             return this;
         }
 
@@ -132,6 +163,9 @@ namespace Squadron
         /// <returns></returns>
         public ContainerResourceSettings Build()
         {
+            if (_options.DockerConfigResolver == null)
+                _options.DockerConfigResolver =
+                    ContainerResourceOptions.DefaultDockerConfigResolver;
             return _options;
         }
     }

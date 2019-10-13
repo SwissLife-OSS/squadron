@@ -23,6 +23,14 @@ namespace Squadron
         public int InternalPort { get; internal set; }
 
         /// <summary>
+        /// Gets the external port (Static).
+        /// </summary>
+        /// <value>
+        /// The external port.
+        /// </value>
+        public int ExternalPort { get; internal set; }
+
+        /// <summary>
         /// Docker image tag
         /// </summary>
         public string Tag { get; internal set; }
@@ -34,7 +42,9 @@ namespace Squadron
         /// <value>
         /// The name of the registry.
         /// </value>
-        public string RegistryName { get; set; }
+        public string RegistryName { get; internal set; }
+        
+        public ContainerAddressMode AddressMode { get; internal set; }
 
         /// <summary>
         /// Environment variables
@@ -60,12 +70,21 @@ namespace Squadron
         /// <summary>
         /// Time to wait until "readyness" of container
         /// </summary>
-        public TimeSpan WaitTimeout { get; set; } = TimeSpan.FromSeconds(30);
+        public TimeSpan WaitTimeout { get; internal set; } = TimeSpan.FromSeconds(30);
 
         /// <summary>
         /// Unique container name
         /// </summary>
         public string UniqueContainerName
             => $"squa_{Name.ToLowerInvariant()}_{DateTime.UtcNow.Ticks}";
+
+
+        /// <summary>
+        /// Gets the docker configuration resolver.
+        /// </summary>
+        /// <value>
+        /// The docker configuration resolver.
+        /// </value>
+        public Func<DockerConfiguration> DockerConfigResolver { get; internal set; }
     }
 }

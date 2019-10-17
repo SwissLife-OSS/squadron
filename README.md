@@ -1,4 +1,4 @@
-<div style="text-align:center"><img src="https://raw.github.com/swissLife-oss/squadron-docs/master/website/static/img/logo_sl_squadron.png" height="200" /></div>
+![Snapshooter](https://raw.github.com/swissLife-oss/squadron-docs/master/website/static/img/logo_sl_squadron_banner.png)
 
 ## [![Nuget](https://img.shields.io/nuget/v/Squadron.Core.svg?style=flat)](https://www.nuget.org/packages/Squadron.Core) [![GitHub Release](https://img.shields.io/github/release/SwissLife-OSS/Squadron.svg?style=flat)](https://github.com/SwissLife-OSS/Squadron/releases/latest) [![Build Status](https://dev.azure.com/swisslife-oss/swisslife-oss/_apis/build/status/Squadron.Release?branchName=master)](https://dev.azure.com/swisslife-oss/swisslife-oss/_build/latest?definitionId=11&branchName=master) [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=SwissLife-OSS_Squadron&metric=coverage)](https://sonarcloud.io/dashboard?id=SwissLife-OSS_Squadron) [![Quality](https://sonarcloud.io/api/project_badges/measure?project=SwissLife-OSS_Squadron&metric=alert_status)](https://sonarcloud.io/dashboard?id=SwissLife-OSS_Squadron)
 
@@ -16,11 +16,12 @@ Squadron is a helpful framework which enables you to write tests against depende
 - [x] Azure Blob and Queues
 - [x] RabittMQ
 - [x] Redis
-- [ ] PostgresSQL
+- [x] PostgresSQL
 - [ ] Kafka
 
 ### Cloud Providers
-- [ ] Azure Service Bus
+- [x] Azure Service Bus
+- [ ] Azure Event Hub
 
 ## Getting Started
 

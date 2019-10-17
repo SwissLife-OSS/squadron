@@ -6,6 +6,8 @@
 
 Squadron is a helpful framework which enables you to write tests against dependent services without any overhead. Squadron can provide you isolation in tests through Container Providers or support for all other services through Cloud Providers.
 
+To get more detailed information about Squadron, go to the [Squadron Docs](https://swisslife-oss.github.io/squadron/)
+
 ## Features
 
 ### Container Providers

@@ -10,7 +10,7 @@
     <PackageReleaseNotes>Release notes: https://github.com/SwissLife-OSS/Squadron/releases/$(Version)</PackageReleaseNotes>
     <PackageTags>xUnit SwissLife Container Testing Azure IntegrationTest Test .Net DatabaseTest MessagingTest Database Messaging ServiceBus</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageIconUrl>https://github.com/SwissLife-OSS/Squadron/raw/master/logo.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/SwissLife-OSS/Squadron-docs/raw/master/website/static/img/logo_sl_squadron.png</PackageIconUrl>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

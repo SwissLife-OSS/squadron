@@ -14,7 +14,8 @@ namespace Squadron
     /// <seealso cref="Xunit.IAsyncLifetime" />
     public class GenericContainerResource<TOptions>
           : ContainerResource<TOptions>,
-            IAsyncLifetime
+            IAsyncLifetime,
+            IComposableResource
           where TOptions : GenericContainerOptions, new()
     {
 
@@ -47,6 +48,20 @@ namespace Squadron
         public Uri GetContainerUri(string scheme = "http")
         {
             return new Uri($"{scheme}://{Address.Address}:{Address.Port}");
+        }
+
+        public Task WaitUntilReadyAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public Dictionary<string, string> GetComposeExports()
+        {
+            return new Dictionary<string, string>()
+            {
+                { "HttpUrl", GetContainerUri("http").ToString() },
+                { "HttpsUrl", GetContainerUri("https").ToString() },
+            };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Squadron
     /// <summary>
     /// Default Generic container resource options
     /// </summary>
-    public class GenericContainerOptions : ContainerResourceOptions
+    public class GenericContainerOptions : ContainerResourceOptions, IComposableResourceOption
     {
         /// <summary>
         /// Configure resource options
@@ -26,6 +26,8 @@ namespace Squadron
         /// The status checker
         /// </summary>
         internal Func<ContainerAddress, CancellationToken, Task<Status>> StatusChecker;
+
+        public Type ResourceType => typeof(GenericContainerResource<>);
 
         /// <summary>
         /// Configures the status checker.

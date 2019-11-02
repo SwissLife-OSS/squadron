@@ -6,18 +6,32 @@ namespace Squadron
 {
     public class ComposableResourceSettings
     {
-        public string Name { get; set; }
+        public ComposableResourceSettings(
+            string name,
+            ComposableResourceType type,
+            IReadOnlyList<ComposeResourceLink> links,
+            ContainerResourceOptions containerOptions,
+            Action<IComposableResource> onStarted)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Type = type;
+            Links = links;
+            ContainerOptions = containerOptions ?? throw new ArgumentNullException(nameof(containerOptions));
+            OnStarted = onStarted;
+        }
 
-        public ComposableResourceType Type { get; set; }
+        public string Name { get ; private set; }
 
-        public IComposableResource Resource { get; set; }
+        public ComposableResourceType Type { get; private set; }
 
-        public IReadOnlyList<ComposeResourceLink> Links { get; set; }
+        public IComposableResource Resource { get; private set; }
+
+        public IReadOnlyList<ComposeResourceLink> Links { get; private set; }
             = new List<ComposeResourceLink>();
 
-        public ContainerResourceOptions ContainerOptions { get; set; }
+        public ContainerResourceOptions ContainerOptions { get; private set; }
 
-        public Action<IComposableResource> OnStarted { get; set; }
+        public Action<IComposableResource> OnStarted { get; private set; }
     }
 
 }

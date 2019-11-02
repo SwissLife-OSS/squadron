@@ -17,6 +17,7 @@ namespace Squadron
                 .InternalPort(4200)
                 .Image("spcasquadron.azurecr.io/fusion-login-samples:v2")
                 .Registry("myPrivate");
+
         }
     }
 
@@ -25,40 +26,17 @@ namespace Squadron
     {
         public override void Configure(ComposeResourceBuilder builder)
         {
-            builder
-                .AddContainer("mongo", new MongoDefaultOptions(), (res) =>
-                {
-                    var m = (MongoResource)res;
-                    var a = m.ConnectionString;
-
-                })
-                .AddContainer("api", new TestWebServerOptions(),
-                    null,
-                    new ComposeResourceLink
-                    {
-                        Name = "mongo",
-                        EnvironmentVariables = new List<EnvironmentVariableMapping>()
-                        {
-                            new EnvironmentVariableMapping(
+            builder.AddContainer<MongoDefaultOptions>("mongo");
+            builder.AddContainer<TestWebServerOptions>("api")
+                    .AddLink("mongo", new EnvironmentVariableMapping(
                                 "UserManagement:Database:ConnectionString",
                                 "#CONNECTIONSTRING#"
-                                )
-                        }
-                    }
-                )
-                .AddContainer("ui", new TestWebServerOptions(),
-                    null,
-                    new ComposeResourceLink
-                    {
-                        Name = "api",
-                        EnvironmentVariables = new List<EnvironmentVariableMapping>()
-                        {
-                            new EnvironmentVariableMapping(
-                                "UserManagement:Host:Url",
-                                "#HttpUrl#"
-                                )
-                        }
-                    });
+                                ));
+
+            builder.AddContainer<TestWebServerOptions>("ui")
+                    .AddLink("api", new EnvironmentVariableMapping(
+                                "UserManagament:Host", "#HTTPURL#"
+                                ));
         }
     }
 

@@ -7,49 +7,6 @@ using Xunit;
 
 namespace Squadron
 {
-    public class ComposeResourceManager
-    {
-        public ComposableResourceSettings ResourceSettings { get; internal set; }
-        public ContainerResourceSettings ContainerSettings { get; private set; }
-        public Dictionary<string, string> Exports { get; private set; }
-
-        public IComposableResource Resource { get; set; }
-        public IEnumerable<string> EnvironmentVariables { get; internal set; }
-
-        internal async Task StartAsync()
-        {
-            if (ResourceSettings.Type == ComposableResourceType.Container)
-            {
-                var builder = ContainerResourceBuilder.New();
-                ResourceSettings.ContainerOptions.Configure(builder);
-
-                BuildResourceInstance();
-                Resource.SetEnvironmentVariables(EnvironmentVariables.ToList());
-                await Resource.InitializeAsync();
-                Exports = Resource.GetComposeExports();
-            }
-        }
-
-        private void BuildResourceInstance()
-        {
-            var composableOptions = (IComposableResourceOption)ResourceSettings.ContainerOptions;
-            Type activateType = composableOptions.ResourceType;
-
-            if (composableOptions.ResourceType.IsGenericType)
-            {
-                activateType = composableOptions.ResourceType
-                    .MakeGenericType(ResourceSettings.ContainerOptions.GetType());
-            }
-            Resource = (IComposableResource)Activator.CreateInstance(activateType);
-        }
-
-        internal async Task StopAsync()
-        {
-            await Resource.DisposeAsync();
-        }
-    }
-
-
     public class ComposeResource<TOptions> : IAsyncLifetime
         where TOptions : ComposeResourceOptions, new()
     {
@@ -80,7 +37,7 @@ namespace Squadron
                         variables.Add($"{map.Name}={GetVariableValue(map.Value, exports)}");
                     }
                 }
-                mgr.EnvironmentVariables = variables;
+                mgr.EnvironmentVariables = Settings.GlobalEnvionmentVariables.Concat(variables);
                 await mgr.StartAsync();
             }
         }
@@ -124,30 +81,6 @@ namespace Squadron
         private ComposableResourceSettings GetResourceSetting(string name)
         {
             return Settings.Resources.FirstOrDefault(x => x.Name == name);
-        }
-    }
-
-    public abstract class ComposeResourceOptions
-    {
-        public abstract void Configure(ComposeResourceBuilder builder);
-    }
-
-    public static class ComposableResourceSettingsExtensions
-    {
-        public static bool HasLinks(this ComposableResourceSettings settings)
-        {
-            return settings.Links.Any();
-        }
-
-        public static IEnumerable<ComposableResourceSettings> Links(
-            this ComposableResourceSettings resource,
-            IEnumerable<ComposableResourceSettings> all )
-        {
-            foreach (ComposeResourceLink link in resource.Links)
-            {
-                ComposableResourceSettings linkRes = all.FirstOrDefault(x => x.Name == link.Name);
-                yield return linkRes;
-            }
         }
     }
 }

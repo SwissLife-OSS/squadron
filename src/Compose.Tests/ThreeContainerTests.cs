@@ -7,17 +7,15 @@ using Xunit;
 
 namespace Squadron
 {
-    public class TestWebServerOptions : GenericContainerOptions
+    public class SampleAppOptions : GenericContainerOptions
     {
         public override void Configure(ContainerResourceBuilder builder)
         {
             base.Configure(builder);
             builder
-                .Name("login-samples")
-                .InternalPort(4200)
-                .Image("spcasquadron.azurecr.io/fusion-login-samples:v2")
-                .Registry("myPrivate");
-
+                .Name("nginx-sample")
+                .InternalPort(80)
+                .Image("nginx");
         }
     }
 
@@ -28,15 +26,15 @@ namespace Squadron
         {
             builder.AddGlobalEnvironmentVariable("FOO", "BAR");
             builder.AddContainer<MongoDefaultOptions>("mongo");
-            builder.AddContainer<TestWebServerOptions>("api")
+            builder.AddContainer<SampleAppOptions>("api")
                     .AddLink("mongo", new EnvironmentVariableMapping(
-                                "UserManagement:Database:ConnectionString",
+                                "Sample:Database:ConnectionString",
                                 "#CONNECTIONSTRING#"
                                 ));
 
-            builder.AddContainer<TestWebServerOptions>("ui")
+            builder.AddContainer<SampleAppOptions>("ui")
                     .AddLink("api", new EnvironmentVariableMapping(
-                                "UserManagament:Host", "#HTTPURL#"
+                                "Sample:Api:Url", "#HTTPURL#"
                                 ));
         }
     }

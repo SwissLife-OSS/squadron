@@ -26,6 +26,7 @@ namespace Squadron
     {
         public override void Configure(ComposeResourceBuilder builder)
         {
+            builder.AddGlobalEnvironmentVariable("FOO", "BAR");
             builder.AddContainer<MongoDefaultOptions>("mongo");
             builder.AddContainer<TestWebServerOptions>("api")
                     .AddLink("mongo", new EnvironmentVariableMapping(
@@ -68,6 +69,5 @@ namespace Squadron
             //Assert
             action.Should().NotThrow();
         }
-
     }
 }

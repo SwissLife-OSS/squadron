@@ -20,10 +20,8 @@ namespace Squadron
             {
                 var builder = ContainerResourceBuilder.New();
                 ResourceSettings.ContainerOptions.Configure(builder);
-
                 BuildResourceInstance();
                 Resource.SetEnvironmentVariables(EnvironmentVariables.ToList());
-
                 await Resource.InitializeAsync();
                 Exports = Resource.GetComposeExports();
             }

@@ -1,9 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Squadron
 {
-    public class ComposableResourceBuilder<TResourceOptions>
+    public interface IComposableResourceBuilder
+    {
+        ComposableResourceSettings Build();
+    }
+
+    public class ComposableResourceBuilder<TResourceOptions> : IComposableResourceBuilder
         where TResourceOptions : ContainerResourceOptions, IComposableResourceOption, new()
     {
         private readonly string _name;
@@ -16,7 +22,7 @@ namespace Squadron
             ComposableResourceType resourceType)
                 => new ComposableResourceBuilder<TResourceOptions>(name, resourceType);
 
-        private ComposableResourceBuilder(string name, ComposableResourceType resourceType )
+        private ComposableResourceBuilder(string name, ComposableResourceType resourceType)
         {
             _name = name;
             _resourceType = resourceType;
@@ -60,17 +66,17 @@ namespace Squadron
     {
         public static ComposeResourceBuilder New() => new ComposeResourceBuilder();
 
-        private List<ComposableResourceSettings> _settings =
-            new List<ComposableResourceSettings>();
+        private List<IComposableResourceBuilder> _settingsBuilder =
+            new List<IComposableResourceBuilder>();
 
         private List<string> _globaEnvironmentVariables = new List<string>();
 
         public ComposeResourceSettings Build()
         {
-            var settings = new ComposeResourceSettings();
-            settings.Resources = new List<ComposableResourceSettings>(_settings);
-
-            return settings;
+            return new ComposeResourceSettings(
+                new List<string>(_globaEnvironmentVariables),
+                _settingsBuilder.Select(x => x.Build()).ToList()
+                );
         }
 
         public ComposableResourceBuilder<TResourceOptions> AddContainer<TResourceOptions>(
@@ -79,10 +85,11 @@ namespace Squadron
             where TResourceOptions : ContainerResourceOptions, IComposableResourceOption, new()
         {
 
-            return ComposableResourceBuilder<TResourceOptions>.New(
+            var crb = ComposableResourceBuilder<TResourceOptions>.New(
                 name,
                 ComposableResourceType.Container);
-
+            _settingsBuilder.Add(crb);
+            return crb;
         }
 
         public ComposeResourceBuilder AddGlobalEnvironmentVariable(string name, string value)

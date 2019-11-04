@@ -14,7 +14,7 @@ namespace Squadron.AzureCloud
     /// </summary>
     /// <typeparam name="TOptions"></typeparam>
     public class AzureResource<TOptions>
-        where TOptions : AzureResourceOptions, IAzureResourceConfigurationProvider, new()
+        where TOptions : AzureResourceOptions, new()
     {
         /// <summary>
         /// Azure configuration to work with Azure management api
@@ -27,11 +27,21 @@ namespace Squadron.AzureCloud
         /// <returns></returns>
         public virtual Task InitializeAsync()
         {
-            var options = new TOptions();
-            AzureConfig = options.GetAzureConfiguration();
+            //var options = new TOptions();
+            //AzureResourceOptionsBuilder builder = new AzureResourceOptionsBuilder();
+            //AzureResourceOptions options = builder.Build();
+            //AzureConfig = options.ConfigResolver();
             Trace.WriteLine("Loading Azure Configuration");
             return Task.CompletedTask;
         }
-    }
 
+        /// <summary>
+        /// Loads the azure resource configuration.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        protected void LoadResourceConfiguration(AzureResourceOptionsBuilder builder)
+        {
+           AzureConfig = builder.ConfigResolver();
+        }
+    }
 }

@@ -19,12 +19,11 @@ namespace Squadron
     public class AzureCloudServiceBusResource<TOptions>
             : AzureResource<TOptions>, IAsyncLifetime
         where TOptions : AzureCloudServiceBusOptions,
-                         IAzureResourceConfigurationProvider,
                          new()
     {
         private ServiceBusManager _serviceBusManager;
 
-        private ServiceBusModel _serviceBusOptions;
+        private ServiceBusModel _serviceBusModel;
         private readonly IMessageSink _messageSink;
 
         /// <summary>
@@ -67,7 +66,7 @@ namespace Squadron
             ServiceBusTopicModel topic = builder.Build();
 
             await CreateTopicAsync(topic);
-            _serviceBusOptions.Topics.Add(topic);
+            _serviceBusModel.Topics.Add(topic);
             return GetTopicClient(topic.Name);
         }
 
@@ -112,7 +111,7 @@ namespace Squadron
 
         private string GetTopic(string name)
         {
-            ServiceBusTopicModel topic = _serviceBusOptions.Topics
+            ServiceBusTopicModel topic = _serviceBusModel.Topics
                               .FirstOrDefault(x => x.Name.Equals(name,
                                               StringComparison.InvariantCultureIgnoreCase));
 
@@ -124,7 +123,7 @@ namespace Squadron
 
         private string GetQueue(string name)
         {
-            ServiceBusQueueModel queue = _serviceBusOptions.Queues
+            ServiceBusQueueModel queue = _serviceBusModel.Queues
                               .FirstOrDefault(x => x.Name.Equals(name,
                                               StringComparison.InvariantCultureIgnoreCase));
 
@@ -154,7 +153,8 @@ namespace Squadron
             var builder = ServiceBusOptionsBuilder.New();
             var options = new TOptions();
             options.Configure(builder);
-            _serviceBusOptions = builder.Build();
+            LoadResourceConfiguration(builder);
+            _serviceBusModel = builder.Build();
         }
 
         private void InitializeServiceBusManager()
@@ -165,25 +165,25 @@ namespace Squadron
                     {
                         SubscriptionId = AzureConfig.SubscriptionId,
                         ResourceGroupName = AzureConfig.ResourceGroup,
-                        Name = _serviceBusOptions.Namespace
+                        Name = _serviceBusModel.Namespace
                     });
         }
 
         private async Task PrepareNamespaceAsync()
         {
-            if (_serviceBusOptions.Namespace == null)
+            if (_serviceBusModel.Namespace == null)
             {
-                _serviceBusOptions.ProvisioningMode = ServiceBusProvisioningMode.CreateAndDelete;
-                _serviceBusOptions.Namespace = await
+                _serviceBusModel.ProvisioningMode = ServiceBusProvisioningMode.CreateAndDelete;
+                _serviceBusModel.Namespace = await
                     _serviceBusManager.CreateNamespaceAsync(AzureConfig.DefaultLocation);
             }
         }
 
         private async Task PrepareQueuesAsync()
         {
-            foreach (ServiceBusQueueModel queue in _serviceBusOptions.Queues)
+            foreach (ServiceBusQueueModel queue in _serviceBusModel.Queues)
             {
-                if (_serviceBusOptions.ProvisioningMode == ServiceBusProvisioningMode.UseExisting)
+                if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.UseExisting)
                 {
                     queue.CreatedName = $"{queue.Name}_{DateTime.UtcNow.Ticks}";
                 }
@@ -197,7 +197,7 @@ namespace Squadron
 
         private async Task PrepareTopicsAsync()
         {
-            foreach (ServiceBusTopicModel topic in _serviceBusOptions.Topics)
+            foreach (ServiceBusTopicModel topic in _serviceBusModel.Topics)
             {
                 _messageSink.OnMessage(
                     new DiagnosticMessage($"Creating topic {topic.CreatedName}"));
@@ -207,7 +207,7 @@ namespace Squadron
 
         private async Task<string> CreateTopicAsync(ServiceBusTopicModel topic)
         {
-            if (_serviceBusOptions.ProvisioningMode == ServiceBusProvisioningMode.UseExisting)
+            if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.UseExisting)
             {
                 topic.CreatedName = $"{topic.Name}_{DateTime.UtcNow.Ticks}";
             }
@@ -226,17 +226,17 @@ namespace Squadron
         {
             try
             {
-                if (_serviceBusOptions.ProvisioningMode == ServiceBusProvisioningMode.CreateAndDelete)
+                if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.CreateAndDelete)
                 {
                     await _serviceBusManager.DeleteNamespaceAsync();
                 }
                 else
                 {
-                    foreach (ServiceBusTopicModel topic in _serviceBusOptions.Topics)
+                    foreach (ServiceBusTopicModel topic in _serviceBusModel.Topics)
                     {
                         await _serviceBusManager.DeleteTopic(topic.CreatedName);
                     }
-                    foreach (ServiceBusQueueModel queue in _serviceBusOptions.Queues)
+                    foreach (ServiceBusQueueModel queue in _serviceBusModel.Queues)
                     {
                         await _serviceBusManager.DeleteQueue(queue.CreatedName);
                     }

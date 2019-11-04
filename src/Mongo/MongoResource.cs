@@ -8,7 +8,6 @@ using Xunit;
 
 namespace Squadron
 {
-
     /// <inheritdoc/>
     public class MongoResource : MongoResource<MongoDefaultOptions>
     {
@@ -21,7 +20,8 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class MongoResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          IAsyncLifetime,
+          IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
 
@@ -43,6 +43,14 @@ namespace Squadron
             });
 
             await Initializer.WaitAsync(new MongoStatus(Client));
+        }
+
+
+        public override Dictionary<string, string> GetComposeExports()
+        {
+            Dictionary<string, string> exports = base.GetComposeExports();
+            exports.Add("CONNECTIONSTRING", ConnectionString);
+            return exports;
         }
 
         /// <summary>
@@ -257,6 +265,8 @@ namespace Squadron
             return database
                 .GetCollection<T>(options.CollectionName);
         }
+
+
     }
 }
 

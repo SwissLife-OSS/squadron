@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Squadron
@@ -35,6 +37,8 @@ namespace Squadron
         /// </summary>
         protected TOptions ResourceOptions = null;
 
+        private List<string> _composeVariables;
+
         /// <summary>
         /// Initializes the resources
         /// </summary>
@@ -44,6 +48,8 @@ namespace Squadron
             var builder = ContainerResourceBuilder.New();
             ResourceOptions.Configure(builder);
             Settings = builder.Build();
+
+            SetComposeVariables();
             OnSettingsBuilded(Settings);
             ValidateSettings(Settings);
 
@@ -53,6 +59,23 @@ namespace Squadron
             Initializer = new ContainerInitializer(Manager, Settings);
             await Manager.CreateAndStartContainerAsync();
         }
+
+        private void SetComposeVariables()
+        {
+            if (_composeVariables != null)
+            {
+                foreach (var envVar in _composeVariables)
+                {
+                    Settings.EnvironmentVariables.Add(envVar);
+                }
+            }
+        }
+
+        public void SetEnvironmentVariables(IEnumerable<string> variables)
+        {
+            _composeVariables = variables.ToList();
+        }
+
 
         private void ValidateSettings(ContainerResourceSettings settings)
         {
@@ -66,13 +89,29 @@ namespace Squadron
                 throw new ArgumentException("Can not be 0", nameof(settings.InternalPort));
         }
 
-
         /// <summary>
         /// Called when after settings are build
         /// </summary>
         /// <param name="settings">The settings.</param>
         protected virtual void OnSettingsBuilded(ContainerResourceSettings settings)
         { }
+
+
+        public async Task PauseContainer(TimeSpan pauseTime)
+        {
+
+
+
+        }
+
+        public virtual Dictionary<string, string> GetComposeExports()
+        {
+            return new Dictionary<string, string>
+            {
+                { "ADDRESS", Manager.Instance.Address },
+                { "PORT", Manager.Instance.HostPort.ToString() },
+            };
+        }
 
 
         /// <summary>

@@ -86,5 +86,6 @@ namespace Squadron
         /// The docker configuration resolver.
         /// </value>
         public Func<DockerConfiguration> DockerConfigResolver { get; internal set; }
+
     }
 }

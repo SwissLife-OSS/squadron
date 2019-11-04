@@ -11,6 +11,5 @@ namespace Squadron.AzureServiceBus.Tests
                    .AddSubscription("test1", "EventType = 'test1'");
             builder.AddQueue("bar");
         }
-
     }
 }

@@ -16,7 +16,7 @@ namespace Squadron.AzureCloud
         /// Gets the azure configuration using the .NET configuration system
         /// </summary>
         /// <returns></returns>
-        public AzureResourceConfiguration GetAzureConfiguration()
+        public virtual AzureResourceConfiguration GetAzureConfiguration()
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)

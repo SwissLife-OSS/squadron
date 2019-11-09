@@ -1,4 +1,4 @@
-﻿namespace PostgreSql
+namespace Squadron.Samples.Shared
 {
     public class User
     {
@@ -7,5 +7,11 @@
         public string Name { get; set; }
 
         public string Email { get; set; }
+
+        public static User CreateSample()
+        {
+
+
+        }
     }
 }

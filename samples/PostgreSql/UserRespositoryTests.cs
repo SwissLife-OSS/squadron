@@ -1,15 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using Squadron;
+using Squadron.Samples.Shared;
 using Xunit;
 
-namespace PostgreSql
+namespace Squadron.Samples.PostgreSql
 {
     public class UserRespositoryTests : IClassFixture<PostgreSqlResource>
     {
@@ -31,14 +29,9 @@ namespace PostgreSql
 
             IConfiguration config = BuildInMemoryConfiguration();
 
-            var user = new User
-            {
-                Id = "A1",
-                Name = "John",
-                Email = "john@squadron.io"
-            };
 
             var repo = new UserRespository(config);
+            var user = User.CreateSample();
 
             //act
             await repo.AddAsync(user);
@@ -51,11 +44,11 @@ namespace PostgreSql
         private IConfiguration BuildInMemoryConfiguration()
         {
             return new ConfigurationBuilder()
-                                   .AddInMemoryCollection(new Dictionary<string, string>
-                                   {
-                            { "DBConnectionString",
-                               _resource.ConnectionString }
-                                   }).Build();
+                        .AddInMemoryCollection(new Dictionary<string, string>
+                        {
+                            { "DBConnectionString", 
+                               _resource.GetConnection(_dbName).ConnectionString }
+                        }).Build();
         }
 
         private async Task<User> GetUserAsync(string id)
@@ -63,7 +56,7 @@ namespace PostgreSql
             using (NpgsqlConnection con = _resource.GetConnection(_dbName))
             {
                 NpgsqlCommand cmd = con.CreateCommand();
-                cmd.CommandText = "SELECT * FROM myusers WHERE id = @id";
+                cmd.CommandText = "select * from myusers where id = @id";
                 cmd.Parameters.AddWithValue("id", id);
                 await con.OpenAsync();
                 using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync())

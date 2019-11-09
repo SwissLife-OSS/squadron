@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using Squadron.Samples.Shared;
 
-namespace PostgreSql
+namespace Squadron.Samples.PostgreSql
 {
     public class UserRespository
     {
@@ -23,8 +21,8 @@ namespace PostgreSql
             using (var con = new NpgsqlConnection(connnectionString))
             {
                 NpgsqlCommand cmd = con.CreateCommand();
-                cmd.CommandText = "INSERT INTO myUsers (id, name, email) " +
-                                  "VALUES (@id, @name, @email)";
+                cmd.CommandText = "insert into myUsers (id, name, email) " +
+                                  "values (@id, @name, @email)";
                 cmd.Parameters.AddWithValue("id", user.Id);
                 cmd.Parameters.AddWithValue("name", user.Name);
                 cmd.Parameters.AddWithValue("email", user.Email);

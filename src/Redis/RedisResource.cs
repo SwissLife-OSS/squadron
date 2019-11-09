@@ -19,12 +19,12 @@ namespace Squadron
         where TOptions : ContainerResourceOptions, new()
     {
         /// <summary>
-        /// Connection string to access to queue
+        /// ConnectionString
         /// </summary>
         public string ConnectionString { get; private set; }
 
         /// <summary>
-        /// Gets the Redix connection
+        /// Gets the Redis connection
         /// </summary>
         /// <returns></returns>
         public ConnectionMultiplexer GetConnection()

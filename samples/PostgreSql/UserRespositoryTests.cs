@@ -20,7 +20,7 @@ namespace Squadron.Samples.PostgreSql
         }
 
         [Fact]
-        public async Task UserRepository_Add_AddedUser()
+        public async Task Add_AddedUserIsEquivalent()
         {
             //arrange
             var initScript = File.ReadAllText("InitDatabase.sql");
@@ -28,7 +28,6 @@ namespace Squadron.Samples.PostgreSql
             await _resource.RunSqlScriptAsync(initScript, _dbName);
 
             IConfiguration config = BuildInMemoryConfiguration();
-
 
             var repo = new UserRespository(config);
             var user = User.CreateSample();

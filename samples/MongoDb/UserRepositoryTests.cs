@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Snapshooter.Xunit;
 using Squadron.Samples.Shared;
 using Xunit;
 
@@ -20,7 +20,7 @@ namespace Squadron.Samples.Mongo
         }
 
         [Fact]
-        public async Task UserRepository_Add_AddedUser()
+        public async Task Add_AddedUserIsEquivalent()
         {
             //arrange
             var user = User.CreateSample();
@@ -33,6 +33,32 @@ namespace Squadron.Samples.Mongo
             //assert
             User createdUser = await GetUserAsync(db, user.Id);
             createdUser.Should().BeEquivalentTo(user);
+        }
+
+        [Fact]
+        public async Task GetAll_MatchSnapshot()
+        {
+            //arrange
+            IMongoDatabase db = _mongoResource.CreateDatabase();
+            var options = new CreateCollectionFromFileOptions
+            {
+                CollectionOptions = new CreateCollectionOptions
+                {
+                    CollectionName = "users"
+                },
+                File = new FileInfo("users.json")
+            };
+
+            IMongoCollection<User> col = await _mongoResource  
+                .CreateCollectionFromFileAsync<User>(db, options);
+
+            var repo = new UserRepository(db);
+
+            //act
+            IEnumerable<User> allUsers = await repo.GetAllAsync();
+
+            //assert
+            allUsers.MatchSnapshot();
         }
 
         private Task<User> GetUserAsync(IMongoDatabase db, string id)

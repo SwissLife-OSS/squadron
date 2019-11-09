@@ -160,7 +160,6 @@ namespace Squadron
         {
             options = options ?? new CreateCollectionFromFileOptions();
             database = database ?? CreateDatabase(options.CollectionOptions.DatabaseOptions);
-
             return await CreateCollectionFromFileInternalAsync<T>(database, options);
         }
 
@@ -168,7 +167,10 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
-
+            options.CollectionOptions.DatabaseOptions = new CreateDatabaseOptions
+            {
+                DatabaseName = database.DatabaseNamespace.DatabaseName
+            };
             await DeployAndImportAsync(options);
 
             return database

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squadron.Samples.Shared;
@@ -20,6 +18,12 @@ namespace Squadron.Samples.Mongo
         {
             IMongoCollection<User> col = _mongoDatabase.GetCollection<User>("users");
             await col.InsertOneAsync(user, options: null);
+        }
+
+        public async Task<IEnumerable<User>> GetAllAsync()
+        {
+            IMongoCollection<User> col = _mongoDatabase.GetCollection<User>("users");
+            return await col.AsQueryable().ToListAsync();
         }
     }
 }

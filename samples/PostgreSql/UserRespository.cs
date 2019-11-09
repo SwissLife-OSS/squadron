@@ -29,6 +29,6 @@ namespace Squadron.Samples.PostgreSql
                 await con.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
             }
-        } 
+        }
     }
 }

@@ -46,9 +46,6 @@ namespace Squadron
                 .ExternalPort(4200)
                 .Image("spcasquadron.azurecr.io/fusion-login-samples:v2")
                 .Registry("myPrivate");
-
-
         }
-
     }
 }

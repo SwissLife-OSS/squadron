@@ -17,7 +17,7 @@ namespace Squadron
         public abstract void Configure(ContainerResourceBuilder builder);
 
 
-        internal static DockerConfiguration DefaultDockerConfigResolver()
+        public static DockerConfiguration DefaultDockerConfigResolver()
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)

@@ -116,6 +116,19 @@ namespace Squadron
             return stopped;
         }
 
+        public async Task PauseAsync(TimeSpan resumeAfter)
+        {
+            await _client.Containers.PauseContainerAsync(Instance.Id);
+            Task.Delay(resumeAfter)
+                .ContinueWith((c) => ResumeAsync())
+                .Start();
+        }
+
+        public async Task ResumeAsync()
+        {
+            await _client.Containers.UnpauseContainerAsync(Instance.Id);
+        }
+
         /// <inheritdoc/>
         public async Task RemoveContainerAsync()
         {

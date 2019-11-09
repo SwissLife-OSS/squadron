@@ -1,10 +1,15 @@
-﻿namespace Squadron
+using System;
+
+namespace Squadron
 {
     /// <summary>
     /// Default Mongo resource options
     /// </summary>
-    public class MongoDefaultOptions : ContainerResourceOptions
+    public class MongoDefaultOptions : ContainerResourceOptions, IComposableResourceOption
     {
+
+        public Type ResourceType => typeof(MongoResource);
+
         /// <summary>
         /// Configure resource options
         /// </summary>

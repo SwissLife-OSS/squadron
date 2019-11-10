@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -21,6 +22,20 @@ namespace Squadron
             builder.Name("generic");
             SetTcpStatusChecker();
         }
+
+        public void Configure(ContainerResourceBuilder builder, string httpStatucCheckPath)
+        {
+            Configure(builder);
+            ConfigureHttpStatusChecker(httpStatucCheckPath);
+        }
+
+        public void Configure(ContainerResourceBuilder builder,
+            Func<ContainerAddress, CancellationToken, Task<Status>> statusChecker)
+        {
+            Configure(builder);
+            StatusChecker = statusChecker;
+        }
+
 
         /// <summary>
         /// The status checker
@@ -45,6 +60,11 @@ namespace Squadron
             StatusChecker = CreateTcpStatusChecker();
         }
 
+        public void ConfigureHttpStatusChecker(string path="/")
+        {
+            StatusChecker = CreateHttpStatusChecker(path);
+        }
+
         private Func<ContainerAddress, CancellationToken, Task<Status>> CreateTcpStatusChecker()
         {
             return async (address, CancellationToken) =>
@@ -57,6 +77,22 @@ namespace Squadron
                         IsReady = tcpClient.Connected
                     };
                 }
+            };
+        }
+
+        private Func<ContainerAddress, CancellationToken, Task<Status>> CreateHttpStatusChecker(
+            string path)
+        {
+            return async (address, CancellationToken) =>
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri($"http://{address.Address}:{address.Port}");
+
+                HttpResponseMessage response = await client.GetAsync(path);
+                return new Status
+                {
+                    IsReady = response.IsSuccessStatusCode
+                };
             };
         }
     }

@@ -7,7 +7,7 @@ namespace Squadron
     /// </summary>
     public class ContainerResourceBuilder
     {
-        private readonly ContainerResourceSettings _options = new ContainerResourceSettings();
+        protected readonly ContainerResourceSettings _options = new ContainerResourceSettings();
 
         /// <summary>
         /// Craeates an new empty builder
@@ -161,7 +161,7 @@ namespace Squadron
         /// Builds the settings
         /// </summary>
         /// <returns></returns>
-        public ContainerResourceSettings Build()
+        public virtual ContainerResourceSettings Build()
         {
             if (_options.DockerConfigResolver == null)
                 _options.DockerConfigResolver =

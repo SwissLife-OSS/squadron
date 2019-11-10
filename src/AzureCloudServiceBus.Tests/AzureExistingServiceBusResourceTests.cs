@@ -37,6 +37,6 @@ namespace Squadron.AzureServiceBus.Tests
             ITopicClient newTopic = await _resource.CreateTopicAsync(b => b
                                             .Name("adhoc")
                                             .AddSubscription("test1"));
-        }
+        }   
     }
 }

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AssemblyName>Squadron.Samples.Generic</AssemblyName>
-    <RootNamespace>Squadron.Samples.Generic</RootNamespace>
+    <AssemblyName>Squadron.Samples.AzureCloud.ServiceBus</AssemblyName>
+    <RootNamespace>Squadron.Samples.AzureCloud.ServiceBus</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -14,9 +14,19 @@
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Core\Core.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\src\AzureCloudServiceBus\AzureCloudServiceBus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.user.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

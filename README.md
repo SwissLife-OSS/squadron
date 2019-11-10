@@ -12,22 +12,29 @@ To get more detailed information about Squadron, go to the [Squadron Docs](https
 
 ### Container Providers
 
-- [x] [MongoDB](https://swisslife-oss.github.io/squadron/docs/mongodb-getstarted)
-- [x] [SQL Server](https://swisslife-oss.github.io/squadron/docs/sqlserver-getstarted)
-- [x] [Elasticsearch](https://swisslife-oss.github.io/squadron/docs/elasticsearch-getstarted)
-- [x] Azure Blob and Queues
-- [x] RabittMQ
-- [x] Redis
-- [x] PostgresSQL
+- [x] [MongoDB](https://swisslife-oss.github.io/squadron/docs/mongodb)
+- [x] [SQL Server](https://swisslife-oss.github.io/squadron/docs/sqlserver)
+- [x] [Elasticsearch](https://swisslife-oss.github.io/squadron/docs/elasticsearch)
+- [x] [Azure Blob and Queues](https://swisslife-oss.github.io/squadron/docs/azure-storage)
+- [x] [RabittMQ](https://swisslife-oss.github.io/squadron/docs/rabbitmq)
+- [x] [Redis](https://swisslife-oss.github.io/squadron/docs/redis)
+- [x] [PostgresSQL](https://swisslife-oss.github.io/squadron/docs/postgresql)
 - [ ] Kafka
+- [ ] RavenDB
+- [ ] MySQL (MariaDB)
+- [ ] MongoDB with ReplicatSet
+
 
 ### Cloud Providers
-- [x] Azure Service Bus
+- [x] [Azure Service Bus](https://swisslife-oss.github.io/squadron/docs/azure-cloud-servicebus)
 - [ ] Azure Event Hub
+- [ ] Azure Storage
 
 ## Getting Started
 
 As getting started we've prepared a simple example how to use Squadron with *MongoDB*.
+
+You can find samples with quick starts [here](https://github.com/SwissLife-OSS/squadron/tree/master/samples).
 
 ### Install
 Install the Squadron nuget package for MongoDB within your test project:

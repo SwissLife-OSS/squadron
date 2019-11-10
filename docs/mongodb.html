@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>MongoDB · Squadron</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="The [MongoDB](https://www.mongodb.com/) resource uses a sigle node docker container."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="MongoDB · Squadron"/><meta property="og:type" content="website"/><meta property="og:url" content="https://swisslife-oss.github.io/squadron/"/><meta property="og:description" content="The [MongoDB](https://www.mongodb.com/) resource uses a sigle node docker container."/><meta property="og:image" content="https://swisslife-oss.github.io/squadron/img/logo_sl_oss.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://swisslife-oss.github.io/squadron/img/logo_sl_oss.svg"/><link rel="shortcut icon" href="/squadron/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai.min.css"/><link rel="alternate" type="application/atom+xml" href="https://swisslife-oss.github.io/squadron/blog/atom.xml" title="Squadron Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://swisslife-oss.github.io/squadron/blog/feed.xml" title="Squadron Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/squadron/js/scrollSpy.js"></script><link rel="stylesheet" href="/squadron/css/prism.css"/><link rel="stylesheet" href="/squadron/css/main.css"/><script src="/squadron/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/squadron/"><img class="logo" src="/squadron/img/logo_sl_squadron.png" alt="Squadron"/><h2 class="headerTitleWithLogo">Squadron</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/squadron/docs/introduction" target="_self">Docs</a></li><li class=""><a href="https://swissLife-oss.github.io/blog" target="_blank">Blog</a></li><li class=""><a href="https://github.com/SwissLife-OSS/squadron" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Container Providers</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/squadron/docs/introduction">Introduction</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/quickstart">Quickstart</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/basic-concept">Basic Concept</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/container-options">Container Options</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/multi">Multiple resources</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Container Providers</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/squadron/docs/mongodb">MongoDB</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/sqlserver">SQL Server</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/elasticsearch">Elasticsearch</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/postgresql">PostgreSQL</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/redis">Redis</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/rabbitmq">RabbitMQ</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/azure-storage">Azure Storage</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/generic-container">Generic</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/compose">Compose</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Azure Cloud Providers</h3><ul class=""><li class="navListItem"><a class="navItem" href="/squadron/docs/azure-cloud-setup">Setup</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/azure-cloud-servicebus">ServiceBus</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/SwissLife-OSS/squadron-docs/edit/master/docs/mongodb.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">MongoDB</h1></header><article><div><span><p>The <a href="https://www.mongodb.com/">MongoDB</a> resource uses a sigle node docker container.</p>
+<h2><a class="anchor" aria-hidden="true" id="install"></a><a href="#install" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Install</h2>
+<p>Install the Squadron nuget package Mongo for within your test project:</p>
+<pre><code class="hljs css language-bash">dotnet add package Squadron.Mongo
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="basic-usage"></a><a href="#basic-usage" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Basic usage</h2>
+<p>Inject the MongoResource into your test class constructor:</p>
+<pre><code class="hljs css language-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserRepositoryTests</span> <span class="token punctuation">:</span> <span class="token class-name">IClassFixture</span><span class="token operator">&lt;</span>MongoResource<span class="token operator">></span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">readonly</span> <span class="token class-name">MongoResource</span> _mongoResource<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">UserRepositoryTests</span><span class="token punctuation">(</span><span class="token class-name">MongoResource</span> mongoResource<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _mongoResource <span class="token operator">=</span> mongoResource<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">[</span><span class="token class-name">Fact</span><span class="token punctuation">]</span>
+    <span class="token keyword">public</span> <span class="token keyword">async</span> <span class="token class-name">Task</span> <span class="token function">UserRepository_Add_AddedUser</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">//arrange</span>
+        <span class="token keyword">var</span> user <span class="token operator">=</span> User<span class="token punctuation">.</span><span class="token function">CreateSample</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">IMongoDatabase</span> db <span class="token operator">=</span> _mongoResource<span class="token punctuation">.</span><span class="token function">CreateDatabase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">var</span> repo <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UserRepository</span><span class="token punctuation">(</span>db<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">//act</span>
+        <span class="token keyword">await</span> repo<span class="token punctuation">.</span><span class="token function">AddAsync</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">//assert</span>
+        <span class="token class-name">User</span> createdUser <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">GetUserAsync</span><span class="token punctuation">(</span>db<span class="token punctuation">,</span> user<span class="token punctuation">.</span>Id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        createdUser<span class="token punctuation">.</span><span class="token function">Should</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">BeEquivalentTo</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="create-database"></a><a href="#create-database" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Create database</h2>
+<p>Use <code>CreateDatabase()</code> to create a database with a random name.</p>
+<h2><a class="anchor" aria-hidden="true" id="create-collection-from-file"></a><a href="#create-collection-from-file" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Create collection from file</h2>
+<p>You can create a collection from an collection exported using <a href="https://docs.mongodb.com/manual/reference/program/mongoexport/">mongoexport</a></p>
+<pre><code class="hljs css language-csharp"><span class="token class-name">IMongoDatabase</span> db <span class="token operator">=</span> _mongoResource<span class="token punctuation">.</span><span class="token function">CreateDatabase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> options <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">CreateCollectionFromFileOptions</span>
+<span class="token punctuation">{</span>
+    CollectionOptions <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">CreateCollectionOptions</span>
+    <span class="token punctuation">{</span>
+        CollectionName <span class="token operator">=</span> <span class="token string">"users"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    File <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInfo</span><span class="token punctuation">(</span><span class="token string">"users.json"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+IMongoCollection<span class="token operator">&lt;</span>User<span class="token operator">></span> col <span class="token operator">=</span> <span class="token keyword">await</span> _mongoResource
+    <span class="token punctuation">.</span><span class="token generic-method"><span class="token function">CreateCollectionFromFileAsync</span><span class="token punctuation">&lt;</span><span class="token class-name">User</span><span class="token punctuation">></span></span><span class="token punctuation">(</span>db<span class="token punctuation">,</span> options<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>More samples are available in our <a href="https://github.com/SwissLife-OSS/squadron/tree/master/src/samples/mongo">samples repo</a>.</p>
+</span></div></article></div><div class="docLastUpdate"><em>Last updated on 11/10/2019 by Philippe Birbaum</em></div><div class="docs-prevnext"><a class="docs-prev button" href="/squadron/docs/multi"><span class="arrow-prev">← </span><span>Multiple resources</span></a><a class="docs-next button" href="/squadron/docs/sqlserver"><span>SQL Server</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#install">Install</a></li><li><a href="#basic-usage">Basic usage</a></li><li><a href="#create-database">Create database</a></li><li><a href="#create-collection-from-file">Create collection from file</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><div><h3>Community</h3><a href="https://swissLife-oss.github.io/cla">Contributor License Agreements</a><a href="https://swissLife-oss.github.io/coc">Code of Conduct</a></div></section><a href="https://swissLife-oss.github.io" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/squadron/img/logo_sl_oss_inverted.svg" alt="Swiss Life OSS" height="45"/><span class="projectTitleInverted">Swiss Life | OSS</span></a><section class="copyright">Copyright © 2019 Swiss Life Developers</section></footer></div></body></html>

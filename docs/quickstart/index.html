@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Quickstart · Squadron</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="1. Make sure that you have [Docker](https://docs.docker.com/docker-for-windows/)"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Quickstart · Squadron"/><meta property="og:type" content="website"/><meta property="og:url" content="https://swisslife-oss.github.io/squadron/"/><meta property="og:description" content="1. Make sure that you have [Docker](https://docs.docker.com/docker-for-windows/)"/><meta property="og:image" content="https://swisslife-oss.github.io/squadron/img/logo_sl_oss.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://swisslife-oss.github.io/squadron/img/logo_sl_oss.svg"/><link rel="shortcut icon" href="/squadron/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai.min.css"/><link rel="alternate" type="application/atom+xml" href="https://swisslife-oss.github.io/squadron/blog/atom.xml" title="Squadron Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://swisslife-oss.github.io/squadron/blog/feed.xml" title="Squadron Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/squadron/js/scrollSpy.js"></script><link rel="stylesheet" href="/squadron/css/prism.css"/><link rel="stylesheet" href="/squadron/css/main.css"/><script src="/squadron/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/squadron/"><img class="logo" src="/squadron/img/logo_sl_squadron.png" alt="Squadron"/><h2 class="headerTitleWithLogo">Squadron</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/squadron/docs/introduction" target="_self">Docs</a></li><li class=""><a href="https://swissLife-oss.github.io/blog" target="_blank">Blog</a></li><li class=""><a href="https://github.com/SwissLife-OSS/squadron" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Introduction</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/squadron/docs/introduction">Introduction</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/squadron/docs/quickstart">Quickstart</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/basic-concept">Basic Concept</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/container-options">Container Options</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/multi">Multiple resources</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Container Providers</h3><ul class=""><li class="navListItem"><a class="navItem" href="/squadron/docs/mongodb">MongoDB</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/sqlserver">SQL Server</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/elasticsearch">Elasticsearch</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/postgresql">PostgreSQL</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/redis">Redis</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/rabbitmq">RabbitMQ</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/azure-storage">Azure Storage</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/generic-container">Generic</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/compose">Compose</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Azure Cloud Providers</h3><ul class=""><li class="navListItem"><a class="navItem" href="/squadron/docs/azure-cloud-setup">Setup</a></li><li class="navListItem"><a class="navItem" href="/squadron/docs/azure-cloud-servicebus">ServiceBus</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/SwissLife-OSS/squadron-docs/edit/master/docs/quickstart.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Quickstart</h1></header><article><div><span><ol>
+<li><p>Make sure that you have <a href="https://docs.docker.com/docker-for-windows/">Docker</a>
+installed on your machine.</p></li>
+<li><p>Create a xUnit test project and install one of the availlable squadron packages.</p></li>
+</ol>
+<table>
+<thead>
+<tr><th>Provider</th><th>Package</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="/squadron/docs/mongodb">Mongo</a></td><td><code>Squadron.MongoDb</code></td></tr>
+<tr><td><a href="/squadron/docs/sqlserver">SQL Server</a></td><td><code>Squadron.SqlServer</code></td></tr>
+<tr><td><a href="/squadron/docs/elasticsearch">Elastic Search</a></td><td><code>Squadron.ElasticSearch</code></td></tr>
+<tr><td><a href="/squadron/docs/postgresql">PostgreSQL</a></td><td><code>Squadron.PostgreSql</code></td></tr>
+<tr><td><a href="/squadron/docs/redis">Redis</a></td><td><code>Squadron.Redis</code></td></tr>
+<tr><td><a href="/squadron/docs/rabbitmq">RabbitMQ</a></td><td><code>Squadron.RabbitMQ</code></td></tr>
+<tr><td><a href="/squadron/docs/azure-storage">Azure Storage</a></td><td><code>Squadron.AzureStorage</code></td></tr>
+<tr><td><a href="/squadron/docs/azure-cloud-servicebus">Azure ServiceBus</a></td><td><code>Squadron.AzureCloudServiceBus</code></td></tr>
+<tr><td><a href="/squadron/docs/generic-container">Generic</a></td><td><code>Squadron.Core</code></td></tr>
+<tr><td><a href="/squadron/docs/compose">Compose</a></td><td><code>Squadron.Compose</code></td></tr>
+</tbody>
+</table>
+<ol start="3">
+<li>Use the resource in a <code>IClassFicture&lt;&gt;</code> to write you tests.</li>
+</ol>
+<pre><code class="hljs css language-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AccountRepositoryTests</span>
+    <span class="token punctuation">:</span> <span class="token class-name">IClassFixture</span><span class="token operator">&lt;</span>MongoResource<span class="token operator">></span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">readonly</span> <span class="token class-name">MongoResource</span> _mongoResource<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">AccountRepositoryTests</span><span class="token punctuation">(</span>
+        <span class="token class-name">MongoResource</span> mongoResource<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _mongoResource <span class="token operator">=</span> mongoResource<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">[</span><span class="token class-name">Fact</span><span class="token punctuation">]</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">CreateAccount_AccountExists</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// arrange</span>
+        <span class="token keyword">var</span> database <span class="token operator">=</span> _mongoResource<span class="token punctuation">.</span><span class="token function">CreateDatabase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">var</span> accountRepository <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AccountRepository</span><span class="token punctuation">(</span>database<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">var</span> account <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Account</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// act</span>
+        <span class="token keyword">var</span> addedAccount <span class="token operator">=</span> accountRepository<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>account<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// assert</span>
+        addedAccount<span class="token punctuation">.</span><span class="token function">Should</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">NotBeNull</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</span></div></article></div><div class="docLastUpdate"><em>Last updated on 11/10/2019 by Philippe Birbaum</em></div><div class="docs-prevnext"><a class="docs-prev button" href="/squadron/docs/introduction"><span class="arrow-prev">← </span><span>Introduction</span></a><a class="docs-next button" href="/squadron/docs/basic-concept"><span>Basic Concept</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><div><h3>Community</h3><a href="https://swissLife-oss.github.io/cla">Contributor License Agreements</a><a href="https://swissLife-oss.github.io/coc">Code of Conduct</a></div></section><a href="https://swissLife-oss.github.io" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/squadron/img/logo_sl_oss_inverted.svg" alt="Swiss Life OSS" height="45"/><span class="projectTitleInverted">Swiss Life | OSS</span></a><section class="copyright">Copyright © 2019 Swiss Life Developers</section></footer></div></body></html>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
@@ -77,6 +78,20 @@ namespace Squadron
             return CreateDatabase(new CreateDatabaseOptions());
         }
 
+        /// <summary>
+        /// Creates a new test databases with specified name
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>
+        /// Returns the newly created test database.
+        /// </returns>
+        public IMongoDatabase CreateDatabase(string name)
+        {
+            return CreateDatabase(new CreateDatabaseOptions
+            {
+                DatabaseName = name
+            });
+        }
 
         /// <summary>
         /// Creates a new test databases with specified <paramref name="options"/>.

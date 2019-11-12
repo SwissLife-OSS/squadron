@@ -41,7 +41,8 @@ namespace Squadron
             _client = new DockerClientConfiguration(
                  LocalDockerUri(),
                  null,
-                 TimeSpan.FromMinutes(5))
+                 TimeSpan.FromMinutes(5)
+                 )
              .CreateClient(Version.Parse("1.25"));
             _authConfig = GetAuthConfig();
         }
@@ -256,7 +257,8 @@ namespace Squadron
                 AttachStdin = false,
                 Tty = false,
                 HostConfig = hostConfig,
-                Env = _settings.EnvironmentVariables
+                Env = _settings.EnvironmentVariables,
+                Cmd = _settings.Cmd
             };
 
             CreateContainerResponse response = await _client

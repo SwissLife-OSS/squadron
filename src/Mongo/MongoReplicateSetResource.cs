@@ -1,0 +1,46 @@
+using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver;
+
+namespace Squadron
+{
+    /// <summary>
+    /// Represents a mongo database resplica set resource that can be used by unit tests.
+    /// </summary>
+    /// <seealso cref="IDisposable"/>
+    public class MongoReplicateSetResource : MongoResource<MongoReplicateSetDefaultOptions>
+    {
+
+        public async override Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+            var client = new MongoClient(ConnectionString + "/?connect=direct");
+            BsonDocument rsConfig = CreateReplicaSetConfiguration();
+            var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
+            {
+                {"replSetInitiate", rsConfig}
+            });
+
+            await client.GetDatabase("admin")
+                .RunCommandAsync(command);
+
+        }
+
+        private BsonDocument CreateReplicaSetConfiguration()
+        {
+            var membersDocument = new BsonArray();
+            {
+                membersDocument.Add(new BsonDocument {
+                    {"_id", 0},
+                    {"host", $"{Manager.Instance.Address}:{Settings.InternalPort}"}
+                });
+            }
+            var cfg = new BsonDocument {
+                {"_id", ResourceOptions.ReplicaSetName},
+                {"members", membersDocument}
+            };
+            return cfg;
+        }
+    }
+}
+

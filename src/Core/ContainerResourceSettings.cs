@@ -52,6 +52,9 @@ namespace Squadron
         public IList<string> EnvironmentVariables { get; internal set; }
             = new List<string>();
 
+
+        public IList<string> Cmd { get; internal set; }
+
         /// <summary>
         /// Password to access resource such as database password
         /// </summary>

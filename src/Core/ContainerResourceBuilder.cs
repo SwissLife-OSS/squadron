@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Squadron
 {
@@ -8,6 +9,8 @@ namespace Squadron
     public class ContainerResourceBuilder
     {
         protected readonly ContainerResourceSettings _options = new ContainerResourceSettings();
+
+        private readonly List<string> _cmd = new List<string>();
 
         /// <summary>
         /// Craeates an new empty builder
@@ -87,6 +90,11 @@ namespace Squadron
             return this;
         }
 
+        public ContainerResourceBuilder AddCmd(params string[] cmd)
+        {
+            _cmd.AddRange(cmd);
+            return this;
+        }
 
         /// <summary>
         /// Username
@@ -166,6 +174,7 @@ namespace Squadron
             if (_options.DockerConfigResolver == null)
                 _options.DockerConfigResolver =
                     ContainerResourceOptions.DefaultDockerConfigResolver;
+            _options.Cmd = _cmd;
             return _options;
         }
     }

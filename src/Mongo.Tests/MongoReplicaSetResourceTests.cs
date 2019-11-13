@@ -28,11 +28,9 @@ namespace Squadron
                 IMongoClient client = new MongoClient(_mongoRsResource.ConnectionString);
                 using (IClientSessionHandle session = client.StartSession())
                 {
-                    IMongoDatabase db = client.GetDatabase("foo");
-                    db.CreateCollection("bar");
+                    IMongoCollection<BsonDocument> collection = _mongoRsResource.CreateCollection<BsonDocument>("bar");
                     session.StartTransaction();
-                    IMongoCollection<BsonDocument> coll = db.GetCollection<BsonDocument>("bar");
-                    coll.InsertOne(session, new BsonDocument("name", "test"));
+                    collection.InsertOne(session, new BsonDocument("name", "test"));
                     session.CommitTransaction();
                 }
             };

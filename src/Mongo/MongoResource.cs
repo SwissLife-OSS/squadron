@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -30,8 +31,13 @@ namespace Squadron
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-
             ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+            SetClient();
+            await Initializer.WaitAsync(new MongoStatus(Client));
+        }
+
+        protected void SetClient()
+        {
             Client = new MongoClient(new MongoClientSettings
             {
                 ConnectionMode = ConnectionMode.Direct,
@@ -42,8 +48,6 @@ namespace Squadron
                 ServerSelectionTimeout = TimeSpan.FromSeconds(5),
                 SocketTimeout = TimeSpan.FromSeconds(5)
             });
-
-            await Initializer.WaitAsync(new MongoStatus(Client));
         }
 
 
@@ -100,7 +104,7 @@ namespace Squadron
         /// <returns>
         /// Returns the newly created test database.
         /// </returns>
-        public IMongoDatabase CreateDatabase(
+        public virtual IMongoDatabase  CreateDatabase(
             CreateDatabaseOptions options)
         {
             return Client.GetDatabase(options.DatabaseName);
@@ -120,6 +124,13 @@ namespace Squadron
 
             return await CreateCollectionFromFileAsync<T>(
                 database, options);
+        }
+
+
+        protected async Task<bool> DatabaseExsists(string name)
+        {
+            return (await  Client.ListDatabaseNamesAsync()).ToList()
+                        .Any( x => x == name);
         }
 
         /// <summary>
@@ -240,7 +251,6 @@ namespace Squadron
             IMongoDatabase database)
         {
             var options = new CreateCollectionOptions();
-
             return CreateCollection<T>(database, options);
         }
 
@@ -278,12 +288,22 @@ namespace Squadron
         {
             options = options ?? new CreateCollectionOptions();
             database = database ?? CreateDatabase(options.DatabaseOptions);
-
-            return database
-                .GetCollection<T>(options.CollectionName);
+            //database.CreateCollection(options.CollectionName);
+            return database.GetCollection<T>(options.CollectionName);
         }
 
-
+        /// <summary>
+        /// Creates a collection with the give name and using a random database name
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        public IMongoCollection<T> CreateCollection<T>(string name)
+        {
+            IMongoDatabase db =  CreateDatabase(new CreateDatabaseOptions());
+            db.CreateCollection(name);
+            return db.GetCollection<T>(name);
+        }
     }
 }
 

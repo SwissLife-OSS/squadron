@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -10,7 +11,6 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class MongoReplicateSetResource : MongoResource<MongoReplicateSetDefaultOptions>
     {
-
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
@@ -24,6 +24,32 @@ namespace Squadron
             await client.GetDatabase("admin")
                 .RunCommandAsync(command);
 
+            SetClient();
+            await WaitForMaster();
+        }
+
+        private async Task WaitForMaster()
+        {
+            IMongoDatabase adminDb = Client.GetDatabase("admin");
+            var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
+            {
+                {"isMaster", 1}
+            });
+
+            int retryCount = 0;
+
+            while (true )
+            {
+                BsonDocument res = await adminDb.RunCommandAsync(command);
+                bool isMaster = res.GetValue("ismaster").AsBoolean;
+                if (isMaster)
+                    break;
+                await Task.Delay(1000);
+                retryCount++;
+
+                if (retryCount > 3)
+                    throw new ApplicationException("Timeout expired while waiting for master");
+            }
         }
 
         private BsonDocument CreateReplicaSetConfiguration()

@@ -7,16 +7,17 @@ namespace Squadron
 {
     public sealed class MongoReplicaSetStatus : IResourceStatusProvider
     {
-        private readonly MongoClient _mongoClient;
+        private readonly string _connectionString;
 
-        public MongoReplicaSetStatus(MongoClient mongoClient)
+        public MongoReplicaSetStatus(string connectionString)
         {
-            _mongoClient = mongoClient;
+            _connectionString = connectionString;
         }
 
         public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-            IMongoDatabase adminDb = _mongoClient.GetDatabase("admin");
+            var client = new MongoClient(_connectionString);
+            IMongoDatabase adminDb = client.GetDatabase("admin");
             var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
             {
                 {"isMaster", 1}
@@ -24,6 +25,13 @@ namespace Squadron
 
             BsonDocument res = await adminDb.RunCommandAsync(command);
             bool isMaster = res.GetValue("ismaster").AsBoolean;
+
+            if (isMaster)
+            {
+                IClientSessionHandle session = await client.StartSessionAsync();
+                session.StartTransaction();
+                await session.CommitTransactionAsync();
+            }
 
             return new Status
             {

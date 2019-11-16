@@ -27,18 +27,21 @@ namespace Squadron
         where TOptions : ContainerResourceOptions, new()
     {
 
+
+        private MongoClient _client = null;
+
         /// <inheritdoc cref="IAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
             ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
-            SetClient();
-            await Initializer.WaitAsync(new MongoStatus(Client));
+            _client = GetClient();
+            await Initializer.WaitAsync(new MongoStatus(_client));
         }
 
-        protected void SetClient()
+        private MongoClient GetClient()
         {
-            Client = new MongoClient(new MongoClientSettings
+            return new MongoClient(new MongoClientSettings
             {
                 ConnectionMode = ConnectionMode.Direct,
                 ReadConcern = ReadConcern.Majority,
@@ -64,7 +67,7 @@ namespace Squadron
         /// repository test environment.
         /// </summary>
         /// <value>The mongo database client.</value>
-        public IMongoClient Client { get; private set; }
+        public virtual IMongoClient Client => _client;
 
         /// <summary>
         /// Gets the mongo database connection string.

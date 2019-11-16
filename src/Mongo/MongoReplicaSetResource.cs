@@ -9,7 +9,7 @@ namespace Squadron
     /// Represents a mongo database resplica set resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MongoReplicateSetResource : MongoResource<MongoReplicateSetDefaultOptions>
+    public class MongoReplicaSetResource : MongoResource<MongoReplicaSetDefaultOptions>
     {
         public async override Task InitializeAsync()
         {
@@ -24,11 +24,10 @@ namespace Squadron
             await client.GetDatabase("admin")
                 .RunCommandAsync(command);
 
-            SetClient();
-            await Initializer.WaitAsync(new MongoReplicaSetStatus(client));
-            SetClient();
+            await Initializer.WaitAsync(new MongoReplicaSetStatus(ConnectionString));
         }
 
+        public override IMongoClient Client => new MongoClient(ConnectionString);
 
         private BsonDocument CreateReplicaSetConfiguration()
         {

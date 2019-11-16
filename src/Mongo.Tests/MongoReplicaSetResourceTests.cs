@@ -10,11 +10,11 @@ using Xunit;
 namespace Squadron
 {
     public class MongoReplicaSetResourceTests
-        : IClassFixture<MongoReplicateSetResource>
+        : IClassFixture<MongoReplicaSetResource>
     {
-        private readonly MongoReplicateSetResource _mongoRsResource;
+        private readonly MongoReplicaSetResource _mongoRsResource;
 
-        public MongoReplicaSetResourceTests(MongoReplicateSetResource mongoRsResource)
+        public MongoReplicaSetResourceTests(MongoReplicaSetResource mongoRsResource)
         {
             _mongoRsResource = mongoRsResource;
         }
@@ -25,8 +25,7 @@ namespace Squadron
             //Act
             Action action = () =>
             {
-                IMongoClient client = new MongoClient(_mongoRsResource.ConnectionString);
-                using (IClientSessionHandle session = client.StartSession())
+                using (IClientSessionHandle session = _mongoRsResource.Client.StartSession())
                 {
                     IMongoCollection<BsonDocument> collection = _mongoRsResource.CreateCollection<BsonDocument>("bar");
                     session.StartTransaction();

@@ -25,32 +25,10 @@ namespace Squadron
                 .RunCommandAsync(command);
 
             SetClient();
-            await WaitForMaster();
+            await Initializer.WaitAsync(new MongoReplicaSetStatus(client));
+            SetClient();
         }
 
-        private async Task WaitForMaster()
-        {
-            IMongoDatabase adminDb = Client.GetDatabase("admin");
-            var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
-            {
-                {"isMaster", 1}
-            });
-
-            int retryCount = 0;
-
-            while (true )
-            {
-                BsonDocument res = await adminDb.RunCommandAsync(command);
-                bool isMaster = res.GetValue("ismaster").AsBoolean;
-                if (isMaster)
-                    break;
-                await Task.Delay(1000);
-                retryCount++;
-
-                if (retryCount > 3)
-                    throw new ApplicationException("Timeout expired while waiting for master");
-            }
-        }
 
         private BsonDocument CreateReplicaSetConfiguration()
         {

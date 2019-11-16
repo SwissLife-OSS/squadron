@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Squadron.Samples.AzureCloud.ServiceBus
 {
     public class UserEventServiceBusOptions : AzureCloudServiceBusOptions

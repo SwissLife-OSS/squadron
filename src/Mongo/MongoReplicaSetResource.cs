@@ -9,7 +9,7 @@ namespace Squadron
     /// Represents a mongo database resplica set resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MongoReplicateSetResource : MongoResource<MongoReplicateSetDefaultOptions>
+    public class MongoReplicaSetResource : MongoResource<MongoReplicaSetDefaultOptions>
     {
         public async override Task InitializeAsync()
         {
@@ -24,33 +24,10 @@ namespace Squadron
             await client.GetDatabase("admin")
                 .RunCommandAsync(command);
 
-            SetClient();
-            await WaitForMaster();
+            await Initializer.WaitAsync(new MongoReplicaSetStatus(ConnectionString));
         }
 
-        private async Task WaitForMaster()
-        {
-            IMongoDatabase adminDb = Client.GetDatabase("admin");
-            var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
-            {
-                {"isMaster", 1}
-            });
-
-            int retryCount = 0;
-
-            while (true )
-            {
-                BsonDocument res = await adminDb.RunCommandAsync(command);
-                bool isMaster = res.GetValue("ismaster").AsBoolean;
-                if (isMaster)
-                    break;
-                await Task.Delay(1000);
-                retryCount++;
-
-                if (retryCount > 3)
-                    throw new ApplicationException("Timeout expired while waiting for master");
-            }
-        }
+        public override IMongoClient Client => new MongoClient(ConnectionString);
 
         private BsonDocument CreateReplicaSetConfiguration()
         {

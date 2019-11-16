@@ -3,16 +3,16 @@ namespace Squadron
     /// <summary>
     /// Default Mongo ResplicaSet resource options
     /// </summary>
-    public class MongoReplicateSetDefaultOptions : MongoDefaultOptions
+    public class MongoReplicaSetDefaultOptions : MongoDefaultOptions
     {
         internal string ReplicaSetName { get; }
 
-        public MongoReplicateSetDefaultOptions(string replicaSetName)
+        public MongoReplicaSetDefaultOptions(string replicaSetName)
         {
             ReplicaSetName = replicaSetName;
         }
 
-        public MongoReplicateSetDefaultOptions()
+        public MongoReplicaSetDefaultOptions()
             : this("rs0")
         {
 

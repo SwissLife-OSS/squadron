@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
@@ -25,13 +27,21 @@ namespace Squadron
         where TOptions : ContainerResourceOptions, new()
     {
 
+
+        private MongoClient _client = null;
+
         /// <inheritdoc cref="IAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-
             ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
-            Client = new MongoClient(new MongoClientSettings
+            _client = GetClient();
+            await Initializer.WaitAsync(new MongoStatus(_client));
+        }
+
+        private MongoClient GetClient()
+        {
+            return new MongoClient(new MongoClientSettings
             {
                 ConnectionMode = ConnectionMode.Direct,
                 ReadConcern = ReadConcern.Majority,
@@ -41,8 +51,6 @@ namespace Squadron
                 ServerSelectionTimeout = TimeSpan.FromSeconds(5),
                 SocketTimeout = TimeSpan.FromSeconds(5)
             });
-
-            await Initializer.WaitAsync(new MongoStatus(Client));
         }
 
 
@@ -59,7 +67,7 @@ namespace Squadron
         /// repository test environment.
         /// </summary>
         /// <value>The mongo database client.</value>
-        public IMongoClient Client { get; private set; }
+        public virtual IMongoClient Client => _client;
 
         /// <summary>
         /// Gets the mongo database connection string.
@@ -77,6 +85,20 @@ namespace Squadron
             return CreateDatabase(new CreateDatabaseOptions());
         }
 
+        /// <summary>
+        /// Creates a new test databases with specified name
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>
+        /// Returns the newly created test database.
+        /// </returns>
+        public IMongoDatabase CreateDatabase(string name)
+        {
+            return CreateDatabase(new CreateDatabaseOptions
+            {
+                DatabaseName = name
+            });
+        }
 
         /// <summary>
         /// Creates a new test databases with specified <paramref name="options"/>.
@@ -85,7 +107,7 @@ namespace Squadron
         /// <returns>
         /// Returns the newly created test database.
         /// </returns>
-        public IMongoDatabase CreateDatabase(
+        public virtual IMongoDatabase  CreateDatabase(
             CreateDatabaseOptions options)
         {
             return Client.GetDatabase(options.DatabaseName);
@@ -105,6 +127,13 @@ namespace Squadron
 
             return await CreateCollectionFromFileAsync<T>(
                 database, options);
+        }
+
+
+        protected async Task<bool> DatabaseExsists(string name)
+        {
+            return (await  Client.ListDatabaseNamesAsync()).ToList()
+                        .Any( x => x == name);
         }
 
         /// <summary>
@@ -160,7 +189,6 @@ namespace Squadron
         {
             options = options ?? new CreateCollectionFromFileOptions();
             database = database ?? CreateDatabase(options.CollectionOptions.DatabaseOptions);
-
             return await CreateCollectionFromFileInternalAsync<T>(database, options);
         }
 
@@ -168,7 +196,10 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
-
+            options.CollectionOptions.DatabaseOptions = new CreateDatabaseOptions
+            {
+                DatabaseName = database.DatabaseNamespace.DatabaseName
+            };
             await DeployAndImportAsync(options);
 
             return database
@@ -223,7 +254,6 @@ namespace Squadron
             IMongoDatabase database)
         {
             var options = new CreateCollectionOptions();
-
             return CreateCollection<T>(database, options);
         }
 
@@ -261,12 +291,22 @@ namespace Squadron
         {
             options = options ?? new CreateCollectionOptions();
             database = database ?? CreateDatabase(options.DatabaseOptions);
-
-            return database
-                .GetCollection<T>(options.CollectionName);
+            //database.CreateCollection(options.CollectionName);
+            return database.GetCollection<T>(options.CollectionName);
         }
 
-
+        /// <summary>
+        /// Creates a collection with the give name and using a random database name
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        public IMongoCollection<T> CreateCollection<T>(string name)
+        {
+            IMongoDatabase db =  CreateDatabase(new CreateDatabaseOptions());
+            db.CreateCollection(name);
+            return db.GetCollection<T>(name);
+        }
     }
 }
 

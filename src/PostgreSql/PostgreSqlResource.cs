@@ -46,6 +46,17 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Gets the connection string for a give database.
+        /// </summary>
+        /// <param name="database">The database.</param>
+        /// <returns></returns>
+        public string GetConnectionString(string database)
+        {
+            return BuildConnectionString(database);
+        }
+
+
+        /// <summary>
         /// Get an Connection for the default database
         /// </summary>
         /// <returns></returns>
@@ -53,6 +64,7 @@ namespace Squadron
         {
             return new NpgsqlConnection(ConnectionString);
         }
+        
 
         /// <summary>
         /// Gets a Connection for the given database

@@ -12,5 +12,10 @@ namespace Squadron
             : base(message)
         {
         }
+
+        public ContainerException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
     }
 }

@@ -18,8 +18,6 @@ namespace Squadron.AzureServiceBus.Tests
             ITestOutputHelper outputHelper)
         {
             _resource = resource;
-            var converter = new Converter(outputHelper);
-            Console.SetOut(converter);
         }
 
 
@@ -39,28 +37,6 @@ namespace Squadron.AzureServiceBus.Tests
             ITopicClient newTopic = await _resource.CreateTopicAsync(b => b
                                             .Name("adhoc")
                                             .AddSubscription("test1"));
-        }
-    }
-
-
-    internal class Converter : TextWriter
-    {
-        ITestOutputHelper _output;
-        public Converter(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-        public override Encoding Encoding
-        {
-            get { return Encoding.UTF8; }
-        }
-        public override void WriteLine(string message)
-        {
-            _output.WriteLine(message);
-        }
-        public override void WriteLine(string format, params object[] args)
-        {
-            _output.WriteLine(format, args);
-        }
+        }   
     }
 }

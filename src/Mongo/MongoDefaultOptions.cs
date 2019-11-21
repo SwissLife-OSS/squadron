@@ -7,7 +7,6 @@ namespace Squadron
     /// </summary>
     public class MongoDefaultOptions : ContainerResourceOptions, IComposableResourceOption
     {
-
         public Type ResourceType => typeof(MongoResource);
 
         /// <summary>

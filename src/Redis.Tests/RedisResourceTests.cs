@@ -30,7 +30,5 @@ namespace Squadron
             //Assert
             action.Should().NotThrow();
         }
-
-
     }
 }

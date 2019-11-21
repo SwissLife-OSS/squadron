@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Squadron
 {
@@ -7,7 +8,9 @@ namespace Squadron
     /// </summary>
     public class ContainerResourceBuilder
     {
-        private readonly ContainerResourceSettings _options = new ContainerResourceSettings();
+        protected readonly ContainerResourceSettings _options = new ContainerResourceSettings();
+
+        private readonly List<string> _cmd = new List<string>();
 
         /// <summary>
         /// Craeates an new empty builder
@@ -87,6 +90,11 @@ namespace Squadron
             return this;
         }
 
+        public ContainerResourceBuilder AddCmd(params string[] cmd)
+        {
+            _cmd.AddRange(cmd);
+            return this;
+        }
 
         /// <summary>
         /// Username
@@ -161,11 +169,12 @@ namespace Squadron
         /// Builds the settings
         /// </summary>
         /// <returns></returns>
-        public ContainerResourceSettings Build()
+        public virtual ContainerResourceSettings Build()
         {
             if (_options.DockerConfigResolver == null)
                 _options.DockerConfigResolver =
                     ContainerResourceOptions.DefaultDockerConfigResolver;
+            _options.Cmd = _cmd;
             return _options;
         }
     }

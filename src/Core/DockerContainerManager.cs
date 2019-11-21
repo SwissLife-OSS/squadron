@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using Polly;
 using Version = System.Version;
 
 namespace Squadron
@@ -28,6 +29,10 @@ namespace Squadron
 
         private readonly DockerClient _client = null;
 
+        private readonly AsyncPolicy retryPolicy = Policy
+                .Handle<TimeoutException>()
+                .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
         /// </summary>
@@ -41,7 +46,8 @@ namespace Squadron
             _client = new DockerClientConfiguration(
                  LocalDockerUri(),
                  null,
-                 TimeSpan.FromMinutes(5))
+                 TimeSpan.FromMinutes(5)
+                 )
              .CreateClient(Version.Parse("1.25"));
             _authConfig = GetAuthConfig();
         }
@@ -138,8 +144,20 @@ namespace Squadron
                 RemoveVolumes = true
             };
 
-            await _client.Containers
-                .RemoveContainerAsync(Instance.Id, removeOptions);
+            try
+            {
+                await retryPolicy
+                    .ExecuteAsync(async () =>
+                    {
+                        await _client.Containers
+                        .RemoveContainerAsync(Instance.Id, removeOptions);
+                    });
+            }
+            catch ( Exception ex)
+            {
+                throw new ContainerException(
+                    $"Error in RemoveContainer: {_settings.UniqueContainerName}", ex);
+            }
         }
 
         /// <inheritdoc/>
@@ -216,16 +234,29 @@ namespace Squadron
         {
             var containerStartParameters = new ContainerStartParameters();
 
-            bool started = await _client.Containers.StartContainerAsync(
-                Instance.Id,
-                containerStartParameters);
+            try
+            {
+                await retryPolicy
+                    .ExecuteAsync(async () =>
+                    {
+                        bool started = await _client.Containers.StartContainerAsync(
+                            Instance.Id,
+                            containerStartParameters);
 
-            if (!started)
+                        if (!started)
+                        {
+                            throw new ContainerException(
+                                "Docker container creation/startup failed.");
+                        }
+                    });
+            }
+            catch (Exception ex)
             {
                 throw new ContainerException(
-                    "Docker container creation/startup failed.");
+                    $"Error in StartContainer: {_settings.UniqueContainerName}", ex);
             }
         }
+
 
         private async Task CreateContainerAsync()
         {
@@ -256,19 +287,33 @@ namespace Squadron
                 AttachStdin = false,
                 Tty = false,
                 HostConfig = hostConfig,
-                Env = _settings.EnvironmentVariables
+                Env = _settings.EnvironmentVariables,
+                Cmd = _settings.Cmd
             };
 
-            CreateContainerResponse response = await _client
-                .Containers
-                .CreateContainerAsync(startParams);
 
-            if (string.IsNullOrEmpty(response.ID))
+            try
+            {
+                await retryPolicy
+                    .ExecuteAsync(async () =>
+                    {
+                        CreateContainerResponse response = await _client
+                            .Containers
+                            .CreateContainerAsync(startParams);
+
+                        if (string.IsNullOrEmpty(response.ID))
+                        {
+                            throw new ContainerException(
+                                "Could not create the container");
+                        }
+                        Instance.Id = response.ID;
+                    });
+            }
+            catch (Exception ex)
             {
                 throw new ContainerException(
-                    "Could not create the container");
+                    $"Error in CreateContainer: {_settings.UniqueContainerName}", ex);
             }
-            Instance.Id = response.ID;
         }
 
 
@@ -284,10 +329,22 @@ namespace Squadron
                 }
             }
 
-            await _client.Images.CreateImageAsync(
-                new ImagesCreateParameters { FromImage = _settings.ImageFullname },
-                _authConfig,
-                new Progress<JSONMessage>(Handler));
+            try
+            {
+                await retryPolicy
+                    .ExecuteAsync(async () =>
+                   {
+                        await _client.Images.CreateImageAsync(
+                        new ImagesCreateParameters { FromImage = _settings.ImageFullname },
+                        _authConfig,
+                        new Progress<JSONMessage>(Handler));
+                    });
+            }
+            catch ( Exception ex)
+            {
+                throw new ContainerException(
+                    $"Error in PullImage: {_settings.ImageFullname }", ex);
+            }
         }
 
 

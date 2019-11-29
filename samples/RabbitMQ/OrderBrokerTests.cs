@@ -11,11 +11,11 @@ using RabbitMQ.Client.Events;
 
 namespace Squadron.Samples.RabbitMQ
 {
-    public class UserEventBrokerTests : IClassFixture<RabbitMQResource<RabbitMQDefaultOptions>>
+    public class OrderBrokerTests : IClassFixture<RabbitMQResource<RabbitMQDefaultOptions>>
     {
         private readonly RabbitMQResource<RabbitMQDefaultOptions> _rabbitMQResource;
 
-        public UserEventBrokerTests(
+        public OrderBrokerTests(
             RabbitMQResource<RabbitMQDefaultOptions> rabbitMQResource)
         {
             _rabbitMQResource = rabbitMQResource;

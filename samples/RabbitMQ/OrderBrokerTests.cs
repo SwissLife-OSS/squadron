@@ -23,7 +23,7 @@ namespace Squadron.Samples.RabbitMQ
         [Fact]
         public async Task SendEvent_Received()
         {
-            // arrange
+            // Arrange
             var ev = new OrderEvent()
             {
                 ProductId = "Product 1",
@@ -33,7 +33,7 @@ namespace Squadron.Samples.RabbitMQ
             IConnectionFactory connectionFactory = _rabbitMQResource.CreateConnectionFactory();
             var broker = new OrderEventBroker(connectionFactory);
 
-            //act
+            // Act
             broker.SendEvent(ev);
 
             OrderEvent resultEvent = null;
@@ -54,7 +54,7 @@ namespace Squadron.Samples.RabbitMQ
                 resultEvent = JsonSerializer.Deserialize<OrderEvent>(json);
             }
 
-            //assert
+            //Assert
             resultEvent.Should().BeEquivalentTo(ev);
         }
     }

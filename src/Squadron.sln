@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenDB", "RavenDB\RavenDB.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenDB.Tests", "RavenDB.Tests\RavenDB.Tests.csproj", "{812303A5-B7A2-4F95-AAC7-F96DD228BBE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo4j", "Neo4j\Neo4j.csproj", "{A8A3F69A-BB6F-4870-BB72-DDD1D042202B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -336,6 +338,9 @@ Global
 		{812303A5-B7A2-4F95-AAC7-F96DD228BBE3}.Release|x64.Build.0 = Release|Any CPU
 		{812303A5-B7A2-4F95-AAC7-F96DD228BBE3}.Release|x86.ActiveCfg = Release|Any CPU
 		{812303A5-B7A2-4F95-AAC7-F96DD228BBE3}.Release|x86.Build.0 = Release|Any CPU
+		{A8A3F69A-BB6F-4870-BB72-DDD1D042202B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8A3F69A-BB6F-4870-BB72-DDD1D042202B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8A3F69A-BB6F-4870-BB72-DDD1D042202B}.Debug|x64.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

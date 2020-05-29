@@ -7,7 +7,7 @@ namespace Squadron
     /// </summary>
     public class Neo4jDefaultOptions : ContainerResourceOptions, IComposableResourceOption
     {
-        public Type ResourceType => typeof(MongoResource);
+        public Type ResourceType => typeof(Neo4jResource);
 
         /// <summary>
         /// Configure resource options

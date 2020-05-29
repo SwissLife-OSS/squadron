@@ -15,8 +15,7 @@ namespace Squadron.Samples.RabbitMQ
     {
         private readonly RabbitMQResource<RabbitMQDefaultOptions> _rabbitMQResource;
 
-        public OrderBrokerTests(
-            RabbitMQResource<RabbitMQDefaultOptions> rabbitMQResource)
+        public OrderBrokerTests(RabbitMQResource<RabbitMQDefaultOptions> rabbitMQResource)
         {
             _rabbitMQResource = rabbitMQResource;
         }

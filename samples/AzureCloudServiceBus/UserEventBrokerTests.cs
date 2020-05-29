@@ -19,7 +19,7 @@ namespace Squadron.Samples.AzureCloud.ServiceBus
         }
 
 
-        [Fact]
+        [Fact(Skip = "only works with active subscription")]
         public async Task SendEvent_Received()
         {
             // arrange

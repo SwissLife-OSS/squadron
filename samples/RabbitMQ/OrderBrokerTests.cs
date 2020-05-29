@@ -21,7 +21,7 @@ namespace Squadron.Samples.RabbitMQ
         }
 
         [Fact]
-        public async Task SendEvent_Received()
+        public void SendEvent_Received()
         {
             // Arrange
             var ev = new OrderEvent()
@@ -50,7 +50,7 @@ namespace Squadron.Samples.RabbitMQ
             BasicGetResult queueResult = channel.BasicGet(OrderEventBroker.QueueName, true);
             if (queueResult != null)
             {
-                var json = Encoding.UTF8.GetString(queueResult.Body);
+                var json = Encoding.UTF8.GetString(queueResult.Body.ToArray());
                 resultEvent = JsonSerializer.Deserialize<OrderEvent>(json);
             }
 

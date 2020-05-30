@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
+  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
 
   <PropertyGroup>
     <AssemblyName>Squadron.RabbitMQ.Tests</AssemblyName>

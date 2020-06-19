@@ -25,7 +25,6 @@ namespace Squadron.AzureCloud
         /// </value>
         public string ResourceGroupName { get; set; }
 
-
         /// <summary>
         /// Gets or sets the name of the resource
         /// </summary>

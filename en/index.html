@@ -10,7 +10,7 @@
 </ol>
 </span></div></h2><div><span><p>Inject the MongoResources into your test class constructor:</p>
 <pre><code class="hljs css language-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AccountRepositoryTests</span>
-    <span class="token punctuation">:</span> <span class="token class-name">IClassFixture</span><span class="token operator">&lt;</span>MongoResource<span class="token operator">></span>
+    <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">IClassFixture<span class="token punctuation">&lt;</span>MongoResource<span class="token punctuation">></span></span></span>
 <span class="token punctuation">{</span>
     <span class="token keyword">private</span> <span class="token keyword">readonly</span> <span class="token class-name">MongoResources</span> _mongoResource<span class="token punctuation">;</span>
 
@@ -25,19 +25,19 @@
 <li>Use</li>
 </ol>
 </span></div></h2><div><span><p>In your test use MongoResources to create a database and initialize your repository:</p>
-<pre><code class="hljs css language-csharp"><span class="token punctuation">[</span><span class="token class-name">Fact</span><span class="token punctuation">]</span>
-<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">CreateAccount_AccountExists</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<pre><code class="hljs css language-csharp"><span class="token punctuation">[</span><span class="token attribute"><span class="token class-name">Fact</span></span><span class="token punctuation">]</span>
+<span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">CreateAccount_AccountExists</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
     <span class="token comment">// arrange</span>
-    <span class="token keyword">var</span> database <span class="token operator">=</span> _mongoResource<span class="token punctuation">.</span><span class="token function">CreateDatabase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">var</span> accountRepository <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AccountRepository</span><span class="token punctuation">(</span>database<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">var</span> account <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Account</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> database <span class="token operator">=</span> _mongoResource<span class="token punctuation">.</span><span class="token function">CreateDatabase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> accountRepository <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">AccountRepository</span><span class="token punctuation">(</span>database<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> account <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">Account</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
     <span class="token comment">// act</span>
-    <span class="token keyword">var</span> addedAccount <span class="token operator">=</span> accountRepository<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>account<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> addedAccount <span class="token operator">=</span> accountRepository<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>account<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
     <span class="token comment">// assert</span>
     Snapshot<span class="token punctuation">.</span><span class="token function">Match</span><span class="token punctuation">(</span>addedAccount<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 </code></pre>
-</span></div></div></div><div class="blockElement fourByGridBlock"><div class="blockContent"><div></div></div></div></div></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><div><h3>Community</h3><a href="https://swissLife-oss.github.io/cla">Contributor License Agreements</a><a href="https://swissLife-oss.github.io/coc">Code of Conduct</a></div></section><a href="https://swissLife-oss.github.io" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/squadron/img/logo_sl_oss_inverted.svg" alt="Swiss Life OSS" height="45"/><span class="projectTitleInverted">Swiss Life | OSS</span></a><section class="copyright">Copyright © 2019 Swiss Life Developers</section></footer></div></body></html>
+</span></div></div></div><div class="blockElement fourByGridBlock"><div class="blockContent"><div></div></div></div></div></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><div><h3>Community</h3><a href="https://swissLife-oss.github.io/cla">Contributor License Agreements</a><a href="https://swissLife-oss.github.io/coc">Code of Conduct</a></div></section><a href="https://swissLife-oss.github.io" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/squadron/img/logo_sl_oss_inverted.svg" alt="Swiss Life OSS" height="45"/><span class="projectTitleInverted">Swiss Life | OSS</span></a><section class="copyright">Copyright © 2020 Swiss Life Developers</section></footer></div></body></html>

@@ -10,17 +10,19 @@ namespace Squadron
             string name,
             ComposableResourceType type,
             IReadOnlyList<ComposeResourceLink> links,
+            IReadOnlyList<ComposeNetwork> networks,
             ContainerResourceOptions containerOptions,
             Action<IComposableResource> onStarted)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Type = type;
             Links = links;
+            Networks = networks;
             ContainerOptions = containerOptions ?? throw new ArgumentNullException(nameof(containerOptions));
             OnStarted = onStarted;
         }
 
-        public string Name { get ; private set; }
+        public string Name { get; private set; }
 
         public ComposableResourceType Type { get; private set; }
 
@@ -28,6 +30,9 @@ namespace Squadron
 
         public IReadOnlyList<ComposeResourceLink> Links { get; private set; }
             = new List<ComposeResourceLink>();
+
+        public IReadOnlyList<ComposeNetwork> Networks { get; private set; }
+            = new List<ComposeNetwork>();
 
         public ContainerResourceOptions ContainerOptions { get; private set; }
 

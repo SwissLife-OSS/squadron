@@ -15,6 +15,7 @@ namespace Squadron
         private readonly string _name;
         private readonly ComposableResourceType _resourceType;
         private List<ComposeResourceLink> _links = new List<ComposeResourceLink>();
+        private List<ComposeNetwork> _networks = new List<ComposeNetwork>();
         private Action<IComposableResource> _onStarted = null;
 
         public static ComposableResourceBuilder<TResourceOptions> New(
@@ -29,14 +30,27 @@ namespace Squadron
         }
 
         public ComposableResourceBuilder<TResourceOptions> AddLink(
-            string name,
+            string linkContainerName,
+            ComposeLinkType linkType,
             params EnvironmentVariableMapping[] mappings)
         {
             _links.Add(new ComposeResourceLink
             {
-                Name = name,
-                EnvironmentVariables = new List<EnvironmentVariableMapping>(mappings)
+                Name = linkContainerName,
+                EnvironmentVariables = new List<EnvironmentVariableMapping>(mappings),
+                LinkType = linkType
             });
+            if (linkType == ComposeLinkType.Container)
+            {
+                _networks.Add(new ComposeNetwork()
+                {
+                    Name = UniqueNameGenerator.CreateNetworkName(_name, linkContainerName),
+                    ContainerNames = new List<string>() {
+                        _name, linkContainerName
+                    }
+                });
+            }
+
             return this;
         }
         public ComposableResourceBuilder<TResourceOptions> WithOnStarted(
@@ -53,6 +67,7 @@ namespace Squadron
                _name,
                _resourceType,
                new List<ComposeResourceLink>(_links),
+               new List<ComposeNetwork>(_networks),
                new TResourceOptions(),
                _onStarted
                );

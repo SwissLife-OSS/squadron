@@ -43,7 +43,7 @@ namespace Squadron
         /// The name of the registry.
         /// </value>
         public string RegistryName { get; internal set; }
-        
+
         public ContainerAddressMode AddressMode { get; internal set; }
 
         /// <summary>
@@ -74,6 +74,12 @@ namespace Squadron
         /// Time to wait until "readyness" of container
         /// </summary>
         public TimeSpan WaitTimeout { get; internal set; } = TimeSpan.FromSeconds(30);
+
+        /// <summary>
+        /// The docker networks that the container should be part of
+        /// </summary>
+        public IList<string> Networks { get; internal set; } =
+            new List<string>();
 
         /// <summary>
         /// Unique container name

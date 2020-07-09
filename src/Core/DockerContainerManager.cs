@@ -98,6 +98,7 @@ namespace Squadron
             await PullImageAsync();
             await CreateContainerAsync();
             await StartContainerAsync();
+            await ConnectToNetworksAsync();
             await ResolveHostAddressAsync();
 
             if (!Instance.IsRunning)
@@ -153,7 +154,7 @@ namespace Squadron
                         .RemoveContainerAsync(Instance.Id, removeOptions);
                     });
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 throw new ContainerException(
                     $"Error in RemoveContainer: {_settings.UniqueContainerName}", ex);
@@ -334,13 +335,13 @@ namespace Squadron
                 await retryPolicy
                     .ExecuteAsync(async () =>
                    {
-                        await _client.Images.CreateImageAsync(
-                        new ImagesCreateParameters { FromImage = _settings.ImageFullname },
-                        _authConfig,
-                        new Progress<JSONMessage>(Handler));
-                    });
+                       await _client.Images.CreateImageAsync(
+                       new ImagesCreateParameters { FromImage = _settings.ImageFullname },
+                       _authConfig,
+                       new Progress<JSONMessage>(Handler));
+                   });
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 throw new ContainerException(
                     $"Error in PullImage: {_settings.ImageFullname }", ex);
@@ -463,6 +464,42 @@ namespace Squadron
                 }
             }
             return result.ToString();
+        }
+
+        private async Task ConnectToNetworksAsync()
+        {
+            foreach (string networkName in _settings.Networks)
+            {
+                string networkId = await GetNetworkIdAsync(networkName);
+                await _client.Networks.ConnectNetworkAsync(
+                    networkId,
+                     new NetworkConnectParameters()
+                     {
+                         Container = Instance.Id
+                     });
+            }
+        }
+
+        private async Task<string> GetNetworkIdAsync(string networkName)
+        {
+            IList<NetworkResponse> response = await _client.Networks.ListNetworksAsync();
+
+            if (response.Any(nr => nr.Name == networkName))
+            {
+                return response.Single(nr => nr.Name == networkName).ID;
+            }
+
+            return await CreateNetworkAsync(networkName);
+        }
+
+        private async Task<string> CreateNetworkAsync(string networkName)
+        {
+            NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
+                new NetworksCreateParameters()
+                {
+                    Name = networkName
+                });
+            return response.ID;
         }
     }
 }

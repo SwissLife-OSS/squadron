@@ -7,6 +7,8 @@ namespace Squadron
         public string Name { get; set; }
 
         public List<EnvironmentVariableMapping> EnvironmentVariables { get; set; }
+
+        public ComposeLinkType LinkType { get; set; }
     }
 
 }

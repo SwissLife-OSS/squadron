@@ -29,6 +29,8 @@ namespace Squadron
 
         private readonly DockerClient _client = null;
 
+        private IDictionary<string, string> _uniqueNetworkNames = new Dictionary<string, string>();
+
         private readonly AsyncPolicy retryPolicy = Policy
                 .Handle<TimeoutException>()
                 .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
@@ -482,11 +484,9 @@ namespace Squadron
 
         private async Task<string> GetNetworkIdAsync(string networkName)
         {
-            IList<NetworkResponse> response = await _client.Networks.ListNetworksAsync();
-
-            if (response.Any(nr => nr.Name == networkName))
+            if (_uniqueNetworkNames.ContainsKey(networkName))
             {
-                return response.Single(nr => nr.Name == networkName).ID;
+                return _uniqueNetworkNames[networkName];
             }
 
             return await CreateNetworkAsync(networkName);
@@ -494,11 +494,13 @@ namespace Squadron
 
         private async Task<string> CreateNetworkAsync(string networkName)
         {
+            string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
             NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
                 new NetworksCreateParameters()
                 {
-                    Name = networkName
+                    Name = uniqueNetworkName
                 });
+            _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
             return response.ID;
         }
     }

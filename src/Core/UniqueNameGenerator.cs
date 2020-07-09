@@ -13,8 +13,9 @@ namespace Squadron
             => $"squa_{name.ToLowerInvariant()}_{DateTime.UtcNow.Ticks}_" +
                $"{Guid.NewGuid().ToString("N").Substring(6)}";
 
-        public static string CreateNetworkName(string container1, string container2)
-            => $"squa_network_{container1.ToLowerInvariant()}_{container2.ToLowerInvariant()}_" +
+        public static string CreateNetworkName(string name)
+            => $"squa_network_{name.ToLowerInvariant()}_" +
                $"{Guid.NewGuid().ToString("N").Substring(6)}";
+
     }
 }

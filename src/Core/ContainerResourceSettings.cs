@@ -84,9 +84,7 @@ namespace Squadron
         /// <summary>
         /// Unique container name
         /// </summary>
-        public string UniqueContainerName
-            => $"squa_{Name.ToLowerInvariant()}_{DateTime.UtcNow.Ticks}_" +
-               $"{Guid.NewGuid().ToString("N").Substring(6)}";
+        public string UniqueContainerName => UniqueNameGenerator.CreateContainerName(Name);
 
         /// <summary>
         /// Gets the docker configuration resolver.

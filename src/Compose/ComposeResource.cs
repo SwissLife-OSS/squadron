@@ -40,23 +40,11 @@ namespace Squadron
                         variables.Add($"{map.Name}={GetVariableValue(map.Value, exports)}");
                     }
                 }
-                foreach (ComposeNetwork network in mgr.ResourceSettings.Networks)
-                {
-                    _networks.Add(network.Name, network.ContainerNames);
-                }
-
-                // Get all networks that this container should be part of
-                foreach (KeyValuePair<string, IEnumerable<string>> network in
-                    _networks.Where(kv => kv.Value.Contains(mgr.ContainerSettings.Name)))
-                {
-                    mgr.ContainerSettings.Networks.Add(network.Key);
-                }
 
                 mgr.EnvironmentVariables = Settings.GlobalEnvionmentVariables.Concat(variables);
                 await mgr.StartAsync();
             }
         }
-
 
         public TResource GetResource<TResource>(string name)
         {

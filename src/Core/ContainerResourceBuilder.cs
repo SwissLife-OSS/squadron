@@ -39,7 +39,7 @@ namespace Squadron
         public ContainerResourceBuilder Image(string image)
         {
             var parts = image.Split(':');
-            if ( parts.Length > 1)
+            if (parts.Length > 1)
             {
                 _options.Image = parts[0];
                 _options.Tag = parts[1];
@@ -162,6 +162,18 @@ namespace Squadron
             Func<DockerConfiguration> resolver)
         {
             _options.DockerConfigResolver = resolver;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a network of which the container should be part of.
+        /// </summary>
+        /// <param name="network">The network name.</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder AddNetwork(
+            string network)
+        {
+            _options.Networks.Add(network);
             return this;
         }
 

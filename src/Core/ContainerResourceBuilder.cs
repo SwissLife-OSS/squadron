@@ -16,7 +16,7 @@ namespace Squadron
         /// Craeates an new empty builder
         /// </summary>
         /// <returns></returns>
-        public static ContainerResourceBuilder New() => new ContainerResourceBuilder();
+        public static ContainerResourceBuilder New() =>  new ContainerResourceBuilder();
 
 
         /// <summary>
@@ -174,6 +174,21 @@ namespace Squadron
             string network)
         {
             _options.Networks.Add(network);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds networks of which the container should be part of.
+        /// </summary>
+        /// <param name="networks">The network names.</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder AddNetworks(
+            IEnumerable<string> networks)
+        {
+            foreach(string network in networks)
+            {
+                _options.Networks.Add(network);
+            }
             return this;
         }
 

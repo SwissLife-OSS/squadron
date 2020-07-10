@@ -29,7 +29,8 @@ namespace Squadron
 
         private readonly DockerClient _client = null;
 
-        private IDictionary<string, string> _uniqueNetworkNames = new Dictionary<string, string>();
+        private static IDictionary<string, string> _uniqueNetworkNames =
+            new Dictionary<string, string>();
 
         private readonly AsyncPolicy retryPolicy = Policy
                 .Handle<TimeoutException>()

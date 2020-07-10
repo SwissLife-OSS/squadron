@@ -15,9 +15,6 @@ namespace Squadron
         protected Dictionary<string, ComposeResourceManager> Managers { get; set; }
             = new Dictionary<string, ComposeResourceManager>();
 
-        private IDictionary<string, IEnumerable<string>> _networks =
-            new Dictionary<string, IEnumerable<string>>();
-
         public async Task InitializeAsync()
         {
             var options = new TOptions();

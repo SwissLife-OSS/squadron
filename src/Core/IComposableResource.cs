@@ -13,6 +13,8 @@ namespace Squadron
         Task DisposeAsync();
 
         void SetEnvironmentVariables(IEnumerable<string> variables);
+
+        void SetNetworks(IEnumerable<string> networkName);
     }
 
     public interface IComposableResourceOption

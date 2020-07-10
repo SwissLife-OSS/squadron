@@ -38,6 +38,7 @@ namespace Squadron
         protected TOptions ResourceOptions = null;
 
         private List<string> _composeVariables;
+        private IEnumerable<string> _composeNetworks = new List<string>();
 
         /// <summary>
         /// Initializes the resources
@@ -47,6 +48,7 @@ namespace Squadron
             ResourceOptions = new TOptions();
             var builder = ContainerResourceBuilder.New();
             ResourceOptions.Configure(builder);
+            builder.AddNetworks(_composeNetworks);
             Settings = builder.Build();
 
             SetComposeVariables();
@@ -76,6 +78,10 @@ namespace Squadron
             _composeVariables = variables.ToList();
         }
 
+        public void SetNetworks(IEnumerable<string> composeNetworks)
+        {
+            _composeNetworks = composeNetworks;
+        }
 
         private void ValidateSettings(ContainerResourceSettings settings)
         {

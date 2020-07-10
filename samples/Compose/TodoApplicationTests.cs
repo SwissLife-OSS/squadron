@@ -71,7 +71,7 @@ namespace Squadron.Samples.Compose
 
             var client = new HttpClient
             {
-                BaseAddress = frontEnd.GetContainerUri()
+                BaseAddress = frontEnd.GetExternalContainerUri()
             };
 
             HttpResponseMessage frontResponse = await client.GetAsync("/");

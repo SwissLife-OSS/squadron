@@ -154,7 +154,11 @@ namespace Squadron
                     .ExecuteAsync(async () =>
                     {
                         await _client.Containers
-                        .RemoveContainerAsync(Instance.Id, removeOptions);
+                            .RemoveContainerAsync(Instance.Id, removeOptions);
+                        foreach (string network in _settings.Networks)
+                        {
+                            await RemoveNetworkIfUnused(network);
+                        }
                     });
             }
             catch (Exception ex)
@@ -474,12 +478,16 @@ namespace Squadron
             foreach (string networkName in _settings.Networks)
             {
                 string networkId = await GetNetworkIdAsync(networkName);
-                await _client.Networks.ConnectNetworkAsync(
-                    networkId,
-                     new NetworkConnectParameters()
-                     {
-                         Container = Instance.Id
-                     });
+
+                await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        await _client.Networks.ConnectNetworkAsync(
+                            networkId,
+                            new NetworkConnectParameters()
+                            {
+                                Container = Instance.Id
+                            });
+                    });
             }
         }
 
@@ -496,6 +504,7 @@ namespace Squadron
         private async Task<string> CreateNetworkAsync(string networkName)
         {
             string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
+
             NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
                 new NetworksCreateParameters()
                 {
@@ -503,6 +512,22 @@ namespace Squadron
                 });
             _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
             return response.ID;
+        }
+
+        private async Task RemoveNetworkIfUnused(string networkName)
+        {
+            string uniqueNetworkName = _uniqueNetworkNames[networkName];
+            await retryPolicy
+                .ExecuteAsync(async () =>
+                {
+                    NetworkResponse inspectResponse = (await _client.Networks.ListNetworksAsync())
+                        .Single(n => n.Name == uniqueNetworkName);
+
+                    if (!inspectResponse.Containers.Any())
+                    {
+                        await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
+                    }
+                });
         }
     }
 }

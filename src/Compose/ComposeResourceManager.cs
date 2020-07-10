@@ -26,7 +26,8 @@ namespace Squadron
                 // Give over the networks if resource is not generic
                 if(!IsResourceGenericType())
                 {
-                    Resource.SetNetworks(ContainerSettings.Networks);
+                    var networks = builder.Build().Networks;
+                    Resource.SetNetworks(networks);
                 }
 
                 await Resource.InitializeAsync();

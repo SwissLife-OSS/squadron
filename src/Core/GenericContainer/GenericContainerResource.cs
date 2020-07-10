@@ -7,7 +7,7 @@ using Xunit;
 namespace Squadron
 {
     /// <summary>
-    /// Defines a Generic container resource that can be used in a unit test 
+    /// Defines a Generic container resource that can be used in a unit test
     /// </summary>
     /// <typeparam name="TOptions">The type of the options.</typeparam>
     /// <seealso cref="Squadron.ContainerResource{TOptions}" />
@@ -20,24 +20,42 @@ namespace Squadron
     {
 
         /// <summary>
-        /// Gets the address.
+        /// The external address of the container, that is expposed to the host
         /// </summary>
-        /// <value>
-        /// The address.
-        /// </value>
-        public ContainerAddress Address { get; private set; }
+        public ContainerAddress ExternalAddress { get; private set; }
+
+        /// <summary>
+        /// The internal address of the container that is exposed into the container network
+        /// </summary>
+        public ContainerAddress InternalAddress { get; private set; }
 
         /// <inheritdoc cref="IAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-            Address = new ContainerAddress
+            ExternalAddress = new ContainerAddress
             {
                 Address = Manager.Instance.Address,
                 Port = Manager.Instance.HostPort
             };
 
-            await Initializer.WaitAsync(new GenericContainerStatus(ResourceOptions.StatusChecker, Address));
+            InternalAddress = new ContainerAddress
+            {
+                Address = Manager.Instance.Name,
+                Port = Settings.InternalPort
+            };
+
+            await Initializer.WaitAsync(new GenericContainerStatus(ResourceOptions.StatusChecker, ExternalAddress));
+        }
+
+        /// <summary>
+        /// Gets the external container URI.
+        /// </summary>
+        /// <param name="scheme">The scheme.</param>
+        /// <returns></returns>
+        public Uri GetExternalContainerUri(string scheme = "http")
+        {
+            return new Uri($"{scheme}://{ExternalAddress.Address}:{ExternalAddress.Port}");
         }
 
         /// <summary>
@@ -45,9 +63,9 @@ namespace Squadron
         /// </summary>
         /// <param name="scheme">The scheme.</param>
         /// <returns></returns>
-        public Uri GetContainerUri(string scheme = "http")
+        public Uri GetInternalContainerUri(string scheme = "http")
         {
-            return new Uri($"{scheme}://{Address.Address}:{Address.Port}");
+            return new Uri($"{scheme}://{InternalAddress.Address}:{InternalAddress.Port}");
         }
 
         public Task WaitUntilReadyAsync()
@@ -59,8 +77,9 @@ namespace Squadron
         {
             return new Dictionary<string, string>()
             {
-                { "HttpUrl", GetContainerUri("http").ToString() },
-                { "HttpsUrl", GetContainerUri("https").ToString() },
+                { "HttpUrl", GetExternalContainerUri("http").ToString() },
+                { "HttpsUrl", GetExternalContainerUri("https").ToString() },
+                { "HttpUrl_Internal", GetExternalContainerUri("http").ToString() },
             };
         }
     }

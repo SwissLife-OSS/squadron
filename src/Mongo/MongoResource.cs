@@ -34,7 +34,10 @@ namespace Squadron
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-            ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+            ExternalConnectionString =
+                $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+            InternalConnectionString =
+                $"mongodb://{Manager.Instance.Name}:{Settings.InternalPort}";
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
         }
@@ -46,7 +49,8 @@ namespace Squadron
                 ConnectionMode = ConnectionMode.Direct,
                 ReadConcern = ReadConcern.Majority,
                 WriteConcern = WriteConcern.Acknowledged,
-                Server = new MongoServerAddress(Manager.Instance.Address, Manager.Instance.HostPort),
+                Server = new MongoServerAddress(
+                    Manager.Instance.Address, Manager.Instance.HostPort),
                 ConnectTimeout = TimeSpan.FromSeconds(5),
                 ServerSelectionTimeout = TimeSpan.FromSeconds(5),
                 SocketTimeout = TimeSpan.FromSeconds(5)
@@ -57,22 +61,29 @@ namespace Squadron
         public override Dictionary<string, string> GetComposeExports()
         {
             Dictionary<string, string> exports = base.GetComposeExports();
-            exports.Add("CONNECTIONSTRING", ConnectionString);
+            exports.Add("CONNECTIONSTRING", ExternalConnectionString);
+            exports.Add("CONNECTIONSTRING_INTERNAL", InternalConnectionString);
             return exports;
         }
 
         /// <summary>
-        /// Gets the mongo database client that is already 
-        /// initialized to use the mongo instance of the 
+        /// Gets the mongo database client that is already
+        /// initialized to use the mongo instance of the
         /// repository test environment.
         /// </summary>
         /// <value>The mongo database client.</value>
         public virtual IMongoClient Client => _client;
 
         /// <summary>
-        /// Gets the mongo database connection string.
+        /// Gets the external mongo database connection string that is exposed to the host
         /// </summary>
-        public string ConnectionString { get; private set; }
+        public string ExternalConnectionString { get; private set; }
+
+        /// <summary>
+        /// Gets the internal mongo database connection string
+        /// that is exposed to the container network
+        /// </summary>
+        public string InternalConnectionString { get; private set; }
 
         /// <summary>
         /// Creates a new test databases with generated name.
@@ -103,11 +114,12 @@ namespace Squadron
         /// <summary>
         /// Creates a new test databases with specified <paramref name="options"/>.
         /// </summary>
-        /// <param name="options">The database creation options. Default values will be used if not specified.</param>
+        /// <param name="options">The database creation options.
+        /// Default values will be used if not specified.</param>
         /// <returns>
         /// Returns the newly created test database.
         /// </returns>
-        public virtual IMongoDatabase  CreateDatabase(
+        public virtual IMongoDatabase CreateDatabase(
             CreateDatabaseOptions options)
         {
             return Client.GetDatabase(options.DatabaseName);
@@ -132,8 +144,8 @@ namespace Squadron
 
         protected async Task<bool> DatabaseExsists(string name)
         {
-            return (await  Client.ListDatabaseNamesAsync()).ToList()
-                        .Any( x => x == name);
+            return (await Client.ListDatabaseNamesAsync()).ToList()
+                        .Any(x => x == name);
         }
 
         /// <summary>
@@ -303,7 +315,7 @@ namespace Squadron
         /// <returns></returns>
         public IMongoCollection<T> CreateCollection<T>(string name)
         {
-            IMongoDatabase db =  CreateDatabase(new CreateDatabaseOptions());
+            IMongoDatabase db = CreateDatabase(new CreateDatabaseOptions());
             db.CreateCollection(name);
             return db.GetCollection<T>(name);
         }

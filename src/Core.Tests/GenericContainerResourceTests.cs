@@ -26,7 +26,7 @@ namespace Squadron
             //Act
             Action action = () =>
             {
-                _resource.GetContainerUri();
+                _resource.GetExternalContainerUri();
             };
 
             //Assert

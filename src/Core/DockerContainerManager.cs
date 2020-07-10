@@ -315,6 +315,7 @@ namespace Squadron
                                 "Could not create the container");
                         }
                         Instance.Id = response.ID;
+                        Instance.Name = startParams.Name;
                     });
             }
             catch (Exception ex)

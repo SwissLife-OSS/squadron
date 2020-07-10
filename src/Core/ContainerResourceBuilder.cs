@@ -178,21 +178,6 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Adds networks of which the container should be part of.
-        /// </summary>
-        /// <param name="networks">The network names.</param>
-        /// <returns></returns>
-        public ContainerResourceBuilder AddNetworks(
-            IEnumerable<string> networks)
-        {
-            foreach(string network in networks)
-            {
-                _options.Networks.Add(network);
-            }
-            return this;
-        }
-
-        /// <summary>
         /// Builds the settings
         /// </summary>
         /// <returns></returns>

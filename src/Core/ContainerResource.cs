@@ -48,7 +48,7 @@ namespace Squadron
             ResourceOptions = new TOptions();
             var builder = ContainerResourceBuilder.New();
             ResourceOptions.Configure(builder);
-            builder.AddNetworks(_composeNetworks);
+            AddNetworksToBuilder(builder);
             Settings = builder.Build();
 
             SetComposeVariables();
@@ -60,6 +60,14 @@ namespace Squadron
             Manager = new DockerContainerManager(Settings, dockerConfig);
             Initializer = new ContainerInitializer(Manager, Settings);
             await Manager.CreateAndStartContainerAsync();
+        }
+
+        private void AddNetworksToBuilder(ContainerResourceBuilder builder)
+        {
+            foreach(string network in _composeNetworks)
+            {
+                builder.AddNetwork(network);
+            }
         }
 
         private void SetComposeVariables()

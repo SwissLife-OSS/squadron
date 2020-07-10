@@ -29,12 +29,12 @@ namespace Squadron
         }
 
         public ComposableResourceBuilder<TResourceOptions> AddLink(
-            string linkContainerName,
+            string name,
             params EnvironmentVariableMapping[] mappings)
         {
             _links.Add(new ComposeResourceLink
             {
-                Name = linkContainerName,
+                Name = name,
                 EnvironmentVariables = new List<EnvironmentVariableMapping>(mappings),
             });
 

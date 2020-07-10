@@ -5,9 +5,7 @@ namespace Squadron
     public static class UniqueNameGenerator
     {
         public static string Create(string prefix)
-        {
-            return $"{prefix}_{Guid.NewGuid():N}";
-        }
+            => $"{prefix}_{Guid.NewGuid():N}";
 
         public static string CreateContainerName(string name)
             => $"squa_{name.ToLowerInvariant()}_{DateTime.UtcNow.Ticks}_" +

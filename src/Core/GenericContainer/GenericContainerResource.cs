@@ -79,7 +79,7 @@ namespace Squadron
             {
                 { "HTTPURL", GetExternalContainerUri("http").ToString() },
                 { "HTTPSURL", GetExternalContainerUri("https").ToString() },
-                { "HTTPURL_INTERNAL", GetExternalContainerUri("http").ToString() },
+                { "HTTPURL_INTERNAL", GetInternalContainerUri("http").ToString() },
             };
         }
     }

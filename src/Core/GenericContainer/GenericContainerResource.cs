@@ -77,9 +77,9 @@ namespace Squadron
         {
             return new Dictionary<string, string>()
             {
-                { "HttpUrl", GetExternalContainerUri("http").ToString() },
-                { "HttpsUrl", GetExternalContainerUri("https").ToString() },
-                { "HttpUrl_Internal", GetExternalContainerUri("http").ToString() },
+                { "HTTPURL", GetExternalContainerUri("http").ToString() },
+                { "HTTPSURL", GetExternalContainerUri("https").ToString() },
+                { "HTTPURL_INTERNAL", GetExternalContainerUri("http").ToString() },
             };
         }
     }

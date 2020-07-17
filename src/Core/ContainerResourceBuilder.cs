@@ -27,6 +27,7 @@ namespace Squadron
         public ContainerResourceBuilder Name(string name)
         {
             _options.Name = name;
+            _options.UniqueContainerName = UniqueNameGenerator.CreateContainerName(name);
             return this;
         }
 

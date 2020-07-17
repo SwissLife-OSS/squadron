@@ -84,7 +84,7 @@ namespace Squadron
         /// <summary>
         /// Unique container name
         /// </summary>
-        public string UniqueContainerName => UniqueNameGenerator.CreateContainerName(Name);
+        public string UniqueContainerName { get; internal set; }
 
         /// <summary>
         /// Gets the docker configuration resolver.

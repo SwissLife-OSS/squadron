@@ -79,6 +79,9 @@ namespace Squadron
                     Settings.EnvironmentVariables.Add(envVar);
                 }
             }
+
+            // Add docker hostname variable
+            Settings.EnvironmentVariables.Add($"DockerHost:Name={Settings.UniqueContainerName}");
         }
 
         public void SetEnvironmentVariables(IEnumerable<string> variables)

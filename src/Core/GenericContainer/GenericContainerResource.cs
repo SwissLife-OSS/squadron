@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,30 +21,31 @@ namespace Squadron
         /// <summary>
         /// The external address of the container, that is expposed to the host
         /// </summary>
-        public ContainerAddress ExternalAddress { get; private set; }
+        public ContainerAddress Address { get; private set; }
 
         /// <summary>
         /// The internal address of the container that is exposed into the container network
         /// </summary>
-        public ContainerAddress InternalAddress { get; private set; }
+        public ContainerAddress NetworkAddress { get; private set; }
 
         /// <inheritdoc cref="IAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-            ExternalAddress = new ContainerAddress
+            Address = new ContainerAddress
             {
                 Address = Manager.Instance.Address,
                 Port = Manager.Instance.HostPort
             };
 
-            InternalAddress = new ContainerAddress
+            NetworkAddress = new ContainerAddress
             {
                 Address = Manager.Instance.Name,
                 Port = Settings.InternalPort
             };
 
-            await Initializer.WaitAsync(new GenericContainerStatus(ResourceOptions.StatusChecker, ExternalAddress));
+            await Initializer.WaitAsync(new GenericContainerStatus(
+                ResourceOptions.StatusChecker, Address));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Squadron
         /// <returns></returns>
         public Uri GetExternalContainerUri(string scheme = "http")
         {
-            return new Uri($"{scheme}://{ExternalAddress.Address}:{ExternalAddress.Port}");
+            return new Uri($"{scheme}://{Address.Address}:{Address.Port}");
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Squadron
         /// <returns></returns>
         public Uri GetInternalContainerUri(string scheme = "http")
         {
-            return new Uri($"{scheme}://{InternalAddress.Address}:{InternalAddress.Port}");
+            return new Uri($"{scheme}://{NetworkAddress.Address}:{NetworkAddress.Port}");
         }
 
         public Task WaitUntilReadyAsync()
@@ -77,9 +77,9 @@ namespace Squadron
         {
             return new Dictionary<string, string>()
             {
-                { "HTTPURL", GetExternalContainerUri("http").ToString() },
-                { "HTTPSURL", GetExternalContainerUri("https").ToString() },
-                { "HTTPURL_INTERNAL", GetInternalContainerUri("http").ToString() },
+                { "HTTPURL", GetExternalContainerUri("http").ToString().Trim('/') },
+                { "HTTPSURL", GetExternalContainerUri("https").ToString().Trim('/') },
+                { "HTTPURL_INTERNAL", GetInternalContainerUri("http").ToString().Trim('/') },
             };
         }
     }

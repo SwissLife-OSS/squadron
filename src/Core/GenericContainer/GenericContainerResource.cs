@@ -53,7 +53,7 @@ namespace Squadron
         /// </summary>
         /// <param name="scheme">The scheme.</param>
         /// <returns></returns>
-        public Uri GetExternalContainerUri(string scheme = "http")
+        public Uri GetContainerUri(string scheme = "http")
         {
             return new Uri($"{scheme}://{Address.Address}:{Address.Port}");
         }
@@ -63,7 +63,7 @@ namespace Squadron
         /// </summary>
         /// <param name="scheme">The scheme.</param>
         /// <returns></returns>
-        public Uri GetInternalContainerUri(string scheme = "http")
+        public Uri GetNetworkContainerUri(string scheme = "http")
         {
             return new Uri($"{scheme}://{NetworkAddress.Address}:{NetworkAddress.Port}");
         }
@@ -77,9 +77,9 @@ namespace Squadron
         {
             return new Dictionary<string, string>()
             {
-                { "HTTPURL", GetExternalContainerUri("http").ToString().Trim('/') },
-                { "HTTPSURL", GetExternalContainerUri("https").ToString().Trim('/') },
-                { "HTTPURL_INTERNAL", GetInternalContainerUri("http").ToString().Trim('/') },
+                { "HTTPURL", GetContainerUri("http").ToString().Trim('/') },
+                { "HTTPSURL", GetContainerUri("https").ToString().Trim('/') },
+                { "HTTPURL_INTERNAL", GetNetworkContainerUri("http").ToString().Trim('/') },
             };
         }
     }

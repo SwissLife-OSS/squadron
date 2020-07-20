@@ -25,7 +25,7 @@ namespace Squadron.Samples.Generic
             //arrange
             var handler = new XtraHeadersDelegateHandler();
             var client = new HttpClient(handler);
-            client.BaseAddress = _genericContainer.GetExternalContainerUri();
+            client.BaseAddress = _genericContainer.GetContainerUri();
 
             //act
             HttpResponseMessage response = await client.GetAsync("headers");

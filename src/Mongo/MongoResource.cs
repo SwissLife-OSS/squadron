@@ -34,9 +34,9 @@ namespace Squadron
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-            ExternalConnectionString =
+            ConnectionString =
                 $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
-            InternalConnectionString =
+            NetworkConnectionString =
                 $"mongodb://{Manager.Instance.Name}:{Settings.InternalPort}";
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
@@ -61,8 +61,8 @@ namespace Squadron
         public override Dictionary<string, string> GetComposeExports()
         {
             Dictionary<string, string> exports = base.GetComposeExports();
-            exports.Add("CONNECTIONSTRING", ExternalConnectionString);
-            exports.Add("CONNECTIONSTRING_INTERNAL", InternalConnectionString);
+            exports.Add("CONNECTIONSTRING", ConnectionString);
+            exports.Add("CONNECTIONSTRING_INTERNAL", NetworkConnectionString);
             return exports;
         }
 
@@ -77,13 +77,13 @@ namespace Squadron
         /// <summary>
         /// Gets the external mongo database connection string that is exposed to the host
         /// </summary>
-        public string ExternalConnectionString { get; private set; }
+        public string ConnectionString { get; private set; }
 
         /// <summary>
         /// Gets the internal mongo database connection string
         /// that is exposed to the container network
         /// </summary>
-        public string InternalConnectionString { get; private set; }
+        public string NetworkConnectionString { get; private set; }
 
         /// <summary>
         /// Creates a new test databases with generated name.

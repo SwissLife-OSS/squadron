@@ -14,7 +14,7 @@ namespace Squadron
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-            var client = new MongoClient(ExternalConnectionString + "/?connect=direct");
+            var client = new MongoClient(ConnectionString + "/?connect=direct");
             BsonDocument rsConfig = CreateReplicaSetConfiguration();
             var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
             {
@@ -24,10 +24,10 @@ namespace Squadron
             await client.GetDatabase("admin")
                 .RunCommandAsync(command);
 
-            await Initializer.WaitAsync(new MongoReplicaSetStatus(ExternalConnectionString));
+            await Initializer.WaitAsync(new MongoReplicaSetStatus(ConnectionString));
         }
 
-        public override IMongoClient Client => new MongoClient(ExternalConnectionString);
+        public override IMongoClient Client => new MongoClient(ConnectionString);
 
         private BsonDocument CreateReplicaSetConfiguration()
         {

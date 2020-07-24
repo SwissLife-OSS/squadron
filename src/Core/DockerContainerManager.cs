@@ -511,7 +511,7 @@ namespace Squadron
                 {
                     Name = uniqueNetworkName
                 });
-            _uniqueNetworkNames.TryAdd(networkName, uniqueNetworkName);
+            _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
             return response.ID;
         }
 

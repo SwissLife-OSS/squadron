@@ -32,6 +32,8 @@ namespace Squadron
         private static IDictionary<string, string> _uniqueNetworkNames =
             new Dictionary<string, string>();
 
+        private static readonly object _createNetworkLock = new object();
+
         private readonly AsyncPolicy retryPolicy = Policy
                 .Handle<TimeoutException>()
                 .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
@@ -478,7 +480,7 @@ namespace Squadron
         {
             foreach (string networkName in _settings.Networks)
             {
-                string networkId = await GetNetworkIdAsync(networkName);
+                string networkId = GetNetworkId(networkName);
 
                 await retryPolicy.ExecuteAsync(async () =>
                     {
@@ -492,25 +494,30 @@ namespace Squadron
             }
         }
 
-        private async Task<string> GetNetworkIdAsync(string networkName)
+        private string GetNetworkId(string networkName)
         {
-            if (_uniqueNetworkNames.ContainsKey(networkName))
+            // Lock to ensure thread safety of static list
+            lock (_createNetworkLock)
             {
-                return _uniqueNetworkNames[networkName];
-            }
+                if (_uniqueNetworkNames.ContainsKey(networkName))
+                {
+                    return _uniqueNetworkNames[networkName];
+                }
 
-            return await CreateNetworkAsync(networkName);
+                return CreateNetwork(networkName);
+            }
         }
 
-        private async Task<string> CreateNetworkAsync(string networkName)
+        private string CreateNetwork(string networkName)
         {
             string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
 
-            NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
+            NetworksCreateResponse response = _client.Networks.CreateNetworkAsync(
                 new NetworksCreateParameters()
                 {
                     Name = uniqueNetworkName
-                });
+                }).Result;
+
             _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
             return response.ID;
         }

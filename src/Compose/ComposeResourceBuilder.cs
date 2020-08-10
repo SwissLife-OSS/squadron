@@ -71,12 +71,12 @@ namespace Squadron
         private List<IComposableResourceBuilder> _settingsBuilder =
             new List<IComposableResourceBuilder>();
 
-        private List<string> _globaEnvironmentVariables = new List<string>();
+        private List<string> _globalEnvironmentVariables = new List<string>();
 
         public ComposeResourceSettings Build()
         {
             return new ComposeResourceSettings(
-                new List<string>(_globaEnvironmentVariables),
+                new List<string>(_globalEnvironmentVariables),
                 _settingsBuilder.Select(x => x.Build()).ToList()
                 );
         }
@@ -96,7 +96,7 @@ namespace Squadron
 
         public ComposeResourceBuilder AddGlobalEnvironmentVariable(string name, string value)
         {
-            _globaEnvironmentVariables.Add($"{name}={value}");
+            _globalEnvironmentVariables.Add($"{name}={value}");
             return this;
         }
     }

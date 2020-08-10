@@ -15,7 +15,8 @@ namespace Squadron
             builder
                 .Name("nginx-sample")
                 .InternalPort(80)
-                .Image("nginx");
+                .Image("nginx")
+                .AddNetwork("demo-network");
         }
     }
 

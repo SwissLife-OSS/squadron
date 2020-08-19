@@ -22,6 +22,14 @@ namespace Squadron
                 ResourceSettings.ContainerOptions.Configure(builder);
                 BuildResourceInstance();
                 Resource.SetEnvironmentVariables(EnvironmentVariables.ToList());
+
+                // Give over the networks if resource is not generic
+                if(!IsResourceGenericType())
+                {
+                    var networks = builder.Build().Networks;
+                    Resource.SetNetworks(networks);
+                }
+
                 await Resource.InitializeAsync();
                 Exports = Resource.GetComposeExports();
             }
@@ -32,13 +40,17 @@ namespace Squadron
             var composableOptions = (IComposableResourceOption)ResourceSettings.ContainerOptions;
             Type activateType = composableOptions.ResourceType;
 
-            if (composableOptions.ResourceType.IsGenericType)
+            if (IsResourceGenericType())
             {
                 activateType = composableOptions.ResourceType
                     .MakeGenericType(ResourceSettings.ContainerOptions.GetType());
             }
             Resource = (IComposableResource)Activator.CreateInstance(activateType);
         }
+
+        private bool IsResourceGenericType() =>
+            ((IComposableResourceOption)ResourceSettings.ContainerOptions)
+                .ResourceType.IsGenericType;
 
         internal async Task StopAsync()
         {

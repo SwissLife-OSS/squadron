@@ -6,7 +6,7 @@ using Xunit;
 namespace Squadron
 {
     /// <summary>
-    /// Defines a Generic container resource that can be used in a unit test 
+    /// Defines a Generic container resource that can be used in a unit test
     /// </summary>
     /// <typeparam name="TOptions">The type of the options.</typeparam>
     /// <seealso cref="Squadron.ContainerResource{TOptions}" />
@@ -60,16 +60,6 @@ namespace Squadron
             return new Uri($"{scheme}://{Address.Address}:{Address.Port}");
         }
 
-        /// <summary>
-        /// Gets the container URI.
-        /// </summary>
-        /// <param name="scheme">The scheme.</param>
-        /// <returns></returns>
-        public Uri GetNetworkContainerUri(string scheme = "http")
-        {
-            return new Uri($"{scheme}://{NetworkAddress.Address}:{NetworkAddress.Port}");
-        }
-
         public Task WaitUntilReadyAsync()
         {
             return Task.CompletedTask;
@@ -77,11 +67,13 @@ namespace Squadron
 
         public Dictionary<string, string> GetComposeExports()
         {
+            var internalUri = new Uri($"http://{NetworkAddress.Address}:{NetworkAddress.Port}");
+
             return new Dictionary<string, string>()
             {
                 { "HTTPURL", GetContainerUri("http").ToString().Trim('/') },
                 { "HTTPSURL", GetContainerUri("https").ToString().Trim('/') },
-                { "HTTPURL_INTERNAL", GetNetworkContainerUri("http").ToString().Trim('/') }
+                { "HTTPURL_INTERNAL", internalUri.ToString().Trim('/') }
             };
         }
     }

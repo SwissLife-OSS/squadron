@@ -29,7 +29,7 @@ namespace Squadron
         public async Task TwoContainer_Network_BothInSameNetwork()
         {
             MongoResource mongoResource = _resource.GetResource<MongoResource>("mongo");
-            string connectionString = mongoResource.NetworkConnectionString;
+            string connectionString = mongoResource.GetComposeExports()["CONNECTIONSTRING_INTERNAL"];
 
             string containerName = GetNameFromConnectionString(connectionString);
             IList<ContainerListResponse> response = (await _dockerClient.Containers.ListContainersAsync(

@@ -48,7 +48,7 @@ namespace Squadron
             Resource = (IComposableResource)Activator.CreateInstance(activateType);
         }
 
-        private bool IsResourceGenericType() =>
+	private bool IsResourceGenericType() =>
             ((IComposableResourceOption)ResourceSettings.ContainerOptions)
                 .ResourceType.IsGenericType;
 

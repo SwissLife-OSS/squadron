@@ -156,7 +156,7 @@ namespace Squadron
                     .ExecuteAsync(async () =>
                     {
                         await _client.Containers
-                        .RemoveContainerAsync(Instance.Id, removeOptions);
+                            .RemoveContainerAsync(Instance.Id, removeOptions);
 
                         foreach (string network in _settings.Networks)
                         {
@@ -476,7 +476,7 @@ namespace Squadron
             }
             return result.ToString();
         }
-
+        
         private async Task ConnectToNetworksAsync()
         {
             foreach (string networkName in _settings.Networks)

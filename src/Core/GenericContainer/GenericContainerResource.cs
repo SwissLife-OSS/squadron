@@ -6,7 +6,7 @@ using Xunit;
 namespace Squadron
 {
     /// <summary>
-    /// Defines a Generic container resource that can be used in a unit test
+    /// Defines a Generic container resource that can be used in a unit test 
     /// </summary>
     /// <typeparam name="TOptions">The type of the options.</typeparam>
     /// <seealso cref="Squadron.ContainerResource{TOptions}" />
@@ -26,7 +26,7 @@ namespace Squadron
         /// </value>
         public ContainerAddress Address { get; private set; }
 
-         /// <summary>
+        /// <summary>
         /// The internal address of the container that is exposed into the container network
         /// </summary>
         public ContainerAddress NetworkAddress { get; private set; }
@@ -81,7 +81,7 @@ namespace Squadron
             {
                 { "HTTPURL", GetContainerUri("http").ToString().Trim('/') },
                 { "HTTPSURL", GetContainerUri("https").ToString().Trim('/') },
-                { "HTTPURL_INTERNAL", GetNetworkContainerUri("http").ToString().Trim('/') },
+                { "HTTPURL_INTERNAL", GetNetworkContainerUri("http").ToString().Trim('/') }
             };
         }
     }

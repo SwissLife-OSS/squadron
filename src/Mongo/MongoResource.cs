@@ -37,7 +37,7 @@ namespace Squadron
             ConnectionString =
                 $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
             NetworkConnectionString =
-                $"mongodb://{Manager.Instance.Name}:{Settings.InternalPort}";
+                $"mongodb://{Manager.Instance.Name}:{Settings.InternalPort}";            
 
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
@@ -67,15 +67,15 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Gets the mongo database client that is already
-        /// initialized to use the mongo instance of the
+        /// Gets the mongo database client that is already 
+        /// initialized to use the mongo instance of the 
         /// repository test environment.
         /// </summary>
         /// <value>The mongo database client.</value>
         public virtual IMongoClient Client => _client;
 
         /// <summary>
-        /// Gets the external mongo database connection string that is exposed to the host
+        /// Gets the external mongo database connection string that is exposed to the host.
         /// </summary>
         public string ConnectionString { get; private set; }
 

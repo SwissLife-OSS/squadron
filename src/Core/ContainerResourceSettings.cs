@@ -43,7 +43,7 @@ namespace Squadron
         /// The name of the registry.
         /// </value>
         public string RegistryName { get; internal set; }
-
+        
         public ContainerAddressMode AddressMode { get; internal set; }
 
         /// <summary>

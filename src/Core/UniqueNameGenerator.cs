@@ -2,9 +2,9 @@ using System;
 
 namespace Squadron
 {
-    public  static class UniqueNameGenerator
+    public static class UniqueNameGenerator
     {
-        public  static string Create(string prefix)
+        public static string Create(string prefix)
             => $"{prefix}_{Guid.NewGuid():N}";
 
         public static string CreateContainerName(string name)

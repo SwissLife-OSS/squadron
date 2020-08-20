@@ -23,7 +23,7 @@ namespace Squadron
                 BuildResourceInstance();
                 Resource.SetEnvironmentVariables(EnvironmentVariables.ToList());
 
-		// Give over the networks if resource is not generic
+                // Give over the networks if resource is not generic
                 if(!IsResourceGenericType())
                 {
                     var networks = builder.Build().Networks;
@@ -48,7 +48,7 @@ namespace Squadron
             Resource = (IComposableResource)Activator.CreateInstance(activateType);
         }
 
-	private bool IsResourceGenericType() =>
+        private bool IsResourceGenericType() =>
             ((IComposableResourceOption)ResourceSettings.ContainerOptions)
                 .ResourceType.IsGenericType;
 

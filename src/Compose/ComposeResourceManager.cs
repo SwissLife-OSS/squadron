@@ -1,9 +1,9 @@
-using System; 
-using System.Collections.Generic; 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace Squadron 
+namespace Squadron
 {
     public class ComposeResourceManager
     {
@@ -57,4 +57,4 @@ namespace Squadron
             await Resource.DisposeAsync();
         }
     }
-} 
+}

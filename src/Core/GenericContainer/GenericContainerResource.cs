@@ -26,11 +26,6 @@ namespace Squadron
         /// </value>
         public ContainerAddress Address { get; private set; }
 
-        /// <summary>
-        /// The internal address of the container that is exposed into the container network
-        /// </summary>
-        public ContainerAddress NetworkAddress { get; private set; }
-
         /// <inheritdoc cref="IAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
@@ -39,11 +34,6 @@ namespace Squadron
             {
                 Address = Manager.Instance.Address,
                 Port = Manager.Instance.HostPort
-            };
-            NetworkAddress = new ContainerAddress
-            {
-                Address = Manager.Instance.Name,
-                Port = Settings.InternalPort
             };
 
             await Initializer.WaitAsync(new GenericContainerStatus(
@@ -67,7 +57,7 @@ namespace Squadron
 
         public Dictionary<string, string> GetComposeExports()
         {
-            var internalUri = new Uri($"http://{NetworkAddress.Address}:{NetworkAddress.Port}");
+            var internalUri = new Uri($"http://{Manager.Instance.Name}:{Settings.InternalPort}");
 
             return new Dictionary<string, string>()
             {

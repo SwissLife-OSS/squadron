@@ -27,6 +27,7 @@ namespace Squadron
         public ContainerResourceBuilder Name(string name)
         {
             _options.Name = name;
+            _options.UniqueContainerName = UniqueNameGenerator.CreateContainerName(name);
             return this;
         }
 
@@ -162,6 +163,18 @@ namespace Squadron
             Func<DockerConfiguration> resolver)
         {
             _options.DockerConfigResolver = resolver;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a network of which the container should be part of.
+        /// </summary>
+        /// <param name="network">The network name.</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder AddNetwork(
+            string network)
+        {
+            _options.Networks.Add(network);
             return this;
         }
 

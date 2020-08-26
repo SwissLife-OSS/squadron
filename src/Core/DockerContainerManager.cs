@@ -29,6 +29,11 @@ namespace Squadron
 
         private readonly DockerClient _client = null;
 
+        private static IDictionary<string, string> _uniqueNetworkNames =
+            new Dictionary<string, string>();
+
+        private static readonly object _createNetworkLock = new object();
+
         private readonly AsyncPolicy retryPolicy = Policy
                 .Handle<TimeoutException>()
                 .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
@@ -64,7 +69,7 @@ namespace Squadron
                 if (registryConfig == null)
                 {
                     throw new InvalidOperationException(
-                        $"No container egistry with name '{_settings.RegistryName}'" +
+                        $"No container registry with name '{_settings.RegistryName}'" +
                          "found in configuration");
                 }
 
@@ -98,6 +103,7 @@ namespace Squadron
             await PullImageAsync();
             await CreateContainerAsync();
             await StartContainerAsync();
+            await ConnectToNetworksAsync();
             await ResolveHostAddressAsync();
 
             if (!Instance.IsRunning)
@@ -150,7 +156,12 @@ namespace Squadron
                     .ExecuteAsync(async () =>
                     {
                         await _client.Containers
-                        .RemoveContainerAsync(Instance.Id, removeOptions);
+                            .RemoveContainerAsync(Instance.Id, removeOptions);
+
+                        foreach (string network in _settings.Networks)
+                        {
+                            await RemoveNetworkIfUnused(network);
+                        }
                     });
             }
             catch ( Exception ex)
@@ -307,6 +318,7 @@ namespace Squadron
                                 "Could not create the container");
                         }
                         Instance.Id = response.ID;
+                        Instance.Name = startParams.Name;
                     });
             }
             catch (Exception ex)
@@ -463,6 +475,68 @@ namespace Squadron
                 }
             }
             return result.ToString();
+        }
+        
+        private async Task ConnectToNetworksAsync()
+        {
+            foreach (string networkName in _settings.Networks)
+            {
+                string networkId = GetNetworkId(networkName);
+
+                await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        await _client.Networks.ConnectNetworkAsync(
+                            networkId,
+                            new NetworkConnectParameters()
+                            {
+                                Container = Instance.Id
+                            });
+                    });
+            }
+        }
+
+        private string GetNetworkId(string networkName)
+        {
+            // Lock to ensure thread safety of static list
+            lock (_createNetworkLock)
+            {
+                if (_uniqueNetworkNames.ContainsKey(networkName))
+                {
+                    return _uniqueNetworkNames[networkName];
+                }
+
+                return CreateNetwork(networkName);
+            }
+        }
+
+        private string CreateNetwork(string networkName)
+        {
+            string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
+
+            NetworksCreateResponse response = _client.Networks.CreateNetworkAsync(
+                new NetworksCreateParameters()
+                {
+                    Name = uniqueNetworkName
+                }).Result;
+
+            _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
+            return response.ID;
+        }
+
+        private async Task RemoveNetworkIfUnused(string networkName)
+        {
+            string uniqueNetworkName = _uniqueNetworkNames[networkName];
+            await retryPolicy
+                .ExecuteAsync(async () =>
+                {
+                    NetworkResponse inspectResponse = (await _client.Networks.ListNetworksAsync())
+                        .Single(n => n.Name == uniqueNetworkName);
+
+                    if (!inspectResponse.Containers.Any())
+                    {
+                        await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
+                    }
+                });
         }
     }
 }

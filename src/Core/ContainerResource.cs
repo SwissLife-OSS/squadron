@@ -39,6 +39,8 @@ namespace Squadron
 
         private List<string> _composeVariables;
 
+        private IEnumerable<string> _composeNetworks = new List<string>();
+
         /// <summary>
         /// Initializes the resources
         /// </summary>
@@ -47,6 +49,7 @@ namespace Squadron
             ResourceOptions = new TOptions();
             var builder = ContainerResourceBuilder.New();
             ResourceOptions.Configure(builder);
+            AddNetworksToBuilder(builder);
             Settings = builder.Build();
 
             SetComposeVariables();
@@ -60,6 +63,14 @@ namespace Squadron
             await Manager.CreateAndStartContainerAsync();
         }
 
+        private void AddNetworksToBuilder(ContainerResourceBuilder builder)
+        {
+            foreach(string network in _composeNetworks)
+            {
+                builder.AddNetwork(network);
+            }
+        }
+
         private void SetComposeVariables()
         {
             if (_composeVariables != null)
@@ -69,6 +80,9 @@ namespace Squadron
                     Settings.EnvironmentVariables.Add(envVar);
                 }
             }
+
+            // Add docker hostname variable
+            Settings.EnvironmentVariables.Add($"DockerHost:Name={Settings.UniqueContainerName}");
         }
 
         public void SetEnvironmentVariables(IEnumerable<string> variables)
@@ -76,6 +90,10 @@ namespace Squadron
             _composeVariables = variables.ToList();
         }
 
+        public void SetNetworks(IEnumerable<string> composeNetworks)
+        {
+            _composeNetworks = composeNetworks;
+        }
 
         private void ValidateSettings(ContainerResourceSettings settings)
         {

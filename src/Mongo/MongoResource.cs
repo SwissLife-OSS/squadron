@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
@@ -34,7 +32,9 @@ namespace Squadron
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
-            ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+            ConnectionString =
+                $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
         }
@@ -56,21 +56,25 @@ namespace Squadron
 
         public override Dictionary<string, string> GetComposeExports()
         {
+            var internalConnectionString =
+                $"mongodb://{Manager.Instance.Name}:{Settings.InternalPort}";
+
             Dictionary<string, string> exports = base.GetComposeExports();
             exports.Add("CONNECTIONSTRING", ConnectionString);
+            exports.Add("CONNECTIONSTRING_INTERNAL", internalConnectionString);
             return exports;
         }
 
         /// <summary>
-        /// Gets the mongo database client that is already 
-        /// initialized to use the mongo instance of the 
+        /// Gets the mongo database client that is already
+        /// initialized to use the mongo instance of the
         /// repository test environment.
         /// </summary>
         /// <value>The mongo database client.</value>
         public virtual IMongoClient Client => _client;
 
         /// <summary>
-        /// Gets the mongo database connection string.
+        /// Gets the external mongo database connection string that is exposed to the host.
         /// </summary>
         public string ConnectionString { get; private set; }
 

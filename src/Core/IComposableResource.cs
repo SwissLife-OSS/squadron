@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Squadron
@@ -14,6 +13,8 @@ namespace Squadron
         Task DisposeAsync();
 
         void SetEnvironmentVariables(IEnumerable<string> variables);
+
+        void SetNetworks(IEnumerable<string> networkName);
     }
 
     public interface IComposableResourceOption

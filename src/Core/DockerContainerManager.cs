@@ -338,8 +338,13 @@ namespace Squadron
             {
                 return await retryPolicy
                      .ExecuteAsync(async () =>
-                         return (await _client.Images.ListImagesAsync(
-                             new ImagesListParameters { MatchName = _settings.ImageFullname })).Any()
+                         {
+                             IEnumerable<ImagesListResponse> listResponse =
+                             await _client.Images.ListImagesAsync(
+                                 new ImagesListParameters { MatchName = _settings.ImageFullname });
+
+                             return listResponse.Any();
+                         }
                      );
             }
             catch (Exception ex)

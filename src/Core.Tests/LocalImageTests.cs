@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Squadron
 {
-    public class LocalImageTest : IClassFixture<GenericContainerResource<LocalAppOptions>>
+    public class LocalImageTests : IClassFixture<GenericContainerResource<LocalAppOptions>>
     {
         public static string LocalTagName { get; } = "test-image";
         public static string LocalTagVersion { get; } = "1.0.0";
@@ -97,7 +97,7 @@ namespace Squadron
                 .InternalPort(80)
                 .Image(LocalImageTest.LocalTagName)
                 .Tag(LocalImageTest.LocalTagVersion)
-                .PreferLocalImage(true);
+                .PreferLocalImage();
         }
     }
 }

@@ -90,7 +90,7 @@ namespace Squadron
         /// Wheter to alway pull an image or look for a local one
         /// </summary>
         /// <value></value>
-        public bool PreferLocalImage {get; internal set;}
+        public bool PreferLocalImage {get; internal set;} = false;
 
         /// <summary>
         /// Gets the docker configuration resolver.

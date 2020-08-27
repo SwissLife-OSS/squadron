@@ -182,11 +182,10 @@ namespace Squadron
         /// Sets the setting, wheter squadron should pull the image or look for a local image first.
         /// If not set, squadron will always pull the image
         /// </summary>
-        /// <param name="preferLocalImage">The local image preferrence setting</param>
         /// <returns></returns>
-        public ContainerResourceBuilder PreferLocalImage(bool preferLocalImage)
+        public ContainerResourceBuilder PreferLocalImage()
         {
-            _options.PreferLocalImage = preferLocalImage;
+            _options.PreferLocalImage = true;
             return this;
         }
 

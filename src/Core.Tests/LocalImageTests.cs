@@ -67,7 +67,7 @@ namespace Squadron
             }
 
             // Pulling Nginx image
-            await LocalImageTest.DockerClient.Images.CreateImageAsync(
+            await LocalImageTests.DockerClient.Images.CreateImageAsync(
                 new ImagesCreateParameters
                 {
                     FromImage = "nginx:latest",
@@ -77,12 +77,12 @@ namespace Squadron
                 CancellationToken.None);
 
             // Re-tagging the Nginx image to our test name
-            await LocalImageTest.DockerClient.Images.TagImageAsync(
+            await LocalImageTests.DockerClient.Images.TagImageAsync(
                 "nginx:latest",
                 new ImageTagParameters
                 {
-                    Tag = LocalImageTest.LocalTagVersion,
-                    RepositoryName = LocalImageTest.LocalTagName
+                    Tag = LocalImageTests.LocalTagVersion,
+                    RepositoryName = LocalImageTests.LocalTagName
                 },
                 CancellationToken.None);
         }
@@ -95,8 +95,8 @@ namespace Squadron
             builder
                 .Name("local-demo-image")
                 .InternalPort(80)
-                .Image(LocalImageTest.LocalTagName)
-                .Tag(LocalImageTest.LocalTagVersion)
+                .Image(LocalImageTests.LocalTagName)
+                .Tag(LocalImageTests.LocalTagVersion)
                 .PreferLocalImage();
         }
     }

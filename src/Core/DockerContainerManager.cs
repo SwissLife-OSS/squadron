@@ -100,11 +100,11 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task CreateAndStartContainerAsync()
         {
-            if (!(await ImageExists()))
+            if (!_settings.PreferLocalImage || !await ImageExists())
             {
                 await PullImageAsync();
-
             }
+            
             await CreateContainerAsync();
             await StartContainerAsync();
             await ConnectToNetworksAsync();

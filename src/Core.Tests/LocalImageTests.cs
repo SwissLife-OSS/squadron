@@ -23,7 +23,7 @@ namespace Squadron
 
         private GenericContainerResource<LocalAppOptions> _containerResource;
 
-        public LocalImageTest(GenericContainerResource<LocalAppOptions> containerResource)
+        public LocalImageTests(GenericContainerResource<LocalAppOptions> containerResource)
         {
             _containerResource = containerResource;
         }

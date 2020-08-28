@@ -31,7 +31,12 @@ namespace Squadron
         [Fact]
         public async Task UseLocalImageTest()
         {
+            // Arrange: See LocalAppOptions
+
+            // Act
             Uri containerUri = _containerResource.GetContainerUri();
+
+            // Assert
             containerUri.Should().NotBeNull();
 
             await DockerClient.Images.DeleteImageAsync(

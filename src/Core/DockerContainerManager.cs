@@ -100,7 +100,11 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task CreateAndStartContainerAsync()
         {
-            await PullImageAsync();
+            if (!_settings.PreferLocalImage || !await ImageExists())
+            {
+                await PullImageAsync();
+            }
+            
             await CreateContainerAsync();
             await StartContainerAsync();
             await ConnectToNetworksAsync();
@@ -164,7 +168,7 @@ namespace Squadron
                         }
                     });
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 throw new ContainerException(
                     $"Error in RemoveContainer: {_settings.UniqueContainerName}", ex);
@@ -328,6 +332,27 @@ namespace Squadron
             }
         }
 
+        public async Task<bool> ImageExists()
+        {
+            try
+            {
+                return await retryPolicy
+                     .ExecuteAsync(async () =>
+                         {
+                             IEnumerable<ImagesListResponse> listResponse =
+                             await _client.Images.ListImagesAsync(
+                                 new ImagesListParameters { MatchName = _settings.ImageFullname });
+
+                             return listResponse.Any();
+                         }
+                     );
+            }
+            catch (Exception ex)
+            {
+                throw new ContainerException(
+                    $"Error in ImageExists: {_settings.ImageFullname }", ex);
+            }
+        }
 
         private async Task PullImageAsync()
         {
@@ -346,13 +371,13 @@ namespace Squadron
                 await retryPolicy
                     .ExecuteAsync(async () =>
                    {
-                        await _client.Images.CreateImageAsync(
-                        new ImagesCreateParameters { FromImage = _settings.ImageFullname },
-                        _authConfig,
-                        new Progress<JSONMessage>(Handler));
-                    });
+                       await _client.Images.CreateImageAsync(
+                       new ImagesCreateParameters { FromImage = _settings.ImageFullname },
+                       _authConfig,
+                       new Progress<JSONMessage>(Handler));
+                   });
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 throw new ContainerException(
                     $"Error in PullImage: {_settings.ImageFullname }", ex);
@@ -476,7 +501,7 @@ namespace Squadron
             }
             return result.ToString();
         }
-        
+
         private async Task ConnectToNetworksAsync()
         {
             foreach (string networkName in _settings.Networks)

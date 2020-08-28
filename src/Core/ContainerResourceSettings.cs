@@ -43,7 +43,7 @@ namespace Squadron
         /// The name of the registry.
         /// </value>
         public string RegistryName { get; internal set; }
-        
+
         public ContainerAddressMode AddressMode { get; internal set; }
 
         /// <summary>
@@ -85,6 +85,12 @@ namespace Squadron
         /// Unique container name
         /// </summary>
         public string UniqueContainerName { get; internal set; }
+
+        /// <summary>
+        /// Wheter to alway pull an image or look for a local one
+        /// </summary>
+        /// <value></value>
+        public bool PreferLocalImage {get; internal set;} = false;
 
         /// <summary>
         /// Gets the docker configuration resolver.

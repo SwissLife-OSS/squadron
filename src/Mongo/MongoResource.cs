@@ -84,6 +84,21 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Creates a new test databases with generated name by creating collections from files
+        /// </summary>
+        /// <param name="files">The import files.</param>
+        /// <returns>
+        /// Returns the newly created test database.
+        /// </returns>
+        public Task<IMongoDatabase> CreateDatabase(params FileInfo[] files)
+        {
+            return CreateDatabase(new CreateDatabaseFromFilesOptions
+            {
+                Files = files,
+            });
+        }
+
+        /// <summary>
         /// Creates a new test databases with specified name
         /// </summary>
         /// <param name="name">The name.</param>
@@ -99,11 +114,33 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Creates a new test databases with specified <paramref name="options"/>.
+        /// Creates a new test databases with specified name by creating collections from files
         /// </summary>
-        /// <param name="options">The database creation options. Default values will be used if not specified.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="files">The import files.</param>
         /// <returns>
         /// Returns the newly created test database.
+        /// </returns>
+        public Task<IMongoDatabase> CreateDatabase(string name, params FileInfo[] files)
+        {
+            return CreateDatabase(new CreateDatabaseFromFilesOptions
+            {
+                Files = files,
+                DatabaseOptions = new CreateDatabaseOptions
+                {
+                    DatabaseName = name
+                }
+            });
+        }
+
+        /// <summary>
+        /// Creates a new databases with specified <paramref name="options"/>.
+        /// </summary>
+        /// <param name="options">
+        /// The database creation options. Default values will be used if not specified.
+        /// </param>
+        /// <returns>
+        /// Returns the created database.
         /// </returns>
         public virtual IMongoDatabase  CreateDatabase(
             CreateDatabaseOptions options)
@@ -111,10 +148,48 @@ namespace Squadron
             return Client.GetDatabase(options.DatabaseName);
         }
 
+        /// <summary>
+        /// Creates a new databases with specified <paramref name="options"/>.
+        /// </summary>
+        /// <param name="options">
+        ///  The database creation options
+        /// </param>
+        /// <returns>
+        /// Returns the created database.
+        /// </returns>
+        public async Task<IMongoDatabase> CreateDatabase(
+            CreateDatabaseFromFilesOptions options)
+        {
+            IMongoDatabase database = CreateDatabase(
+                options.DatabaseOptions);
+
+            foreach (FileInfo fileInfo in options.Files)
+            {
+                var fileCreationOptions = new CreateCollectionFromFileOptions
+                {
+                    File = fileInfo,
+                    Destination = options.Destination,
+                    CustomImportArgs = options.CustomImportArgs,
+                    CollectionOptions = new CreateCollectionOptions
+                    {
+                        CollectionName = Path.GetFileNameWithoutExtension(fileInfo.FullName),
+                        DatabaseOptions = new CreateDatabaseOptions
+                        {
+                            DatabaseName = database.DatabaseNamespace.DatabaseName
+                        }
+                    }
+                };
+
+                await CreateCollectionFromFileInternalAsync(database, fileCreationOptions);
+            }
+
+            return database;
+        }
+
         protected async Task<bool> DatabaseExists(string name)
         {
-            return (await  Client.ListDatabaseNamesAsync()).ToList()
-                        .Any( x => x == name);
+            return (await Client.ListDatabaseNamesAsync()).ToList()
+                .Any(x => x == name);
         }
 
         /// <summary>
@@ -132,8 +207,10 @@ namespace Squadron
             IMongoDatabase database = CreateDatabase(
                 options.CollectionOptions.DatabaseOptions);
 
-            return await CreateCollectionFromFileInternalAsync<T>(
-                database, options);
+            await CreateCollectionFromFileInternalAsync(database, options);
+
+            return database
+                .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
 
         /// <summary>
@@ -150,12 +227,16 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
-            options ??= new CreateCollectionFromFileOptions();
-            database ??= CreateDatabase(options.CollectionOptions.DatabaseOptions);
-            return await CreateCollectionFromFileInternalAsync<T>(database, options);
+            options = options ?? new CreateCollectionFromFileOptions();
+            database = database ?? CreateDatabase(options.CollectionOptions.DatabaseOptions);
+
+            await CreateCollectionFromFileInternalAsync(database, options);
+
+            return database
+                .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
 
-        private async Task<IMongoCollection<T>> CreateCollectionFromFileInternalAsync<T>(
+        private async Task CreateCollectionFromFileInternalAsync(
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
@@ -164,9 +245,6 @@ namespace Squadron
                 DatabaseName = database.DatabaseNamespace.DatabaseName
             };
             await DeployAndImportAsync(options);
-
-            return database
-                .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
 
         private async Task DeployAndImportAsync(
@@ -251,8 +329,8 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionOptions options)
         {
-            options ??= new CreateCollectionOptions();
-            database ??= CreateDatabase(options.DatabaseOptions);
+            options = options ?? new CreateCollectionOptions();
+            database = database ?? CreateDatabase(options.DatabaseOptions);
             return database.GetCollection<T>(options.CollectionName);
         }
 

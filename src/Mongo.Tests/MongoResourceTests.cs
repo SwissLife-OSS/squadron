@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Snapshooter.Xunit;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Squadron
 {
@@ -76,13 +76,22 @@ namespace Squadron
 
             // assert
             BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
-            imported.Should().NotBeNull();
-            imported.Contains("headline").Should().BeTrue();
-            imported.Contains("date").Should().BeTrue();
-            imported.Contains("views").Should().BeTrue();
-            imported.Contains("author").Should().BeTrue();
-            imported.Contains("published").Should().BeTrue();
-            imported.Contains("tags").Should().BeTrue();
+            imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
+        }
+
+        [Fact]
+        public async Task CreateDatabaseFromFiles()
+        {
+            // act
+            IMongoDatabase db = await MongoResource.CreateDatabase(
+                new FileInfo(Path.Combine("Resources", "news.json")));
+
+            // assert
+            IMongoCollection<BsonDocument> imported = db.GetCollection<BsonDocument>("news");
+            List<BsonDocument> items = await imported
+                .Find(Builders<BsonDocument>.Filter.Empty)
+                .ToListAsync();
+            items.MatchSnapshot(o => o.IgnoreField("[0].[0].Value"));
         }
 
         [Fact]
@@ -111,13 +120,7 @@ namespace Squadron
 
             // assert
             BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
-            imported.Should().NotBeNull();
-            imported.Contains("headline").Should().BeTrue();
-            imported.Contains("date").Should().BeTrue();
-            imported.Contains("views").Should().BeTrue();
-            imported.Contains("author").Should().BeTrue();
-            imported.Contains("published").Should().BeTrue();
-            imported.Contains("tags").Should().BeTrue();
+            imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
         }
     }
 }

@@ -11,7 +11,6 @@ namespace Squadron
     /// <inheritdoc/>
     public partial class SqlServerResource : SqlServerResource<SqlServerDefaultOptions> { }
 
-
     /// <summary>
     /// Represents a SqlServer database resource that can be used by unit tests.
     /// </summary>
@@ -53,7 +52,21 @@ namespace Squadron
             => CreateDatabaseConnectionString(databaseName);
 
         /// <summary>
-        /// Crate a database from an SQL script
+        /// Create a empty database
+        /// </summary>
+        /// <param name="databaseName">The database name.</param>
+        /// /// <exception cref="ArgumentException">
+        /// <paramref name="databaseName"/> is <c>null</c> or <see cref="string.Empty"/>
+        /// </exception>
+        /// <returns>Database connection string.</returns>
+        public Task<string> CreateDatabaseAsync(string databaseName)
+        {
+            var script = $"CREATE DATABASE {databaseName};";
+            return CreateDatabaseAsync(script, databaseName);
+        }
+
+        /// <summary>
+        /// Create a database from an SQL script
         /// </summary>
         /// <param name="sqlScript">The SQL script content</param>
         /// <param name="databaseName">The database name.</param>
@@ -181,6 +194,5 @@ namespace Squadron
             File.WriteAllText(scriptFile, content);
             return new FileInfo(scriptFile);
         }
-
     }
 }

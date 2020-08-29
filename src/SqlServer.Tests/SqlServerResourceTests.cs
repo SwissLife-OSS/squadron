@@ -59,6 +59,20 @@ namespace Squadron
             string retrievedDatabaseName = FindDatabase(connectionString, databaseName);
             Assert.Equal(databaseName, retrievedDatabaseName);
         }
+
+        [Fact]
+        public async Task SqlServerResource_Empty_Created()
+        {
+            // arrange
+            const string databaseName = "Sales_DEABB980";
+
+            // act
+            var connectionString = await _resource.CreateDatabaseAsync(databaseName);
+
+            // assert
+            string retrievedDatabaseName = FindDatabase(connectionString, databaseName);
+            Assert.Equal(databaseName, retrievedDatabaseName);
+        }
 #endif
 
         private string FindDatabase(string databaseConnection, string databaseName)

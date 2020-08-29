@@ -32,6 +32,11 @@ namespace Squadron
 
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
+
+            if (ResourceOptions is MongoInitOptions initOptions)
+            {
+                InitDatabase = await CreateDatabase(initOptions.GetOptions());
+            }
         }
 
         private MongoClient GetClient()
@@ -66,6 +71,11 @@ namespace Squadron
         /// </summary>
         /// <value>The mongo database client.</value>
         public virtual IMongoClient Client => _client;
+
+        /// <summary>
+        /// Gets database if <see cref="MongoInitOptions"/> was used for initializing this resource.
+        /// </summary>
+        public IMongoDatabase? InitDatabase { get; private set; }
 
         /// <summary>
         /// Gets the external mongo database connection string that is exposed to the host.

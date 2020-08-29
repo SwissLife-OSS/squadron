@@ -48,7 +48,6 @@ namespace Squadron
             });
         }
 
-
         public override Dictionary<string, string> GetComposeExports()
         {
             var internalConnectionString =
@@ -112,24 +111,7 @@ namespace Squadron
             return Client.GetDatabase(options.DatabaseName);
         }
 
-        /// <summary>
-        /// Creates a new test collection from file.
-        /// </summary>
-        /// <typeparam name="T">The document type.</typeparam>
-        /// <returns>
-        /// Returns the newly created collection.
-        /// </returns>
-        public async Task<IMongoCollection<T>> CreateCollectionFromFileAsync<T>()
-        {
-            var options = new CreateCollectionFromFileOptions();
-            IMongoDatabase database = CreateDatabase();
-
-            return await CreateCollectionFromFileAsync<T>(
-                database, options);
-        }
-
-
-        protected async Task<bool> DatabaseExsists(string name)
+        protected async Task<bool> DatabaseExists(string name)
         {
             return (await  Client.ListDatabaseNamesAsync()).ToList()
                         .Any( x => x == name);
@@ -168,8 +150,8 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
-            options = options ?? new CreateCollectionFromFileOptions();
-            database = database ?? CreateDatabase(options.CollectionOptions.DatabaseOptions);
+            options ??= new CreateCollectionFromFileOptions();
+            database ??= CreateDatabase(options.CollectionOptions.DatabaseOptions);
             return await CreateCollectionFromFileInternalAsync<T>(database, options);
         }
 
@@ -203,7 +185,6 @@ namespace Squadron
                     options.CustomImportArgs)
                 .ToContainerExecCreateParameters());
         }
-
 
         /// <summary>
         /// Creates a new test collection with dafault options
@@ -270,9 +251,8 @@ namespace Squadron
             IMongoDatabase database,
             CreateCollectionOptions options)
         {
-            options = options ?? new CreateCollectionOptions();
-            database = database ?? CreateDatabase(options.DatabaseOptions);
-            //database.CreateCollection(options.CollectionName);
+            options ??= new CreateCollectionOptions();
+            database ??= CreateDatabase(options.DatabaseOptions);
             return database.GetCollection<T>(options.CollectionName);
         }
 

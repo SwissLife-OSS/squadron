@@ -19,7 +19,6 @@
     <PackageReference Include="Snapshooter.Xunit" Version="0.5.6" />
   </ItemGroup>
 
-
   <ItemGroup>
     <None Update="__snapshots__\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -76,7 +76,7 @@ namespace Squadron
 
             // assert
             BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
-            imported.MatchSnapshot();
+            imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace Squadron
             List<BsonDocument> items = await imported
                 .Find(Builders<BsonDocument>.Filter.Empty)
                 .ToListAsync();
-            items.MatchSnapshot();
+            items.MatchSnapshot(o => o.IgnoreField("[0].[0].Value"));
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Squadron
 
             // assert
             BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
-            imported.MatchSnapshot();
+            imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
         }
     }
 }

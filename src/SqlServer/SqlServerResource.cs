@@ -54,15 +54,13 @@ namespace Squadron
         /// <summary>
         /// Create a empty database
         /// </summary>
-        /// <param name="databaseName">The database name.</param>
-        /// /// <exception cref="ArgumentException">
-        /// <paramref name="databaseName"/> is <c>null</c> or <see cref="string.Empty"/>
-        /// </exception>
+        /// <param name="databaseName">Optional: the database name.</param>
         /// <returns>Database connection string.</returns>
-        public Task<string> CreateDatabaseAsync(string databaseName)
+        public Task<string> CreateDatabaseAsync(string databaseName = null)
         {
-            var script = $"CREATE DATABASE {databaseName};";
-            return CreateDatabaseAsync(script, databaseName);
+            var name = databaseName ?? UniqueNameGenerator.Create("db");
+            var script = $"CREATE DATABASE {name};";
+            return CreateDatabaseAsync(script, name);
         }
 
         /// <summary>
@@ -157,7 +155,6 @@ namespace Squadron
             }
         }
 
-
         /// <summary>
         /// Creates the database connection string.
         /// </summary>
@@ -174,7 +171,6 @@ namespace Squadron
                 .Append($"Password={Settings.Password};")
                 .Append($"MultipleActiveResultSets=True;")
                 .ToString();
-
 
         internal async Task DeployAndExecute(string sqlScript)
         {

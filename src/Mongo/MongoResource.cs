@@ -9,10 +9,7 @@ using Xunit;
 namespace Squadron
 {
     /// <inheritdoc/>
-    public class MongoResource : MongoResource<MongoDefaultOptions>
-    {
-
-    }
+    public class MongoResource : MongoResource<MongoDefaultOptions> { }
 
     /// <summary>
     /// Represents a mongo database resource that can be used by unit tests.
@@ -24,12 +21,10 @@ namespace Squadron
           IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
-
-
-        private MongoClient _client = null;
+        private MongoClient _client;
 
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async override Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
             ConnectionString =
@@ -138,24 +133,6 @@ namespace Squadron
         {
             return (await  Client.ListDatabaseNamesAsync()).ToList()
                         .Any( x => x == name);
-        }
-
-        /// <summary>
-        /// Creates a new test collection from file.
-        /// inside of the given <paramref name="database"/>
-        /// </summary>
-        /// <typeparam name="T">The document type.</typeparam>
-        /// <param name="database">The target database</param>
-        /// <returns>
-        /// Returns the newly created collection.
-        /// </returns>
-        public async Task<IMongoCollection<T>> CreateCollectionFromFileAsync<T>(
-            IMongoDatabase database)
-        {
-            var options = new CreateCollectionFromFileOptions();
-
-            return await CreateCollectionFromFileInternalAsync<T>(
-                database, options);
         }
 
         /// <summary>

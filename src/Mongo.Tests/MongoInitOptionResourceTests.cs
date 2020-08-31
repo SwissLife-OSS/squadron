@@ -21,7 +21,8 @@ namespace Squadron
         [Fact]
         public async Task Database_IsInitialized()
         {
-            IMongoCollection<BsonDocument> collection = _mongoResource.InitDatabase!
+            IMongoCollection<BsonDocument> collection = _mongoResource.Client
+                .GetDatabase("fileImport")
                 .GetCollection<BsonDocument>("news");
 
             List<BsonDocument> items = await collection

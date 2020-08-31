@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -32,9 +31,10 @@ namespace Squadron
         {
             BsonDocument result = await _client
                 .GetDatabase(_systemDatabase)
-                .RunCommandAsync<BsonDocument>(_pingCommand,
-                                               readPreference: null,
-                                               cancellationToken);
+                .RunCommandAsync<BsonDocument>(
+                    _pingCommand,
+                    readPreference: null,
+                    cancellationToken);
 
             return new Status
             {
@@ -44,5 +44,3 @@ namespace Squadron
         }
     }
 }
-
-

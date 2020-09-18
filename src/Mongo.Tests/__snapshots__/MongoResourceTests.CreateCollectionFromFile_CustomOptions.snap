@@ -1,0 +1,70 @@
+﻿[
+  {
+    "Name": "_id",
+    "Value": "5f4a34be2471ecb2cc1a8ef8"
+  },
+  {
+    "Name": "headline",
+    "Value": "Apple Reported Fourth Quarter Revenue Today"
+  },
+  {
+    "Name": "date",
+    "Value": "2015-10-27T22:35:21.908Z"
+  },
+  {
+    "Name": "views",
+    "Value": 1132
+  },
+  {
+    "Name": "author",
+    "Value": [
+      {
+        "Name": "name",
+        "Value": "Bob Walker"
+      },
+      {
+        "Name": "title",
+        "Value": "Lead Business Editor"
+      }
+    ]
+  },
+  {
+    "Name": "published",
+    "Value": "true"
+  },
+  {
+    "Name": "tags",
+    "Value": [
+      {
+        "Name": "0",
+        "Value": "AAPL"
+      },
+      {
+        "Name": "1",
+        "Value": [
+          {
+            "Name": "name",
+            "Value": "city"
+          },
+          {
+            "Name": "value",
+            "Value": "Cupertino"
+          }
+        ]
+      },
+      {
+        "Name": "2",
+        "Value": [
+          {
+            "Name": "0",
+            "Value": "Electronics"
+          },
+          {
+            "Name": "1",
+            "Value": "Computers"
+          }
+        ]
+      }
+    ]
+  }
+]

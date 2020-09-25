@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Neo4j.Driver;
-using Xunit;
-using Squadron.Neo4j.Models;
 using Neo4jMapper;
-using System.Collections.Generic;
 using Snapshooter.Xunit;
+using Squadron.Neo4j.Models;
+using Xunit;
 
 namespace Squadron {
     public class Neo4jResourceTests
@@ -25,29 +25,25 @@ namespace Squadron {
                 action.Should ().NotThrow ();
             }
 
-        [Fact]
-        public async void CreateActor()
-        {
-            IAsyncSession session = _neo4JResource.GetAsyncSession();
+            [Fact]
+            public async void CreateActor () {
+                IAsyncSession session = _neo4JResource.GetAsyncSession ();
 
-            try
-            {
-                var actor = new Actor("Keanu Reaves", 43);
+                try {
+                    var actor = new Actor ("Keanu Reaves", 56);
 
-                IDictionary<string, object> parameters = new Neo4jParameters().WithEntity("newActor", actor);
+                    IDictionary<string, object> parameters = new Neo4jParameters ().WithEntity ("newActor", actor);
 
-                IResultCursor cursor = await session.RunAsync(@"CREATE (actor:Actor $newActor) RETURN actor", parameters);
+                    IResultCursor cursor = await session.RunAsync (@"CREATE (actor:Actor $newActor) RETURN actor", parameters);
 
-                Actor createdMovie = await cursor.MapSingleAsync<Actor>();
+                    Actor createdActor = await cursor.MapSingleAsync<Actor> ();
 
-                await cursor.ConsumeAsync();
+                    await cursor.ConsumeAsync ();
 
-                actor.MatchSnapshot();
-            }
-            finally
-            {
-                await session.CloseAsync();
+                    createdActor.MatchSnapshot ();
+                } finally {
+                    await session.CloseAsync ();
+                }
             }
         }
-    }
 }

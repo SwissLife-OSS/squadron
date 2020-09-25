@@ -18,7 +18,7 @@ namespace Squadron
             builder
                 .Name("neo4j")
                 .Image("neo4j:latest")
-                .InternalPort(7474);
+                .InternalPort(7687);
         }
     }
 }

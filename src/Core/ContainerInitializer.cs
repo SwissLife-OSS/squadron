@@ -12,8 +12,8 @@ namespace Squadron
     {
         private readonly IDockerContainerManager _manager;
         private readonly ContainerResourceSettings _settings;
-        private readonly int intervallInSeconds = 3;
-
+        private readonly TimeSpan _consumeLogsInterval = TimeSpan.FromSeconds(3);
+        private readonly TimeSpan _readyTimeout = TimeSpan.FromSeconds(5);
 
         /// <summary>Initializes a new instance of the <see cref="ContainerInitializer"/> class.</summary>
         /// <param name="manager">The manager.</param>
@@ -26,43 +26,47 @@ namespace Squadron
             _settings = settings;
         }
 
-
         /// <summary>Waits for a container to be ready</summary>
         /// <param name="statusProvider">The status provider.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">Initialize sequence timed-out.</exception>
-        public async Task<Status> WaitAsync(
-                IResourceStatusProvider statusProvider)
+        public async Task<Status> WaitAsync(IResourceStatusProvider statusProvider)
         {
-            var timer = Stopwatch.StartNew();
-            Status status = Status.NotReady;
-
-            while (timer.Elapsed < _settings.WaitTimeout && !status.IsReady)
+            using (var cancellation = new CancellationTokenSource())
             {
-                try
+                cancellation.CancelAfter(_settings.WaitTimeout);
+                Status status = Status.NotReady;
+
+                while (!cancellation.IsCancellationRequested && !status.IsReady)
                 {
-                    var cts = new CancellationTokenSource();
-                    cts.CancelAfter(TimeSpan.FromSeconds(5));
-                    status = await statusProvider.IsReadyAsync(cts.Token);
+                    try
+                    {
+                        using (var singleRunCancellation = new CancellationTokenSource())
+                        {
+                            singleRunCancellation.CancelAfter(_readyTimeout);
+                            status = await statusProvider.IsReadyAsync(singleRunCancellation.Token);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceWarning($"Container status error. {_settings.Name} -> {ex.Message}");
+                    }
+
+                    if (!status.IsReady)
+                    {
+                        await _manager.ConsumeLogsAsync(_consumeLogsInterval);
+                        Trace.TraceWarning($"Container is not yet {_settings.Name} not ready. --> {status.Message}");
+                    }
                 }
-                catch ( Exception ex)
-                {
-                    Trace.TraceWarning($"Container status error. {_settings.Name} -> {ex.Message}");
-                }
+
                 if (!status.IsReady)
                 {
-                    await _manager.ConsumeLogsAsync(TimeSpan.FromSeconds(intervallInSeconds));
-                    Trace.TraceWarning($"Container is not yet {_settings.Name} not ready. --> {status.Message}");
+                    throw new InvalidOperationException(
+                        $"Initialize sequence timed-out. {status.Message}\r\n{_manager.Instance.Logs}");
                 }
-            }
 
-            if (!status.IsReady)
-            {
-                throw new InvalidOperationException(
-                    $"Initialize sequence timed-out. {status.Message}\r\n{_manager.Instance.Logs}");
+                return status;
             }
-
-            return status;
         }
     }
 }

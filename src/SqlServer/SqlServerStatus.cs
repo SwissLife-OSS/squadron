@@ -1,6 +1,4 @@
-using System;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,14 +27,14 @@ namespace Squadron
         {
             using (var connection = new SqlConnection(_serverConnectionString))
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync(cancellationToken);
 
                 using (System.Data.SqlClient.SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = "SELECT Count(name) FROM sys.databases";
                     return new Status
                     {
-                        IsReady = (int)command.ExecuteScalar() >= 4
+                        IsReady = (int)await command.ExecuteScalarAsync(cancellationToken) >= 4
                     };
                 }
             }

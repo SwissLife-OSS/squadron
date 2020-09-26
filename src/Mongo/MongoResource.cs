@@ -2,19 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
 namespace Squadron
 {
     /// <inheritdoc/>
-    public class MongoResource : MongoResource<MongoDefaultOptions>
-    {
-
-    }
+    public class MongoResource : MongoResource<MongoDefaultOptions> { }
 
     /// <summary>
     /// Represents a mongo database resource that can be used by unit tests.
@@ -26,15 +21,15 @@ namespace Squadron
           IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
-
-
-        private MongoClient _client = null;
+        private MongoClient _client;
 
         /// <inheritdoc cref="IAsyncLifetime"/>
-        public async override Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            ConnectionString = $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+            ConnectionString =
+                $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
         }
@@ -53,24 +48,27 @@ namespace Squadron
             });
         }
 
-
         public override Dictionary<string, string> GetComposeExports()
         {
+            var internalConnectionString =
+                $"mongodb://{Manager.Instance.Name}:{Settings.InternalPort}";
+
             Dictionary<string, string> exports = base.GetComposeExports();
             exports.Add("CONNECTIONSTRING", ConnectionString);
+            exports.Add("CONNECTIONSTRING_INTERNAL", internalConnectionString);
             return exports;
         }
 
         /// <summary>
-        /// Gets the mongo database client that is already 
-        /// initialized to use the mongo instance of the 
+        /// Gets the mongo database client that is already
+        /// initialized to use the mongo instance of the
         /// repository test environment.
         /// </summary>
         /// <value>The mongo database client.</value>
         public virtual IMongoClient Client => _client;
 
         /// <summary>
-        /// Gets the mongo database connection string.
+        /// Gets the external mongo database connection string that is exposed to the host.
         /// </summary>
         public string ConnectionString { get; private set; }
 
@@ -83,6 +81,21 @@ namespace Squadron
         public IMongoDatabase CreateDatabase()
         {
             return CreateDatabase(new CreateDatabaseOptions());
+        }
+
+        /// <summary>
+        /// Creates a new test databases with generated name by creating collections from files
+        /// </summary>
+        /// <param name="files">The import files.</param>
+        /// <returns>
+        /// Returns the newly created test database.
+        /// </returns>
+        public Task<IMongoDatabase> CreateDatabase(params FileInfo[] files)
+        {
+            return CreateDatabase(new CreateDatabaseFromFilesOptions
+            {
+                Files = files,
+            });
         }
 
         /// <summary>
@@ -101,11 +114,33 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Creates a new test databases with specified <paramref name="options"/>.
+        /// Creates a new test databases with specified name by creating collections from files
         /// </summary>
-        /// <param name="options">The database creation options. Default values will be used if not specified.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="files">The import files.</param>
         /// <returns>
         /// Returns the newly created test database.
+        /// </returns>
+        public Task<IMongoDatabase> CreateDatabase(string name, params FileInfo[] files)
+        {
+            return CreateDatabase(new CreateDatabaseFromFilesOptions
+            {
+                Files = files,
+                DatabaseOptions = new CreateDatabaseOptions
+                {
+                    DatabaseName = name
+                }
+            });
+        }
+
+        /// <summary>
+        /// Creates a new databases with specified <paramref name="options"/>.
+        /// </summary>
+        /// <param name="options">
+        /// The database creation options. Default values will be used if not specified.
+        /// </param>
+        /// <returns>
+        /// Returns the created database.
         /// </returns>
         public virtual IMongoDatabase  CreateDatabase(
             CreateDatabaseOptions options)
@@ -114,44 +149,47 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Creates a new test collection from file.
+        /// Creates a new databases with specified <paramref name="options"/>.
         /// </summary>
-        /// <typeparam name="T">The document type.</typeparam>
+        /// <param name="options">
+        ///  The database creation options
+        /// </param>
         /// <returns>
-        /// Returns the newly created collection.
+        /// Returns the created database.
         /// </returns>
-        public async Task<IMongoCollection<T>> CreateCollectionFromFileAsync<T>()
+        public async Task<IMongoDatabase> CreateDatabase(
+            CreateDatabaseFromFilesOptions options)
         {
-            var options = new CreateCollectionFromFileOptions();
-            IMongoDatabase database = CreateDatabase();
+            IMongoDatabase database = CreateDatabase(
+                options.DatabaseOptions);
 
-            return await CreateCollectionFromFileAsync<T>(
-                database, options);
+            foreach (FileInfo fileInfo in options.Files)
+            {
+                var fileCreationOptions = new CreateCollectionFromFileOptions
+                {
+                    File = fileInfo,
+                    Destination = options.Destination,
+                    CustomImportArgs = options.CustomImportArgs,
+                    CollectionOptions = new CreateCollectionOptions
+                    {
+                        CollectionName = Path.GetFileNameWithoutExtension(fileInfo.FullName),
+                        DatabaseOptions = new CreateDatabaseOptions
+                        {
+                            DatabaseName = database.DatabaseNamespace.DatabaseName
+                        }
+                    }
+                };
+
+                await CreateCollectionFromFileInternalAsync(database, fileCreationOptions);
+            }
+
+            return database;
         }
 
-
-        protected async Task<bool> DatabaseExsists(string name)
+        protected async Task<bool> DatabaseExists(string name)
         {
-            return (await  Client.ListDatabaseNamesAsync()).ToList()
-                        .Any( x => x == name);
-        }
-
-        /// <summary>
-        /// Creates a new test collection from file.
-        /// inside of the given <paramref name="database"/>
-        /// </summary>
-        /// <typeparam name="T">The document type.</typeparam>
-        /// <param name="database">The target database</param>
-        /// <returns>
-        /// Returns the newly created collection.
-        /// </returns>
-        public async Task<IMongoCollection<T>> CreateCollectionFromFileAsync<T>(
-            IMongoDatabase database)
-        {
-            var options = new CreateCollectionFromFileOptions();
-
-            return await CreateCollectionFromFileInternalAsync<T>(
-                database, options);
+            return (await Client.ListDatabaseNamesAsync()).ToList()
+                .Any(x => x == name);
         }
 
         /// <summary>
@@ -169,8 +207,10 @@ namespace Squadron
             IMongoDatabase database = CreateDatabase(
                 options.CollectionOptions.DatabaseOptions);
 
-            return await CreateCollectionFromFileInternalAsync<T>(
-                database, options);
+            await CreateCollectionFromFileInternalAsync(database, options);
+
+            return database
+                .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
 
         /// <summary>
@@ -189,10 +229,14 @@ namespace Squadron
         {
             options = options ?? new CreateCollectionFromFileOptions();
             database = database ?? CreateDatabase(options.CollectionOptions.DatabaseOptions);
-            return await CreateCollectionFromFileInternalAsync<T>(database, options);
+
+            await CreateCollectionFromFileInternalAsync(database, options);
+
+            return database
+                .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
 
-        private async Task<IMongoCollection<T>> CreateCollectionFromFileInternalAsync<T>(
+        private async Task CreateCollectionFromFileInternalAsync(
             IMongoDatabase database,
             CreateCollectionFromFileOptions options)
         {
@@ -201,9 +245,6 @@ namespace Squadron
                 DatabaseName = database.DatabaseNamespace.DatabaseName
             };
             await DeployAndImportAsync(options);
-
-            return database
-                .GetCollection<T>(options.CollectionOptions.CollectionName);
         }
 
         private async Task DeployAndImportAsync(
@@ -222,7 +263,6 @@ namespace Squadron
                     options.CustomImportArgs)
                 .ToContainerExecCreateParameters());
         }
-
 
         /// <summary>
         /// Creates a new test collection with dafault options
@@ -291,7 +331,6 @@ namespace Squadron
         {
             options = options ?? new CreateCollectionOptions();
             database = database ?? CreateDatabase(options.DatabaseOptions);
-            //database.CreateCollection(options.CollectionName);
             return database.GetCollection<T>(options.CollectionName);
         }
 

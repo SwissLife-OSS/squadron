@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Squadron
 {
     /// <summary>
-    /// Defines a Generic container resource that can be used in a unit test 
+    /// Defines a Generic container resource that can be used in a unit test
     /// </summary>
     /// <typeparam name="TOptions">The type of the options.</typeparam>
     /// <seealso cref="Squadron.ContainerResource{TOptions}" />
@@ -37,11 +36,12 @@ namespace Squadron
                 Port = Manager.Instance.HostPort
             };
 
-            await Initializer.WaitAsync(new GenericContainerStatus(ResourceOptions.StatusChecker, Address));
+            await Initializer.WaitAsync(new GenericContainerStatus(
+                ResourceOptions.StatusChecker, Address));
         }
 
         /// <summary>
-        /// Gets the container URI.
+        /// Gets the external container URI.
         /// </summary>
         /// <param name="scheme">The scheme.</param>
         /// <returns></returns>
@@ -57,10 +57,13 @@ namespace Squadron
 
         public Dictionary<string, string> GetComposeExports()
         {
+            var internalUri = new Uri($"http://{Manager.Instance.Name}:{Settings.InternalPort}");
+
             return new Dictionary<string, string>()
             {
-                { "HttpUrl", GetContainerUri("http").ToString() },
-                { "HttpsUrl", GetContainerUri("https").ToString() },
+                { "HTTPURL", GetContainerUri("http").ToString().Trim('/') },
+                { "HTTPSURL", GetContainerUri("https").ToString().Trim('/') },
+                { "HTTPURL_INTERNAL", internalUri.ToString().Trim('/') }
             };
         }
     }

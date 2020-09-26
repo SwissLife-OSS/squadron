@@ -1,4 +1,4 @@
-﻿namespace Squadron
+namespace Squadron
 {
     /// <summary>
     ///  ServiceBusQueue model

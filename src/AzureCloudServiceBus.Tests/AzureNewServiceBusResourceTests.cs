@@ -16,7 +16,6 @@ namespace Squadron.AzureServiceBus.Tests
             _resource = resource;
         }
 
-
         [Fact(Skip = "Can not run without Azure credentials")]
         public async Task PrepareAzureServiceBusResource_NewNamespace_NoError()
         {

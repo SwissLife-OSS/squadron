@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Squadron.AzureCloud
 {
@@ -27,10 +21,6 @@ namespace Squadron.AzureCloud
         /// <returns></returns>
         public virtual Task InitializeAsync()
         {
-            //var options = new TOptions();
-            //AzureResourceOptionsBuilder builder = new AzureResourceOptionsBuilder();
-            //AzureResourceOptions options = builder.Build();
-            //AzureConfig = options.ConfigResolver();
             Trace.WriteLine("Loading Azure Configuration");
             return Task.CompletedTask;
         }

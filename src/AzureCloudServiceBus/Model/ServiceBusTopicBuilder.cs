@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Squadron
 {
@@ -26,7 +26,6 @@ namespace Squadron
         public static ServiceBusTopicBuilder New()
             => new ServiceBusTopicBuilder();
 
-
         /// <summary>
         /// Creates a new builder with a topic name
         /// </summary>
@@ -34,7 +33,6 @@ namespace Squadron
         /// <returns></returns>
         public static ServiceBusTopicBuilder New(string name)
             => new ServiceBusTopicBuilder(name);
-
 
         /// <summary>
         /// Topic name
@@ -46,7 +44,6 @@ namespace Squadron
             _topic.Name = name;
             return this;
         }
-
 
         /// <summary>
         /// Adds a subscription to the topic

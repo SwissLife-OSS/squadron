@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace Squadron
 {
@@ -13,8 +12,8 @@ namespace Squadron
     /// <seealso cref="Xunit.IAsyncLifetime" />
     public class GenericContainerResource<TOptions>
           : ContainerResource<TOptions>,
-            IAsyncLifetime,
-            IComposableResource
+              IComposableResource,
+              ISquadronAsyncLifetime
           where TOptions : GenericContainerOptions, new()
     {
 

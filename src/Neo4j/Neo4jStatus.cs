@@ -31,7 +31,7 @@ namespace Squadron
                 return new Status
                 {
                     IsReady = true,
-                        Message = "Ready"
+                    Message = "Ready"
                 };
             }
             catch (Exception ex)
@@ -39,7 +39,7 @@ namespace Squadron
                 return new Status
                 {
                     IsReady = false,
-                        Message = ex.Message
+                    Message = ex.Message
                 };
             }
         }

@@ -32,6 +32,11 @@ namespace Squadron
 
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
+
+            if (ResourceOptions is MongoInitOptions initOptions)
+            {
+                await CreateDatabase(initOptions.GetOptions());
+            }
         }
 
         private MongoClient GetClient()

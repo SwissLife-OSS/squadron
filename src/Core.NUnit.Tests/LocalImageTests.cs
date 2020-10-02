@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using FluentAssertions;
-using Xunit;
+using NUnit.Framework;
+
 
 namespace Squadron
 {
-    public class LocalImageTests : IResourceFixture<GenericContainerResource<LocalAppOptions>>
+    public class LocalImageTests : NUnitResourceInitializer
     {
         public static string LocalTagName { get; } = "test-image";
         public static string LocalTagVersion { get; } = "1.0.0";
@@ -21,20 +22,15 @@ namespace Squadron
                 TimeSpan.FromMinutes(5))
             .CreateClient();
 
-        private GenericContainerResource<LocalAppOptions> _containerResource;
+        [NUnitSquadronInject]
+        private GenericContainerResource<LocalAppOptions> _resource;
 
-        public LocalImageTests(XUnitResource<GenericContainerResource<LocalAppOptions>> containerResource)
-        {
-            _containerResource = containerResource.Resource;
-        }
-
-        [Fact]
+        [Test]
         public async Task UseLocalImageTest()
         {
             // Arrange: See LocalAppOptions
-
             // Act
-            Uri containerUri = _containerResource.GetContainerUri();
+            Uri containerUri = _resource.GetContainerUri();
 
             // Assert
             containerUri.Should().NotBeNull();

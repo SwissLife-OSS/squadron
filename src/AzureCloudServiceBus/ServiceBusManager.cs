@@ -78,7 +78,6 @@ namespace Squadron
             }
         }
 
-
         internal async Task CreateQueueAsync(string name)
         {
             var pars = new SBQueue()

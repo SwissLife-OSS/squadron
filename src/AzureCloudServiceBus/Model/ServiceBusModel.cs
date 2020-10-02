@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Squadron.AzureCloud;
 
 namespace Squadron
 {
@@ -41,23 +42,7 @@ namespace Squadron
         /// <value>
         /// The provisioning mode.
         /// </value>
-        internal ServiceBusProvisioningMode ProvisioningMode { get; set; }
-            = ServiceBusProvisioningMode.UseExisting;
-    }
-
-    /// <summary>
-    /// Defines ServiceBUs provisioning modes
-    /// </summary>
-    internal enum ServiceBusProvisioningMode
-    {
-        /// <summary>
-        /// The uan existing Azure resource
-        /// </summary>
-        UseExisting,
-
-        /// <summary>
-        /// Provision and delete resource
-        /// </summary>
-        CreateAndDelete
+        internal AzureResourceProvisioningMode ProvisioningMode { get; set; }
+            = AzureResourceProvisioningMode.UseExisting;
     }
 }

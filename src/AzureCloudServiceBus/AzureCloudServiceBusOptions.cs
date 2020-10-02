@@ -17,6 +17,5 @@ namespace Squadron
         /// </summary>
         /// <param name="builder">The builder.</param>
         public abstract void Configure(ServiceBusOptionsBuilder builder);
-
     }
 }

@@ -22,7 +22,6 @@ namespace Squadron
                          new()
     {
         private ServiceBusManager _serviceBusManager;
-
         private ServiceBusModel _serviceBusModel;
         private readonly IMessageSink _messageSink;
 
@@ -173,7 +172,7 @@ namespace Squadron
         {
             if (_serviceBusModel.Namespace == null)
             {
-                _serviceBusModel.ProvisioningMode = ServiceBusProvisioningMode.CreateAndDelete;
+                _serviceBusModel.ProvisioningMode = AzureResourceProvisioningMode.CreateAndDelete;
                 _serviceBusModel.Namespace = await
                     _serviceBusManager.CreateNamespaceAsync(AzureConfig.DefaultLocation);
             }
@@ -183,7 +182,7 @@ namespace Squadron
         {
             foreach (ServiceBusQueueModel queue in _serviceBusModel.Queues)
             {
-                if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.UseExisting)
+                if (_serviceBusModel.ProvisioningMode == AzureResourceProvisioningMode.UseExisting)
                 {
                     queue.CreatedName = $"{queue.Name}_{DateTime.UtcNow.Ticks}";
                 }
@@ -207,7 +206,7 @@ namespace Squadron
 
         private async Task<string> CreateTopicAsync(ServiceBusTopicModel topic)
         {
-            if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.UseExisting)
+            if (_serviceBusModel.ProvisioningMode == AzureResourceProvisioningMode.UseExisting)
             {
                 topic.CreatedName = $"{topic.Name}_{DateTime.UtcNow.Ticks}";
             }
@@ -226,7 +225,7 @@ namespace Squadron
         {
             try
             {
-                if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.CreateAndDelete)
+                if (_serviceBusModel.ProvisioningMode == AzureResourceProvisioningMode.CreateAndDelete)
                 {
                     await _serviceBusManager.DeleteNamespaceAsync();
                 }

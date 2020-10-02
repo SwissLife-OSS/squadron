@@ -19,12 +19,9 @@ namespace Squadron
         /// <returns></returns>
         public static ServiceBusOptionsBuilder New() => new ServiceBusOptionsBuilder();
 
-
         private ServiceBusOptionsBuilder()
             : base()
-        {
-
-        }
+        { }
 
         /// <summary>
         /// Namespace
@@ -37,7 +34,6 @@ namespace Squadron
             return this;
         }
 
-
         /// <summary>
         /// Adds a topic.
         /// </summary>
@@ -49,7 +45,6 @@ namespace Squadron
             _topics.Add(topicBuilder);
             return topicBuilder;
         }
-
 
         /// <summary>
         /// Adds a queue.

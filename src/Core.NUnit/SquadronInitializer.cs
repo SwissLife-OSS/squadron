@@ -22,17 +22,32 @@ namespace Squadron
             }
         }
 
+        [OneTimeTearDown]
+        protected async Task OneTimeTearDown()
+        {
+            foreach (ISquadronAsyncLifetime resource in _resources)
+            {
+                await resource.DisposeAsync();
+            }
+        }
+
+        protected TResource GetSquadronResource<TResource>()
+            where TResource : ISquadronAsyncLifetime
+        {
+            return (TResource)_resources.First(p => p.GetType() == typeof(TResource));
+        }
+
         private IList<ISquadronAsyncLifetime> GetResources()
         {
             var squadronResources = new List<ISquadronAsyncLifetime>();
 
-            AddFromInterface(squadronResources);
-            AddFromAttribute(squadronResources);
+            TryAddToListFromInterface(squadronResources);
+            TryAddToListFromAttribute(squadronResources);
 
             return squadronResources;
         }
 
-        private void AddFromInterface(List<ISquadronAsyncLifetime> squadronResources)
+        private void TryAddToListFromInterface(List<ISquadronAsyncLifetime> squadronResources)
         {
             IList<Type> resourceTypes =
                 SquadronNUnitHelpers.GetFromTypeByInterface(this.GetType());
@@ -47,13 +62,13 @@ namespace Squadron
             }
         }
 
-        private void AddFromAttribute(List<ISquadronAsyncLifetime> squadronResources)
+        private void TryAddToListFromAttribute(List<ISquadronAsyncLifetime> squadronResources)
         {
             IList<FieldInfo> fieldInfos = SquadronNUnitHelpers.GetFromTypeByAttribute(this.GetType());
 
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
-                var resourceType = fieldInfo.FieldType;
+                Type resourceType = fieldInfo.FieldType;
                 ISquadronAsyncLifetime resourceInstance =
                     squadronResources.FirstOrDefault(p => p.GetType() == resourceType);
 
@@ -72,6 +87,7 @@ namespace Squadron
         {
             var resourceInstance =
                 (ISquadronAsyncLifetime)Activator.CreateInstance(resourceType);
+
             if (resourceInstance == null)
             {
                 throw new ArgumentException(
@@ -79,20 +95,6 @@ namespace Squadron
             }
 
             return resourceInstance;
-        }
-
-        [OneTimeTearDown]
-        protected async Task OneTimeTearDown()
-        {
-            foreach (ISquadronAsyncLifetime resource in _resources)
-            {
-                await resource.DisposeAsync();
-            }
-        }
-
-        protected TResource GetSquadronResource<TResource>() where TResource : ISquadronAsyncLifetime
-        {
-            return (TResource)_resources.First(p => p.GetType() == typeof(TResource));
         }
     }
 }

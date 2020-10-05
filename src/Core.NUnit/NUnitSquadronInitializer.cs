@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Squadron
 {
-    public class NUnitResourceInitializer
+    public class NUnitSquadronInitializer
     {
         private IList<ISquadronAsyncLifetime> _resources;
 

@@ -7,24 +7,22 @@ namespace Squadron
     public class XUnitResource<T> : IAsyncLifetime
         where T : ISquadronAsyncLifetime, new()
     {
-        private readonly T _resource;
-
         public XUnitResource()
         {
-            _resource = new T();
+            Resource = new T();
         }
 
-        public T Resource => _resource;
+        public T Resource { get; }
 
         public async Task InitializeAsync()
         {
-            await _resource.InitializeAsync();
+            await Resource.InitializeAsync();
 
         }
 
         public async Task DisposeAsync()
         {
-            await _resource.DisposeAsync();
+            await Resource.DisposeAsync();
         }
     }
 }

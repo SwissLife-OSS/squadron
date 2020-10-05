@@ -36,6 +36,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\Core.XUnit\Core.XUnit.csproj" />
     <ProjectReference Include="..\Mongo\Mongo.csproj" />
   </ItemGroup>
 

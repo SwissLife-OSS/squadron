@@ -9,11 +9,11 @@ using Xunit;
 namespace Squadron
 {
     public class MongoResourceTests
-        : IClassFixture<MongoResource>
+        : IResourceFixture<MongoResource>
     {
-        public MongoResourceTests(MongoResource mongoResource)
+        public MongoResourceTests(XUnitResource<MongoResource> mongoResource)
         {
-            MongoResource = mongoResource;
+            MongoResource = mongoResource.Resource;
         }
 
         private MongoResource MongoResource { get; }
@@ -24,7 +24,7 @@ namespace Squadron
             // arrange
             IMongoCollection<BsonDocument> collection = MongoResource.CreateCollection<BsonDocument>();
 
-            BsonDocument document = new BsonDocument {{"a", "b"}};
+            BsonDocument document = new BsonDocument { { "a", "b" } };
 
             // act
             collection.InsertOne(document);
@@ -39,7 +39,7 @@ namespace Squadron
         public void ReUseDatabase()
         {
             // arrange
-            BsonDocument document = new BsonDocument {{"a", "b"}};
+            BsonDocument document = new BsonDocument { { "a", "b" } };
 
             // act
             IMongoDatabase database = MongoResource.CreateDatabase();
@@ -111,7 +111,7 @@ namespace Squadron
                             DatabaseName = "myDatabase"
                         }
                     },
-                    CustomImportArgs = new []
+                    CustomImportArgs = new[]
                     {
                         "--type=tsv",
                         "--headerline"

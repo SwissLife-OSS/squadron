@@ -10,13 +10,13 @@ using Xunit;
 namespace Squadron
 {
     public class MongoReplicaSetResourceTests
-        : IClassFixture<MongoReplicaSetResource>
+        : IResourceFixture<MongoReplicaSetResource>
     {
         private readonly MongoReplicaSetResource _mongoRsResource;
 
-        public MongoReplicaSetResourceTests(MongoReplicaSetResource mongoRsResource)
+        public MongoReplicaSetResourceTests(XUnitResource<MongoReplicaSetResource> mongoRsResource)
         {
-            _mongoRsResource = mongoRsResource;
+            _mongoRsResource = mongoRsResource.Resource;
         }
 
         [Fact]

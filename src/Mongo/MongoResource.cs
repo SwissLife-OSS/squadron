@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Xunit;
 
 namespace Squadron
 {
@@ -17,7 +16,7 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class MongoResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime,
+          ISquadronAsyncLifetime,
           IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
@@ -142,7 +141,7 @@ namespace Squadron
         /// <returns>
         /// Returns the created database.
         /// </returns>
-        public virtual IMongoDatabase  CreateDatabase(
+        public virtual IMongoDatabase CreateDatabase(
             CreateDatabaseOptions options)
         {
             return Client.GetDatabase(options.DatabaseName);
@@ -342,7 +341,7 @@ namespace Squadron
         /// <returns></returns>
         public IMongoCollection<T> CreateCollection<T>(string name)
         {
-            IMongoDatabase db =  CreateDatabase(new CreateDatabaseOptions());
+            IMongoDatabase db = CreateDatabase(new CreateDatabaseOptions());
             db.CreateCollection(name);
             return db.GetCollection<T>(name);
         }

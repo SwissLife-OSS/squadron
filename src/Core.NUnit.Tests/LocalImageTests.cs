@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Squadron
 {
-    public class LocalImageTests : NUnitResourceInitializer
+    public class LocalImageTests : NUnitSquadronInitializer
     {
         public static string LocalTagName { get; } = "test-image";
         public static string LocalTagVersion { get; } = "1.0.0";

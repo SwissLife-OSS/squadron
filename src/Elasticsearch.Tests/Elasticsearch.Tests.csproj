@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
+  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
   <PropertyGroup>
     <AssemblyName>Squadron.Elasticsearch.Tests</AssemblyName>
   </PropertyGroup>
@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core.XUnit\Core.XUnit.csproj" />
     <ProjectReference Include="..\Elasticsearch\Elasticsearch.csproj" />
   </ItemGroup>
 

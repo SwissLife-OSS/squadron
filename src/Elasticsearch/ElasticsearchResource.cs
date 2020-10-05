@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
-using Xunit;
+
 
 namespace Squadron
 {
@@ -21,7 +21,7 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class ElasticsearchResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
         /// <inheritdoc cref="IAsyncLifetime"/>

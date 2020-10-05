@@ -22,7 +22,7 @@ namespace Squadron
     {
         private MongoClient _client;
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();

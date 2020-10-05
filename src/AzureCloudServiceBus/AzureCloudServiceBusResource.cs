@@ -6,9 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Squadron.AzureCloud;
-using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Squadron
 {
@@ -17,22 +14,20 @@ namespace Squadron
     /// </summary>
     /// <typeparam name="TOptions">Option to initialize the resource</typeparam>
     public class AzureCloudServiceBusResource<TOptions>
-            : AzureResource<TOptions>, IAsyncLifetime
+            : AzureResource<TOptions>, ISquadronAsyncLifetime
         where TOptions : AzureCloudServiceBusOptions,
                          new()
     {
         private ServiceBusManager _serviceBusManager;
 
         private ServiceBusModel _serviceBusModel;
-        private readonly IMessageSink _messageSink;
+        //private readonly IMessageSink _messageSink;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureCloudServiceBusResource{TOptions}"/> class.
         /// </summary>
-        /// <param name="messageSink">The message sink.</param>
-        public AzureCloudServiceBusResource(IMessageSink messageSink)
+        public AzureCloudServiceBusResource()
         {
-            _messageSink = messageSink;
         }
 
         /// <summary>
@@ -199,8 +194,6 @@ namespace Squadron
         {
             foreach (ServiceBusTopicModel topic in _serviceBusModel.Topics)
             {
-                _messageSink.OnMessage(
-                    new DiagnosticMessage($"Creating topic {topic.CreatedName}"));
                 await CreateTopicAsync(topic);
             }
         }

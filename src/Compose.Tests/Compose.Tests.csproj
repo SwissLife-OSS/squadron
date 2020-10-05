@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Compose\Compose.csproj" />
+    <ProjectReference Include="..\Core.XUnit\Core.XUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

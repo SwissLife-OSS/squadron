@@ -47,13 +47,13 @@ namespace Squadron
     }
 
 
-    public class ThreeContainerTests : IClassFixture<TwoContainerComposedResource>
+    public class ThreeContainerTests : IResourceFixture<TwoContainerComposedResource>
     {
         private readonly TwoContainerComposedResource _resource;
 
-        public ThreeContainerTests(TwoContainerComposedResource resource)
+        public ThreeContainerTests(XUnitResource<TwoContainerComposedResource> resource)
         {
-            _resource = resource;
+            _resource = resource.Resource;
         }
 
         [Fact]

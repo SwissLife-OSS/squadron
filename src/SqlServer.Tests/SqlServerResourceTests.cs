@@ -10,17 +10,17 @@ using Xunit.Abstractions;
 namespace Squadron
 {
     public class SqlServerResourceTests
-        : IClassFixture<SqlServerResource>
+        : IResourceFixture<SqlServerResource>
     {
         private readonly SqlServerResource _resource;
         private readonly ITestOutputHelper _logger;
 
         public SqlServerResourceTests(
-            SqlServerResource resource,
+            XUnitResource<SqlServerResource> resource,
             ITestOutputHelper logger)
         {
             _logger = logger;
-            _resource = resource;
+            _resource = resource.Resource;
         }
 
 #if NET46

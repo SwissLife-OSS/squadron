@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace Squadron
 {
@@ -17,7 +16,7 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public partial class SqlServerResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
         /// <summary>
@@ -33,7 +32,7 @@ namespace Squadron
         /// </summary>
         protected string _serverConnectionString;
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();

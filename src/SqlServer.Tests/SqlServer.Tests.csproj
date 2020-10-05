@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
 
   <PropertyGroup>
@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SqlServer\SqlServer.csproj" />
+    <ProjectReference Include="..\Core.XUnit\Core.XUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

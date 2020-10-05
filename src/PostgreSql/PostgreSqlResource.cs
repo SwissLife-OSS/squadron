@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Npgsql;
-using Xunit;
 
 namespace Squadron
 {
@@ -11,7 +10,7 @@ namespace Squadron
     /// Represents a PostgreSQL database that can be used by unit tests.
     /// </summary>
     public class PostgreSqlResource<TOptions>
-        : ContainerResource<TOptions>, IAsyncLifetime
+        : ContainerResource<TOptions>, ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
 
@@ -30,7 +29,7 @@ namespace Squadron
         }
 
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();

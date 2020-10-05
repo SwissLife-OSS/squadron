@@ -6,14 +6,14 @@ using Xunit;
 namespace Squadron.AzureServiceBus.Tests
 {
     public class AzureNewServiceBusResourceTests
-        : IClassFixture<AzureCloudServiceBusResource<TestNewNamespaceAzureServiceBusOptions>>
+        : IResourceFixture<AzureCloudServiceBusResource<TestNewNamespaceAzureServiceBusOptions>>
     {
         private readonly AzureCloudServiceBusResource<TestNewNamespaceAzureServiceBusOptions> _resource;
 
         public AzureNewServiceBusResourceTests(
-            AzureCloudServiceBusResource<TestNewNamespaceAzureServiceBusOptions> resource)
+            XUnitResource<AzureCloudServiceBusResource<TestNewNamespaceAzureServiceBusOptions>> resource)
         {
-            _resource = resource;
+            _resource = resource.Resource;
         }
 
 

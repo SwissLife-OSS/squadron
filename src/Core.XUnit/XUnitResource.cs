@@ -4,7 +4,7 @@ using Xunit;
 namespace Squadron
 {
 
-    public class XUnitResource<T> : IAsyncLifetime
+    public class XUnitResource<T> : ISquadronAsyncLifetime
         where T : ISquadronAsyncLifetime, new()
     {
         public XUnitResource()
@@ -16,13 +16,13 @@ namespace Squadron
 
         public async Task InitializeAsync()
         {
-            await Resource.InitializeAsync();
+            await Resource.InitializeAsync().ConfigureAwait(false);
 
         }
 
         public async Task DisposeAsync()
         {
-            await Resource.DisposeAsync();
+            await Resource.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

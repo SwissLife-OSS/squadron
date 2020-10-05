@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xunit;
-
 namespace Squadron
 {
-    public class ComposeResource<TOptions> : IAsyncLifetime
+    public class ComposeResource<TOptions> : ISquadronAsyncLifetime
         where TOptions : ComposeResourceOptions, new()
     {
         public ComposeResourceSettings Settings { get; set; }

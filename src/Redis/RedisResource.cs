@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using StackExchange.Redis;
-using Xunit;
 
 namespace Squadron
 {
@@ -15,7 +14,7 @@ namespace Squadron
     /// </summary>
     public class RedisResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
         /// <summary>
@@ -33,7 +32,7 @@ namespace Squadron
                 .Connect(ConnectionString);
         }
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();

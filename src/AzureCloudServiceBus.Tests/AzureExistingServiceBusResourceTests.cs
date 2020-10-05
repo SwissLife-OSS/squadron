@@ -9,19 +9,19 @@ using Xunit.Abstractions;
 namespace Squadron.AzureServiceBus.Tests
 {
     public class AzureExistingServiceBusResourceTests
-        : IClassFixture<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>>
+        : IResourceFixture<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>>
     {
         private readonly AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions> _resource;
 
         public AzureExistingServiceBusResourceTests(
-            AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions> resource,
+            XUnitResource<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>> resource,
             ITestOutputHelper outputHelper)
         {
-            _resource = resource;
+            _resource = resource.Resource;
         }
 
 
-        [Fact( Skip ="Can not run without Azure credentials")]
+        [Fact(Skip = "Can not run without Azure credentials")]
         public async Task PrepareAzureServiceBusResource_ExistingNamespace_NoError()
         {
             ITopicClient topicClient = _resource.GetTopicClient("foo");
@@ -37,6 +37,6 @@ namespace Squadron.AzureServiceBus.Tests
             ITopicClient newTopic = await _resource.CreateTopicAsync(b => b
                                             .Name("adhoc")
                                             .AddSubscription("test1"));
-        }   
+        }
     }
 }

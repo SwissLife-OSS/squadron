@@ -6,13 +6,13 @@ using Xunit;
 
 namespace RabbitMQ.Tests
 {
-    public class RabbitMQResourceTests : IClassFixture<RabbitMQResource>
+    public class RabbitMQResourceTests : IResourceFixture<RabbitMQResource>
     {
         private readonly RabbitMQResource _rabbitMQResource;
 
-        public RabbitMQResourceTests(RabbitMQResource rabbitMQResource)
+        public RabbitMQResourceTests(XUnitResource<RabbitMQResource> rabbitMQResource)
         {
-            _rabbitMQResource = rabbitMQResource;
+            _rabbitMQResource = rabbitMQResource.Resource;
         }
 
         [Fact]

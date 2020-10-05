@@ -37,7 +37,6 @@ namespace Squadron
             return this;
         }
 
-
         /// <summary>
         /// Adds a topic.
         /// </summary>
@@ -50,7 +49,6 @@ namespace Squadron
             return topicBuilder;
         }
 
-
         /// <summary>
         /// Adds a queue.
         /// </summary>
@@ -62,7 +60,6 @@ namespace Squadron
             _queues.Add(queueBuilder);
             return queueBuilder;
         }
-
 
         /// <summary>
         /// Builds the options

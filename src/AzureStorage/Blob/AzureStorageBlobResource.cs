@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using Xunit;
+
 
 namespace Squadron
 {
@@ -20,7 +20,7 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class AzureStorageBlobResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
         CloudStorageAccount _storageAccount = null;

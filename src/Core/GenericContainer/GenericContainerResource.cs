@@ -9,7 +9,7 @@ namespace Squadron
     /// </summary>
     /// <typeparam name="TOptions">The type of the options.</typeparam>
     /// <seealso cref="Squadron.ContainerResource{TOptions}" />
-    /// <seealso cref="Xunit.IAsyncLifetime" />
+    /// <seealso cref="Xunit.ISquadronAsyncLifetime" />
     public class GenericContainerResource<TOptions>
           : ContainerResource<TOptions>,
               IComposableResource,
@@ -25,7 +25,7 @@ namespace Squadron
         /// </value>
         public ContainerAddress Address { get; private set; }
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();

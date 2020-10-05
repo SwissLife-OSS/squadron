@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
   <PropertyGroup>
     <AssemblyName>Squadron.PostgreSql.Tests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PostgreSql\PostgreSql.csproj" />
+    <ProjectReference Include="..\Core.XUnit\Core.XUnit.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Resources\Init1.sql">

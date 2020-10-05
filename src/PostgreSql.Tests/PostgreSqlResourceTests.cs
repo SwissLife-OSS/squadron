@@ -8,13 +8,13 @@ using Xunit;
 
 namespace Squadron
 {
-    public class PostgreSqlResourceTests : IClassFixture<PostgreSqlResource>
+    public class PostgreSqlResourceTests : IResourceFixture<PostgreSqlResource>
     {
         private readonly PostgreSqlResource _resource;
 
-        public PostgreSqlResourceTests(PostgreSqlResource resource)
+        public PostgreSqlResourceTests(XUnitResource<PostgreSqlResource> resource)
         {
-            _resource = resource;
+            _resource = resource.Resource;
         }
 
         [Fact]

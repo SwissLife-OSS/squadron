@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
-using Xunit;
 
 namespace Squadron
 {
@@ -20,7 +19,7 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class RabbitMQResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     { 
         /// <summary>
@@ -28,7 +27,7 @@ namespace Squadron
         /// </summary>
     public string ConnectionString { get; private set; }
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();

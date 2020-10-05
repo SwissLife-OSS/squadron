@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AzureCloudServiceBus\AzureCloudServiceBus.csproj" />
     <ProjectReference Include="..\AzureCloud\AzureCloud.csproj" />
+    <ProjectReference Include="..\Core.XUnit\Core.XUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

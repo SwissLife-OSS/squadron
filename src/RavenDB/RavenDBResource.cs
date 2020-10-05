@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
-using Xunit;
 
 namespace Squadron
 {
@@ -15,14 +14,13 @@ namespace Squadron
 
     }
 
-
     /// <summary>
     /// Represents a RavenDB resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
     public class RavenDBResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          ISquadronAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     { 
         /// <summary>
@@ -30,7 +28,7 @@ namespace Squadron
         /// </summary>
     public string ConnectionString { get; private set; }
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
+        /// <inheritdoc cref="ISquadronAsyncLifetime"/>
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();

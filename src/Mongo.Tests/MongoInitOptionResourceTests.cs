@@ -9,13 +9,13 @@ using Xunit;
 namespace Squadron
 {
     public class MongoInitOptionResourceTests
-        : IClassFixture<MongoResource<FileInitOptions>>
+        : IResourceFixture<MongoResource<FileInitOptions>>
     {
         private readonly MongoResource<FileInitOptions> _mongoResource;
 
-        public MongoInitOptionResourceTests(MongoResource<FileInitOptions> mongoResource)
+        public MongoInitOptionResourceTests(XUnitResource<MongoResource<FileInitOptions>> mongoResource)
         {
-            _mongoResource = mongoResource;
+            _mongoResource = mongoResource.Resource;
         }
 
         [Fact]
@@ -43,11 +43,11 @@ namespace Squadron
                 {
                     DatabaseName = "fileImport"
                 },
-                Files = new []
+                Files = new[]
                 {
                     new FileInfo(Path.Combine("Resources", "news.json"))
                 }
             };
         }
-    }   
+    }
 }

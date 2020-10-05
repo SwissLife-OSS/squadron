@@ -8,10 +8,10 @@ using Xunit;
 
 namespace Squadron
 {
-    public class MongoResourceTests
-        : IResourceFixture<MongoResource>
+    public class MongoSquadronResourceTests
+        : ISquadronResourceFixture<MongoResource>
     {
-        public MongoResourceTests(XUnitResource<MongoResource> mongoResource)
+        public MongoSquadronResourceTests(SquadronResource<MongoResource> mongoResource)
         {
             MongoResource = mongoResource.Resource;
         }

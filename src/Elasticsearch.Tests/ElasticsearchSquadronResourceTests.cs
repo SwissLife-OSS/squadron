@@ -9,12 +9,12 @@ using Xunit.Abstractions;
 
 namespace Elasticsearch.Tests
 {
-    public class ElasticsearchResourceTests
-        : IResourceFixture<ElasticsearchResource>
+    public class ElasticsearchSquadronResourceTests
+        : ISquadronResourceFixture<ElasticsearchResource>
     {
         private readonly ElasticsearchResource _elasticsearchResource;
 
-        public ElasticsearchResourceTests(XUnitResource<ElasticsearchResource> elasticsearchResource)
+        public ElasticsearchSquadronResourceTests(SquadronResource<ElasticsearchResource> elasticsearchResource)
         {
             _elasticsearchResource = elasticsearchResource.Resource;
         }

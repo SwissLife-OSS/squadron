@@ -9,12 +9,12 @@ using Xunit;
 
 namespace Squadron
 {
-    public class MongoReplicaSetResourceTests
-        : IResourceFixture<MongoReplicaSetResource>
+    public class MongoReplicaSetSquadronResourceTests
+        : ISquadronResourceFixture<MongoReplicaSetResource>
     {
         private readonly MongoReplicaSetResource _mongoRsResource;
 
-        public MongoReplicaSetResourceTests(XUnitResource<MongoReplicaSetResource> mongoRsResource)
+        public MongoReplicaSetSquadronResourceTests(SquadronResource<MongoReplicaSetResource> mongoRsResource)
         {
             _mongoRsResource = mongoRsResource.Resource;
         }

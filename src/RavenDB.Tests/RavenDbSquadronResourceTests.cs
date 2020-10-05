@@ -7,11 +7,11 @@ using Xunit;
 
 namespace Squadron
 {
-    public class RavenDBResourceTests : IResourceFixture<RavenDBResource>
+    public class RavenDbSquadronResourceTests : ISquadronResourceFixture<RavenDBResource>
     {
         private readonly RavenDBResource _ravenDBResource;
 
-        public RavenDBResourceTests(XUnitResource<RavenDBResource> ravenDBResource)
+        public RavenDbSquadronResourceTests(SquadronResource<RavenDBResource> ravenDBResource)
         {
             _ravenDBResource = ravenDBResource.Resource;
         }

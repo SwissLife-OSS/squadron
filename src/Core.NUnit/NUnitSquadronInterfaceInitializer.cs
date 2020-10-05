@@ -43,7 +43,7 @@ namespace Squadron
             }
         }
 
-        protected TResource GetResource<TResource>() where TResource : ISquadronAsyncLifetime
+        protected TResource GetSquadronResource<TResource>() where TResource : ISquadronAsyncLifetime
         {
             return (TResource)_resources.First(p => p.GetType() == typeof(TResource));
         }

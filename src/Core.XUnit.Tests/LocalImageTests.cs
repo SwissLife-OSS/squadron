@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Squadron
 {
-    public class LocalImageTests : IResourceFixture<GenericContainerResource<LocalAppOptions>>
+    public class LocalImageTests : ISquadronResourceFixture<GenericContainerResource<LocalAppOptions>>
     {
         public static string LocalTagName { get; } = "test-image";
         public static string LocalTagVersion { get; } = "1.0.0";
@@ -23,7 +23,7 @@ namespace Squadron
 
         private GenericContainerResource<LocalAppOptions> _containerResource;
 
-        public LocalImageTests(XUnitResource<GenericContainerResource<LocalAppOptions>> containerResource)
+        public LocalImageTests(SquadronResource<GenericContainerResource<LocalAppOptions>> containerResource)
         {
             _containerResource = containerResource.Resource;
         }

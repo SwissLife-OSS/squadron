@@ -8,12 +8,12 @@ using Xunit;
 
 namespace Squadron
 {
-    public class MongoInitOptionResourceTests
-        : IResourceFixture<MongoResource<FileInitOptions>>
+    public class MongoInitOptionSquadronResourceTests
+        : ISquadronResourceFixture<MongoResource<FileInitOptions>>
     {
         private readonly MongoResource<FileInitOptions> _mongoResource;
 
-        public MongoInitOptionResourceTests(XUnitResource<MongoResource<FileInitOptions>> mongoResource)
+        public MongoInitOptionSquadronResourceTests(SquadronResource<MongoResource<FileInitOptions>> mongoResource)
         {
             _mongoResource = mongoResource.Resource;
         }

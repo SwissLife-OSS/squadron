@@ -10,12 +10,12 @@ using Xunit;
 
 namespace Squadron
 {
-    public class NetworkTest : IResourceFixture<NetworkCompositionResource>
+    public class NetworkTest : ISquadronResourceFixture<NetworkCompositionResource>
     {
         private readonly NetworkCompositionResource _resource;
         private readonly IDockerClient _dockerClient;
 
-        public NetworkTest(XUnitResource<NetworkCompositionResource> resource)
+        public NetworkTest(SquadronResource<NetworkCompositionResource> resource)
         {
             _resource = resource.Resource;
             _dockerClient = new DockerClientConfiguration(

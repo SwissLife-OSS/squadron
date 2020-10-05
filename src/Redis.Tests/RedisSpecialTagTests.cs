@@ -5,11 +5,11 @@ using Xunit;
 
 namespace Squadron
 {
-    public class RedisSpecialTagTests : IResourceFixture<RedisResource<RedisSpecialTagOptions>>
+    public class RedisSpecialTagTests : ISquadronResourceFixture<RedisResource<RedisSpecialTagOptions>>
     {
         private readonly RedisResource<RedisSpecialTagOptions> _redisResource;
 
-        public RedisSpecialTagTests(XUnitResource<RedisResource<RedisSpecialTagOptions>> redisResource)
+        public RedisSpecialTagTests(SquadronResource<RedisResource<RedisSpecialTagOptions>> redisResource)
         {
             _redisResource = redisResource.Resource;
         }

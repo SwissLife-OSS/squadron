@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Squadron
 {
-    public interface IResourceFixture<T> where T : ISquadronAsyncLifetime
+    public interface ISquadronResourceFixture<T> where T : ISquadronAsyncLifetime
     {
     }
 }

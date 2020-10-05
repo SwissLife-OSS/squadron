@@ -10,9 +10,7 @@ using NUnit.Framework;
 
 namespace Squadron
 {
-    public class LocalImageTestsInterfaceInitializer :
-        NUnitSquadronInterfaceInitializer,
-        ISquadronResourceFixture<GenericContainerResource<LocalAppOptions>>
+    public class LocalImageTestsPropertyInitializers : NUnitSquadronInitializer
     {
         public static DockerClient DockerClient =
             new DockerClientConfiguration(
@@ -21,15 +19,15 @@ namespace Squadron
                 TimeSpan.FromMinutes(5))
             .CreateClient();
 
+        [NUnitSquadronInject]
+        private GenericContainerResource<LocalAppOptions> _resource;
+
         [Test]
         public async Task UseLocalImageTest()
         {
             // Arrange: See LocalAppOptions
-            GenericContainerResource<LocalAppOptions> resource =
-                GetSquadronResource<GenericContainerResource<LocalAppOptions>>();
-
             // Act
-            Uri containerUri = resource.GetContainerUri();
+            Uri containerUri = _resource.GetContainerUri();
 
             // Assert
             containerUri.Should().NotBeNull();

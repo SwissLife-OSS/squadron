@@ -8,13 +8,13 @@ using Xunit.Abstractions;
 
 namespace Squadron.AzureServiceBus.Tests
 {
-    public class AzureExistingServiceBusResourceTests
-        : IResourceFixture<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>>
+    public class AzureExistingServiceBusSquadronResourceTests
+        : ISquadronResourceFixture<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>>
     {
         private readonly AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions> _resource;
 
-        public AzureExistingServiceBusResourceTests(
-            XUnitResource<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>> resource,
+        public AzureExistingServiceBusSquadronResourceTests(
+            SquadronResource<AzureCloudServiceBusResource<TestExistingNamespaceAzureServiceBusOptions>> resource,
             ITestOutputHelper outputHelper)
         {
             _resource = resource.Resource;

@@ -6,11 +6,11 @@ using Xunit;
 
 namespace Squadron.AzureStorage.Tests
 {
-    public class AzureStorageBlobResourceTests : IResourceFixture<AzureStorageBlobResource>
+    public class AzureStorageBlobSquadronResourceTests : ISquadronResourceFixture<AzureStorageBlobResource>
     {
         private readonly AzureStorageBlobResource _azureStorageResource;
 
-        public AzureStorageBlobResourceTests(XUnitResource<AzureStorageBlobResource> azureStorageResource)
+        public AzureStorageBlobSquadronResourceTests(SquadronResource<AzureStorageBlobResource> azureStorageResource)
         {
             _azureStorageResource = azureStorageResource.Resource;
         }

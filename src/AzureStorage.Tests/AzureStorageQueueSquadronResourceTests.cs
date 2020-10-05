@@ -5,11 +5,11 @@ using Xunit;
 
 namespace Squadron.AzureStorage.Tests
 {
-    public class AzureStorageQueueResourceTests : IResourceFixture<AzureStorageQueueResource>
+    public class AzureStorageQueueSquadronResourceTests : ISquadronResourceFixture<AzureStorageQueueResource>
     {
         private readonly AzureStorageQueueResource _azureStorageResource;
 
-        public AzureStorageQueueResourceTests(XUnitResource<AzureStorageQueueResource> azureStorageResource)
+        public AzureStorageQueueSquadronResourceTests(SquadronResource<AzureStorageQueueResource> azureStorageResource)
         {
             _azureStorageResource = azureStorageResource.Resource;
         }

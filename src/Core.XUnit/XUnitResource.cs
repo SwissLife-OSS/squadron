@@ -4,7 +4,7 @@ using Xunit;
 namespace Squadron
 {
 
-    public class XUnitResource<T> : ISquadronAsyncLifetime
+    public class XUnitResource<T> : IAsyncLifetime
         where T : ISquadronAsyncLifetime, new()
     {
         public XUnitResource()

@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Squadron
 {
-    public class LocalImageTestsPropertyInitializers : NUnitSquadronInitializer
+    public class LocalImageTestsPropertyInitializers : SquadronInitializer
     {
         public static DockerClient DockerClient =
             new DockerClientConfiguration(

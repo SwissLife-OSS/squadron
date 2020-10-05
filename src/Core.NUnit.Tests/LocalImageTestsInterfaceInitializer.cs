@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Squadron
 {
     public class LocalImageTestsInterfaceInitializer :
-        NUnitSquadronInterfaceInitializer,
+        SquadronInitializer,
         ISquadronResourceFixture<GenericContainerResource<LocalAppOptions>>
     {
         public static DockerClient DockerClient =

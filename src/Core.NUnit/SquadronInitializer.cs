@@ -14,7 +14,7 @@ namespace Squadron
         [OneTimeSetUp]
         protected async Task OneTimeSetUp()
         {
-            _resources = GetResources();
+            _resources = GetSquadronResources();
 
             foreach (ISquadronAsyncLifetime resource in _resources)
             {
@@ -27,7 +27,7 @@ namespace Squadron
         {
             foreach (ISquadronAsyncLifetime resource in _resources)
             {
-                await resource.DisposeAsync();
+                await resource.DisposeAsync().ConfigureAwait(false);
             }
         }
 
@@ -37,7 +37,7 @@ namespace Squadron
             return (TResource)_resources.First(p => p.GetType() == typeof(TResource));
         }
 
-        private IList<ISquadronAsyncLifetime> GetResources()
+        private IList<ISquadronAsyncLifetime> GetSquadronResources()
         {
             var squadronResources = new List<ISquadronAsyncLifetime>();
 
@@ -54,9 +54,9 @@ namespace Squadron
 
             foreach (Type resourceType in resourceTypes)
             {
-                if (squadronResources.All(p => p.GetType() != resourceType))
+                if (squadronResources.TryGetByType(resourceType) == null)
                 {
-                    ISquadronAsyncLifetime instance = GetSquadronResourceInstance(resourceType);
+                    ISquadronAsyncLifetime instance = CreateResourceInstance(resourceType);
                     squadronResources.Add(instance);
                 }
             }
@@ -64,26 +64,27 @@ namespace Squadron
 
         private void TryAddToListFromAttribute(List<ISquadronAsyncLifetime> squadronResources)
         {
-            IList<FieldInfo> fieldInfos = SquadronNUnitHelpers.GetFromTypeByAttribute(this.GetType());
+            IList<FieldInfo> fieldInfos =
+                SquadronNUnitHelpers.GetFromTypeByAttribute(this.GetType());
 
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
                 Type resourceType = fieldInfo.FieldType;
+
                 ISquadronAsyncLifetime resourceInstance =
-                    squadronResources.FirstOrDefault(p => p.GetType() == resourceType);
+                    squadronResources.TryGetByType(resourceType);
 
                 if (resourceInstance == null)
                 {
-                    resourceInstance = GetSquadronResourceInstance(resourceType);
+                    resourceInstance = CreateResourceInstance(resourceType);
+                    squadronResources.Add(resourceInstance);
                 }
 
                 fieldInfo.SetValue(this, resourceInstance);
-
-                squadronResources.Add(resourceInstance);
             }
         }
 
-        private ISquadronAsyncLifetime GetSquadronResourceInstance(Type resourceType)
+        private ISquadronAsyncLifetime CreateResourceInstance(Type resourceType)
         {
             var resourceInstance =
                 (ISquadronAsyncLifetime)Activator.CreateInstance(resourceType);

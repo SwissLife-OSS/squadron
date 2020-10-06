@@ -10,10 +10,13 @@ namespace Squadron
     {
         public static IList<Type> GetFromTypeByInterface(Type type)
         {
-            //TODO: filter interfaces
-            var interfaces = type.GetInterfaces();
-            //TODO: filter generic arguments
-            var resourceTypes = interfaces.Select(p => p.GetGenericArguments().First()).ToList();
+            var interfaces = type.GetInterfaces()
+                .Where(p => p.GetGenericTypeDefinition() == typeof(ISquadronResourceFixture<>))
+                .ToList();
+
+            var resourceTypes =
+                interfaces.SelectMany(p => p.GetGenericArguments()).Distinct().ToList();
+
             return resourceTypes;
         }
 

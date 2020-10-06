@@ -21,7 +21,7 @@ namespace Squadron
             }
 
             // Pulling Nginx image
-            await LocalImageTestsPropertyInitializers.DockerClient.Images.CreateImageAsync(
+            await Helpers.GetDockerClient.Images.CreateImageAsync(
                 new ImagesCreateParameters
                 {
                     FromImage = "nginx:latest",
@@ -31,7 +31,7 @@ namespace Squadron
                 CancellationToken.None);
 
             // Re-tagging the Nginx image to our test name
-            await LocalImageTestsPropertyInitializers.DockerClient.Images.TagImageAsync(
+            await Helpers.GetDockerClient.Images.TagImageAsync(
                 "nginx:latest",
                 new ImageTagParameters
                 {

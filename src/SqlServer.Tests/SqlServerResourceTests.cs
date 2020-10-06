@@ -9,13 +9,13 @@ using Xunit.Abstractions;
 
 namespace Squadron
 {
-    public class SqlServerSquadronResourceTests
+    public class SqlServerResourceTests
         : ISquadronResourceFixture<SqlServerResource>
     {
         private readonly SqlServerResource _resource;
         private readonly ITestOutputHelper _logger;
 
-        public SqlServerSquadronResourceTests(
+        public SqlServerResourceTests(
             SquadronResource<SqlServerResource> resource,
             ITestOutputHelper logger)
         {

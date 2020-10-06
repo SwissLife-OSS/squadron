@@ -7,11 +7,11 @@ using Xunit;
 
 namespace Squadron
 {
-    public class RedisSquadronResourceTests : ISquadronResourceFixture<RedisResource>
+    public class RedisResourceTests : ISquadronResourceFixture<RedisResource>
     {
         private readonly RedisResource _redisResource;
 
-        public RedisSquadronResourceTests(SquadronResource<RedisResource> redisResource)
+        public RedisResourceTests(SquadronResource<RedisResource> redisResource)
         {
             _redisResource = redisResource.Resource;
         }

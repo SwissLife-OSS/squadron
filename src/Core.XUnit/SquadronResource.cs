@@ -3,7 +3,6 @@ using Xunit;
 
 namespace Squadron
 {
-
     public class SquadronResource<T> : IAsyncLifetime
         where T : ISquadronAsyncLifetime, new()
     {
@@ -17,7 +16,6 @@ namespace Squadron
         public async Task InitializeAsync()
         {
             await Resource.InitializeAsync().ConfigureAwait(false);
-
         }
 
         public async Task DisposeAsync()

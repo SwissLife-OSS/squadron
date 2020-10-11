@@ -32,10 +32,12 @@ namespace Squadron
         [Fact]
         public async void CreateActor()
         {
+            // arrange
             IAsyncSession session = _neo4JResource.GetAsyncSession();
 
             try
             {
+                // act
                 var actor = new Actor("Keanu Reaves", 56);
 
                 IDictionary<string, object> parameters =
@@ -49,6 +51,7 @@ namespace Squadron
 
                 await cursor.ConsumeAsync();
 
+                // assert
                 createdActor.MatchSnapshot();
             }
             finally

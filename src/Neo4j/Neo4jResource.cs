@@ -10,9 +10,9 @@ namespace Squadron
     /// Represents a neo4j database resource that can be used by unit tests.
     /// </summary>
     public class Neo4jResource<TOptions>
-        : ContainerResource<TOptions>,
-        IAsyncLifetime
-    where TOptions : ContainerResourceOptions, new()
+        : ContainerResource<TOptions>
+        , IAsyncLifetime
+        where TOptions : ContainerResourceOptions, new()
     {
         /// <summary>
         /// Neo4j database driver

@@ -5,7 +5,9 @@ namespace Squadron
     /// <summary>
     /// Default Neo4j resource options
     /// </summary>
-    public class Neo4jDefaultOptions : ContainerResourceOptions, IComposableResourceOption
+    public class Neo4jDefaultOptions 
+        : ContainerResourceOptions
+        , IComposableResourceOption
     {
         public Type ResourceType => typeof(Neo4jResource);
 

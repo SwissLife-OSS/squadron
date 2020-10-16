@@ -29,17 +29,19 @@ namespace Squadron
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            ConnectionString = BuildConnectionString(Settings.Username);
+            ConnectionString = BuildConnectionString(Settings.Username, Settings.Password);
 
             await Initializer.WaitAsync(
                 new MySqlStatus(ConnectionString));
         }
 
-        private string BuildConnectionString(string database)
+        private string BuildConnectionString(string username, string password)
         {
-            return $"server={Manager.Instance.Address};port={Manager.Instance.HostPort};" +
-                $"uid=root;pwd=MyPassword;" +
-                $"ConnectionTimeout=600;DefaultCommandTimeout=600;SslMode=None";
+            return $"server={Manager.Instance.Address};" +
+                   $"port={Manager.Instance.HostPort};" +
+                   $"uid={username};" +
+                   $"pwd={password};" +
+                   $"SslMode=None;";
         }
 
         public MySqlConnection GetConnection()

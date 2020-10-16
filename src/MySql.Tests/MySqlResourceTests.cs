@@ -36,11 +36,11 @@ namespace Squadron
         {
             //Arrange
             var script = File.ReadAllText(Path.Combine("Resources", "Init1.sql"));
-            var newDb = "squadron";
+            var newDb = "squadron1";
 
             //Act
             await _resource.CreateDatabaseAsync(newDb);
-            //await _resource.RunSqlScriptAsync(script, newDb);
+            await _resource.RunSqlScriptAsync(script, newDb);
 
             //Assert
             var features = new List<string>();

@@ -14,9 +14,7 @@ namespace Squadron
             string dbname,
             ContainerResourceSettings settings)
         {
-            _command.Append("createdb ");
-            _command.Append($"-h localhost -U {settings.Username} ");
-            _command.Append(dbname);
+            _command.Append($"mysql -u root -p {settings.Password} -e \"CREATE DATABASE {dbname}\";");
         }
 
         internal static ContainerExecCreateParameters Execute(string name,

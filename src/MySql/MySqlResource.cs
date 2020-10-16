@@ -50,12 +50,17 @@ namespace Squadron
 
         public MySqlConnection GetConnection(string dbName)
         {
-            throw new NotImplementedException();
+            return new MySqlConnection($"{ConnectionString}database={dbName}");
         }
 
         public async Task CreateDatabaseAsync(string dbName)
         {
             await Manager.InvokeCommandAsync(CreateDbCommand.Execute(dbName, Settings));
+        }
+
+        public async Task RunSqlScriptAsync(string script, string dbName)
+        {
+            await Manager.InvokeCommandAsync(SqlCommand.ExecuteFile(script, dbName, Settings));
         }
     }
 }

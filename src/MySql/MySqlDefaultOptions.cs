@@ -20,6 +20,7 @@ namespace Squadron
                 .Name("mysql")
                 .Image("mysql:latest")
                 .AddEnvironmentVariable($"MYSQL_ROOT_PASSWORD={Password}")
+                //.AddEnvironmentVariable($"MYSQL_DATABASE=squadron")
                 .AddEnvironmentVariable($"MYSQL_USER={User}")
                 .AddEnvironmentVariable($"MYSQL_PASSWORD={Password}")
                 .WaitTimeout(60)

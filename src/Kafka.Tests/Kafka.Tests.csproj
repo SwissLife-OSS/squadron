@@ -5,4 +5,8 @@
     <AssemblyName>Squadron.Kafka.Tests</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Kafka\Kafka.csproj" />
+  </ItemGroup>
+
 </Project>

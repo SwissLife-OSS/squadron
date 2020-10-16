@@ -42,8 +42,6 @@ namespace Squadron
 
     public class TwoContainerComposedResource : ComposeResource<ThreeContainerOptions>
     {
-
-
     }
 
 

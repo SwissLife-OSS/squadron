@@ -2,17 +2,15 @@
   <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
-    <AssemblyName>Squadron.Elasticsearch</AssemblyName>
+    <AssemblyName>Squadron.Neo4j</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Elasticsearch.Net" Version="6.0.2" />
-    <PackageReference Include="NEST" Version="6.0.2" />
+    <PackageReference Include="Neo4j.Driver" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
-
 
 </Project>

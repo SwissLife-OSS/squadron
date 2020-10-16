@@ -18,12 +18,11 @@ namespace Squadron
         {
             builder
                 .Name("mysql")
-                .Image("mysql:5.7")
+                .Image("mysql:latest")
                 .AddEnvironmentVariable($"MYSQL_ROOT_PASSWORD={Password}")
-                .AddEnvironmentVariable($"MYSQL_DATABASE=squadron_{Guid.NewGuid()}")
                 .AddEnvironmentVariable($"MYSQL_USER={User}")
                 .AddEnvironmentVariable($"MYSQL_PASSWORD={Password}")
-                //.AddEnvironmentVariable("MYSQL_ROOT_HOST=172.17.0.1")
+                .WaitTimeout(60)
                 .Username(User)
                 .Password(Password)
                 .InternalPort(3306);

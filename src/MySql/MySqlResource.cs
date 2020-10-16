@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Xunit;
 
 namespace Squadron
@@ -28,7 +28,7 @@ namespace Squadron
         /// <inheritdoc cref="IAsyncLifetime"/>
         public override async Task InitializeAsync()
         {
-            await base.InitializeAsync();
+            await base.InitializeAsync().ConfigureAwait(false);
             ConnectionString = BuildConnectionString(Settings.Username, Settings.Password);
 
             await Initializer.WaitAsync(
@@ -40,8 +40,7 @@ namespace Squadron
             return $"server={Manager.Instance.Address};" +
                    $"port={Manager.Instance.HostPort};" +
                    $"uid={username};" +
-                   $"pwd={password};" +
-                   $"SslMode=None;";
+                   $"pwd={password};";
         }
 
         public MySqlConnection GetConnection()

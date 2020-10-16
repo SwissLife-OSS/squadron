@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Xunit;
 
 namespace Squadron
@@ -52,9 +52,9 @@ namespace Squadron
                 await con.OpenAsync();
                 using (DbDataReader reader = await cmd.ExecuteReaderAsync())
                 {
-                    while ( await reader.ReadAsync())
+                    while (await reader.ReadAsync())
                     {
-                        features.Add((string) reader["name"]);
+                        features.Add((string)reader["name"]);
                     }
                 }
             }

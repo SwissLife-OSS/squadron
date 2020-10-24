@@ -20,7 +20,6 @@ namespace Squadron
         }
     }
 
-
     public class ThreeContainerOptions : ComposeResourceOptions
     {
         public override void Configure(ComposeResourceBuilder builder)

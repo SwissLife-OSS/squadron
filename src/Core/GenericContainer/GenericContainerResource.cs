@@ -17,7 +17,6 @@ namespace Squadron
             IComposableResource
           where TOptions : GenericContainerOptions, new()
     {
-
         /// <summary>
         /// Gets the address.
         /// </summary>
@@ -33,7 +32,8 @@ namespace Squadron
             Address = new ContainerAddress
             {
                 Address = Manager.Instance.Address,
-                Port = Manager.Instance.HostPort
+                Port = Manager.Instance.HostPort,
+                Name = Manager.Instance.Name
             };
 
             await Initializer.WaitAsync(new GenericContainerStatus(

@@ -26,7 +26,6 @@ namespace Squadron
         /// </value>
         public string Address { get; set; }
 
-
         /// <summary>
         /// Gets or sets the ip address.
         /// </summary>
@@ -34,7 +33,6 @@ namespace Squadron
         /// The ip address.
         /// </value>
         public string IpAddress { get; set; }
-
 
         /// <summary>
         /// Gets or sets the host port.
@@ -44,7 +42,6 @@ namespace Squadron
         /// </value>
         public int HostPort { get; set; }
 
-
         /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
@@ -52,7 +49,6 @@ namespace Squadron
         ///   <c>true</c> if this instance is running; otherwise, <c>false</c>.
         /// </value>
         public bool IsRunning { get; internal set; }
-
 
         /// <summary>
         /// Gets or sets the container logs.

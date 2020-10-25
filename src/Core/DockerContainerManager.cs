@@ -297,6 +297,7 @@ namespace Squadron
             {
                 Name = _settings.UniqueContainerName,
                 Image = _settings.ImageFullname,
+                Volumes = _settings.Volumes.ToDictionary(k => k, v => new EmptyStruct()),
                 AttachStdout = true,
                 AttachStderr = true,
                 AttachStdin = false,
@@ -305,7 +306,6 @@ namespace Squadron
                 Env = _settings.EnvironmentVariables,
                 Cmd = _settings.Cmd
             };
-
 
             try
             {
@@ -383,7 +383,6 @@ namespace Squadron
                     $"Error in PullImage: {_settings.ImageFullname }", ex);
             }
         }
-
 
         private async Task ResolveHostAddressAsync()
         {

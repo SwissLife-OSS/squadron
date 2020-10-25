@@ -24,10 +24,5 @@ namespace Squadron
         /// The port.
         /// </value>
         public int Port { get; internal set; }
-
-        /// <summary>
-        /// Gets the container name
-        /// </summary>
-        public string Name { get; internal set; }
     }
 }

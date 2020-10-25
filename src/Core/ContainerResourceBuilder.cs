@@ -79,6 +79,12 @@ namespace Squadron
             return this;
         }
 
+        public ContainerResourceBuilder AddVolume(string mapping)
+        {
+            _options.Volumes.Add(mapping);
+
+            return this;
+        }
 
         /// <summary>
         /// Container image tag

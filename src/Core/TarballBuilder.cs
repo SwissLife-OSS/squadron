@@ -38,7 +38,6 @@ namespace Squadron
                 archive.CloseEntry();
             }
             archive.Close();
-
             tarball.Position = 0;
 
             return tarball;

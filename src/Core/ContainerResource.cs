@@ -26,7 +26,6 @@ namespace Squadron
         /// </summary>
         protected IDockerContainerManager Manager = null;
 
-
         /// <summary>
         /// The container initializer
         /// </summary>
@@ -40,6 +39,8 @@ namespace Squadron
         private List<string> _composeVariables;
 
         private IEnumerable<string> _composeNetworks = new List<string>();
+
+        public ContainerInstance Instance => Manager.Instance;
 
         /// <summary>
         /// Initializes the resources
@@ -116,17 +117,14 @@ namespace Squadron
 
 
         public async Task PauseContainer(TimeSpan pauseTime)
-        {
-
-
-
-        }
+        {}
 
         public virtual Dictionary<string, string> GetComposeExports()
         {
             return new Dictionary<string, string>
             {
                 { "ADDRESS", Manager.Instance.Address },
+                { "NAME", Manager.Instance.Name },
                 { "PORT", Manager.Instance.HostPort.ToString() },
             };
         }

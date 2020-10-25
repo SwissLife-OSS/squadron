@@ -23,10 +23,10 @@ namespace Squadron
             SetTcpStatusChecker();
         }
 
-        public void Configure(ContainerResourceBuilder builder, string httpStatucCheckPath)
+        public void Configure(ContainerResourceBuilder builder, string httpStatusCheckPath)
         {
             Configure(builder);
-            ConfigureHttpStatusChecker(httpStatucCheckPath);
+            ConfigureHttpStatusChecker(httpStatusCheckPath);
         }
 
         public void Configure(ContainerResourceBuilder builder,

@@ -28,7 +28,7 @@ namespace Squadron
         /// Copies files to the contaier
         /// </summary>
         /// <param name="context">The context.</param>
-        Task CopyToContainerAsync(CopyContext context);
+        Task CopyToContainerAsync(CopyContext context ,bool overrideTargetName = false);
 
         /// <summary>
         /// Creates the and starts the container.

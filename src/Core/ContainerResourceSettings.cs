@@ -92,10 +92,15 @@ namespace Squadron
         public string UniqueContainerName { get; internal set; }
 
         /// <summary>
-        /// Wheter to alway pull an image or look for a local one
+        /// Wether to always pull an image or look for a local one
         /// </summary>
         /// <value></value>
         public bool PreferLocalImage {get; internal set;} = false;
+
+        /// <summary>
+        /// Files to copy from local to the container
+        /// </summary>
+        public IList<CopyContext> FilesToCopy { get; internal set; } = new List<CopyContext>();
 
         /// <summary>
         /// Gets the docker configuration resolver.

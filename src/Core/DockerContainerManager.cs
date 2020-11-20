@@ -104,7 +104,7 @@ namespace Squadron
             {
                 await PullImageAsync();
             }
-            
+
             await CreateContainerAsync();
             await StartContainerAsync();
             await ConnectToNetworksAsync();
@@ -176,9 +176,9 @@ namespace Squadron
         }
 
         /// <inheritdoc/>
-        public async Task CopyToContainerAsync(CopyContext context)
+        public async Task CopyToContainerAsync(CopyContext context, bool overrideTargetName = false)
         {
-            using (var archiver = new TarArchiver(context.Source))
+            using (var archiver = new TarArchiver(context, overrideTargetName))
             {
                 await _client.Containers.ExtractArchiveToContainerAsync(
                     Instance.Id,
@@ -189,7 +189,6 @@ namespace Squadron
                     }, archiver.Stream);
             }
         }
-
 
         /// <inheritdoc/>
         public async Task InvokeCommandAsync(
@@ -324,6 +323,14 @@ namespace Squadron
                         Instance.Id = response.ID;
                         Instance.Name = startParams.Name;
                     });
+
+                if (_settings.FilesToCopy.Any())
+                {
+                    foreach (CopyContext copyContext in _settings.FilesToCopy)
+                    {
+                        await CopyToContainerAsync(copyContext, true);
+                    }
+                }
             }
             catch (Exception ex)
             {

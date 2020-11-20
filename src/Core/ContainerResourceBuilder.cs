@@ -196,6 +196,18 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Copies a file from the host to the container
+        /// </summary>
+        /// <param name="pathToLocalFile">Path to the file on the host</param>
+        /// <param name="destinationOnContainer">Destination of the file in the container</param>
+        /// <returns></returns>
+        public ContainerResourceBuilder CopyFileToContainer(string pathToLocalFile, string destinationOnContainer)
+        {
+            _options.FilesToCopy.Add(new CopyContext(pathToLocalFile, destinationOnContainer));
+            return this;
+        }
+
+        /// <summary>
         /// Builds the settings
         /// </summary>
         /// <returns></returns>

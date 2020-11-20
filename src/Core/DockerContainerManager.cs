@@ -324,12 +324,9 @@ namespace Squadron
                         Instance.Name = startParams.Name;
                     });
 
-                if (_settings.FilesToCopy.Any())
+                foreach (CopyContext copyContext in _settings.FilesToCopy)
                 {
-                    foreach (CopyContext copyContext in _settings.FilesToCopy)
-                    {
-                        await CopyToContainerAsync(copyContext, true);
-                    }
+                    await CopyToContainerAsync(copyContext, true);
                 }
             }
             catch (Exception ex)

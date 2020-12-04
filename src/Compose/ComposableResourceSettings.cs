@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Squadron
 {
@@ -33,5 +32,4 @@ namespace Squadron
 
         public Action<IComposableResource> OnStarted { get; private set; }
     }
-
 }

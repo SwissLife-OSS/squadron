@@ -37,6 +37,7 @@ namespace Squadron
                 Name = name,
                 EnvironmentVariables = new List<EnvironmentVariableMapping>(mappings)
             });
+
             return this;
         }
         public ComposableResourceBuilder<TResourceOptions> WithOnStarted(

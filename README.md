@@ -23,6 +23,7 @@ To get more detailed information about Squadron, go to the [Squadron Docs](https
 - [ ] Kafka
 - [ ] RavenDB
 - [ ] MySQL (MariaDB)
+- [ ] Neo4j
 
 ### Cloud Providers
 

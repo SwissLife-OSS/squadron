@@ -42,7 +42,6 @@ namespace Squadron
             }
         }
 
-
         public TResource GetResource<TResource>(string name)
         {
             ComposeResourceManager manager = Managers[name];
@@ -69,8 +68,6 @@ namespace Squadron
             }
             await Task.WhenAll(stopTasks);
         }
-
-        private List<Tuple<int, string>> byLevel = new List<Tuple<int, string>>();
 
         private IEnumerable<string> BuildStartOrder()
         {

@@ -20,7 +20,6 @@ namespace Squadron
         }
 
         [Fact(Skip = "Can not run without registry credentials")]
-
         public void PrepareResource_NoError()
         {
             //Act
@@ -32,7 +31,6 @@ namespace Squadron
             //Assert
             action.Should().NotThrow();
         }
-
     }
 
     public class TestWebServerOptions : GenericContainerOptions

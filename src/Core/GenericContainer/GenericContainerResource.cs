@@ -17,7 +17,6 @@ namespace Squadron
             IComposableResource
           where TOptions : GenericContainerOptions, new()
     {
-
         /// <summary>
         /// Gets the address.
         /// </summary>
@@ -33,7 +32,7 @@ namespace Squadron
             Address = new ContainerAddress
             {
                 Address = Manager.Instance.Address,
-                Port = Manager.Instance.HostPort
+                Port = Manager.Instance.HostPort,
             };
 
             await Initializer.WaitAsync(new GenericContainerStatus(
@@ -48,6 +47,16 @@ namespace Squadron
         public Uri GetContainerUri(string scheme = "http")
         {
             return new Uri($"{scheme}://{Address.Address}:{Address.Port}");
+        }
+
+        /// <summary>
+        /// Gets the internal container URI.
+        /// </summary>
+        /// <param name="scheme">The scheme.</param>
+        /// <returns></returns>
+        public Uri GetInternalContainerUri(string scheme = "http")
+        {
+            return new Uri($"{scheme}://{Instance.Name}:{Settings.ExternalPort}");
         }
 
         public Task WaitUntilReadyAsync()

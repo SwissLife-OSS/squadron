@@ -52,6 +52,11 @@ namespace Squadron
         public IList<string> EnvironmentVariables { get; internal set; }
             = new List<string>();
 
+        /// <summary>
+        /// Volumes
+        /// </summary>
+        public IList<string> Volumes { get; internal set; }
+            = new List<string>();
 
         public IList<string> Cmd { get; internal set; }
 

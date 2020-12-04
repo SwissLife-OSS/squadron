@@ -36,7 +36,7 @@ namespace Squadron
         {
             //Arrange
             var script = File.ReadAllText(Path.Combine("Resources", "Init1.sql"));
-            var dbName = "squadron_45233aaf30a74eb6a381fb6ee0a617f9";
+            var dbName = "squadron_45233aaf";
 
             //Act
             await _resource.CreateDatabaseAsync(dbName);
@@ -54,8 +54,8 @@ namespace Squadron
             //Arrange
             var script1 = File.ReadAllText(Path.Combine("Resources", "Init1.sql"));
             var script2 = File.ReadAllText(Path.Combine("Resources", "Init2.sql"));
-            var newDb1 = "squadron_8474fb97f42847aea8b3fb84345bd488";
-            var newDb2 = "squadron_b8d58ce05ba1407b9c56b46610560e74";
+            var newDb1 = "squadron_8474fb97";
+            var newDb2 = "squadron_b8d58ce0";
 
             //Act
             await _resource.CreateDatabaseAsync(newDb1);
@@ -76,7 +76,7 @@ namespace Squadron
         public void TryCreateDatabaseWithSameNameThrows()
         {
             //Arrange
-            var newDb1 = "squadron_c87f0a89c4e242d3a8ce90e9de2841ee";
+            var newDb1 = "squadron_c87f0a89";
 
             //Act
             Func<Task> resultAction = async () =>

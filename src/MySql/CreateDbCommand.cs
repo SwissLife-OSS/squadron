@@ -15,11 +15,12 @@ namespace Squadron
             ContainerResourceSettings settings)
         {
             Parameters = GetContainerExecParameters(
-                $"CREATE DATABASE {dbname};" +
-                $"CREATE ROLE developer_{dbname};" +
-                $"GRANT alter,create,delete,drop,index,insert,select,update,trigger," +
-                $"alter routine,create routine, execute, create temporary tables " +
-                $"ON {dbname}.* TO '{settings.Username}';",
+                $@"CREATE DATABASE {dbname};
+                   CREATE ROLE developer_{dbname};
+                   GRANT alter,create,delete,drop,index,insert,select,update,trigger,alter routine,
+                            create routine, execute, create temporary tables 
+                   ON {dbname}.* 
+                   TO '{settings.Username}';",
                 settings);
         }
 

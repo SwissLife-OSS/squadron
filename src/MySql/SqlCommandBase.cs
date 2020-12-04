@@ -23,8 +23,8 @@ namespace Squadron
         }
 
         private IList<string> GetCommand(
-                string query,
-                ContainerResourceSettings settings)
+            string query,
+            ContainerResourceSettings settings)
         {
             return new List<string>
             {

@@ -24,35 +24,39 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudServiceBus", "Azu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgreSql", "PostgreSql\PostgreSql.csproj", "{E99A4569-1F2C-4080-ADDE-3BDC3FB52070}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgreSql.Tests", "PostgreSql.Tests\PostgreSql.Tests.csproj", "{0C1FC22C-C6B2-4AD0-AFEF-CB8EFB59580D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgreSql.Tests", "PostgreSql.Tests\PostgreSql.Tests.csproj", "{0C1FC22C-C6B2-4AD0-AFEF-CB8EFB59580D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compose", "Compose\Compose.csproj", "{3F8EE0BD-6EBE-46E5-A9DB-020E558634B8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compose.Tests", "Compose.Tests\Compose.Tests.csproj", "{B31AAAEE-5995-4780-B961-79F82AE3358F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenDB.Tests", "RavenDB.Tests\RavenDB.Tests.csproj", "{812303A5-B7A2-4F95-AAC7-F96DD228BBE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenDB.Tests", "RavenDB.Tests\RavenDB.Tests.csproj", "{812303A5-B7A2-4F95-AAC7-F96DD228BBE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo4j", "Neo4j\Neo4j.csproj", "{A8A3F69A-BB6F-4870-BB72-DDD1D042202B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo4j", "Neo4j\Neo4j.csproj", "{A8A3F69A-BB6F-4870-BB72-DDD1D042202B}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "AzureCloudServiceBus.Tests", "AzureCloudServiceBus.Tests\AzureCloudServiceBus.Tests.csproj", "{6CD97354-536A-4208-8F58-8330455D46B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudServiceBus.Tests", "AzureCloudServiceBus.Tests\AzureCloudServiceBus.Tests.csproj", "{6CD97354-536A-4208-8F58-8330455D46B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{7000546B-D237-4312-864E-9418A562D40D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{7000546B-D237-4312-864E-9418A562D40D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongo.Tests", "Mongo.Tests\Mongo.Tests.csproj", "{23975B77-D7A8-4AD1-8E7A-A1F5D62A9169}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mongo.Tests", "Mongo.Tests\Mongo.Tests.csproj", "{23975B77-D7A8-4AD1-8E7A-A1F5D62A9169}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elasticsearch", "Elasticsearch\Elasticsearch.csproj", "{592E776A-4816-431D-8093-2612587C294A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elasticsearch", "Elasticsearch\Elasticsearch.csproj", "{592E776A-4816-431D-8093-2612587C294A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elasticsearch.Tests", "Elasticsearch.Tests\Elasticsearch.Tests.csproj", "{2C70381D-AA76-415D-AC93-86D7349A9D3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elasticsearch.Tests", "Elasticsearch.Tests\Elasticsearch.Tests.csproj", "{2C70381D-AA76-415D-AC93-86D7349A9D3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorage.Tests", "AzureStorage.Tests\AzureStorage.Tests.csproj", "{A6BC2DE0-A4DA-459D-9009-3F2BCAAD1A85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorage.Tests", "AzureStorage.Tests\AzureStorage.Tests.csproj", "{A6BC2DE0-A4DA-459D-9009-3F2BCAAD1A85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.Tests", "RabbitMQ.Tests\RabbitMQ.Tests.csproj", "{92FAFECD-64DA-4E0A-9D52-E57AA5C10153}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQ.Tests", "RabbitMQ.Tests\RabbitMQ.Tests.csproj", "{92FAFECD-64DA-4E0A-9D52-E57AA5C10153}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redis.Tests", "Redis.Tests\Redis.Tests.csproj", "{CB9CEA3E-FFA6-4FAE-9651-BCE370D54B7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis.Tests", "Redis.Tests\Redis.Tests.csproj", "{CB9CEA3E-FFA6-4FAE-9651-BCE370D54B7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenDB", "RavenDB\RavenDB.csproj", "{77771EFA-F539-4896-A7A3-FD9F30BC8C89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenDB", "RavenDB\RavenDB.csproj", "{77771EFA-F539-4896-A7A3-FD9F30BC8C89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo4j.Tests", "Neo4j.Tests\Neo4j.Tests.csproj", "{9F3AB08D-FBA2-49E3-8E23-2EB14586663F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo4j.Tests", "Neo4j.Tests\Neo4j.Tests.csproj", "{9F3AB08D-FBA2-49E3-8E23-2EB14586663F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MySql", "MySql\MySql.csproj", "{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MySql.Tests", "MySql.Tests\MySql.Tests.csproj", "{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -364,6 +368,30 @@ Global
 		{9F3AB08D-FBA2-49E3-8E23-2EB14586663F}.Release|x64.Build.0 = Release|Any CPU
 		{9F3AB08D-FBA2-49E3-8E23-2EB14586663F}.Release|x86.ActiveCfg = Release|Any CPU
 		{9F3AB08D-FBA2-49E3-8E23-2EB14586663F}.Release|x86.Build.0 = Release|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Debug|x64.Build.0 = Debug|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Debug|x86.Build.0 = Debug|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Release|x64.ActiveCfg = Release|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Release|x64.Build.0 = Release|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Release|x86.ActiveCfg = Release|Any CPU
+		{05FDCF27-52F3-42FB-B1E3-6DC3DC2BCED3}.Release|x86.Build.0 = Release|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Debug|x64.Build.0 = Debug|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Debug|x86.Build.0 = Debug|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Release|x64.ActiveCfg = Release|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Release|x64.Build.0 = Release|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{DB7CFB70-823A-4BFD-B454-5A3CBC124CA6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

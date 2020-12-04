@@ -21,15 +21,16 @@ To get more detailed information about Squadron, go to the [Squadron Docs](https
 - [x] [Redis](https://swisslife-oss.github.io/squadron/docs/redis)
 - [x] [PostgresSQL](https://swisslife-oss.github.io/squadron/docs/postgresql)
 - [ ] Kafka
-- [ ] RavenDB
-- [ ] MySQL (MariaDB)
-- [ ] Neo4j
+- [x] RavenDB
+- [x] MySQL
+- [x] MariaDB
+- [x] Neo4j
 
 ### Cloud Providers
 
 - [x] [Azure Service Bus](https://swisslife-oss.github.io/squadron/docs/azure-cloud-servicebus)
 - [ ] Azure Event Hub
-- [ ] Azure Storage
+- [x] Azure Storage
 
 ## Getting Started
 

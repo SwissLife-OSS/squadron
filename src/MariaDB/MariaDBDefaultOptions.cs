@@ -3,7 +3,7 @@ using System;
 namespace Squadron
 {
     /// <summary>
-    /// Default mySql resource options
+    /// Default MariaDB resource options
     /// </summary>
     public class MariaDBDefaultOptions
         : ContainerResourceOptions

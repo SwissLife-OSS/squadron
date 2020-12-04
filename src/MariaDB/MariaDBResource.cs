@@ -5,17 +5,10 @@ using Xunit;
 
 namespace Squadron
 {
-    /// <inheritdoc/>
-    public class MariaDBResource: MariaDBResource<MariaDBDefaultOptions>
-    {
-
-    }
-
     /// <summary>
-    /// Represents a MySql resource that can be used by unit tests.
+    /// Represents a MariaDB resource that can be used by unit tests.
     /// </summary>
-    /// <seealso cref="IDisposable"/>
-    public class MariaDBResource<TOptions> : MySqlResource
-    { 
+    public class MariaDBResource: MySqlResource<MariaDBDefaultOptions>
+    {
     }
 }

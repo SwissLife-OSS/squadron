@@ -1,27 +1,27 @@
+using System.Collections.Generic;
 using System.Text;
 using Docker.DotNet.Models;
 
 
 namespace Squadron
 {
-    internal class SqlCommand : ICommand
+    internal class SqlCommand: SqlCommandBase, ICommand
     {
-        private readonly StringBuilder _command = new StringBuilder();
+        public ContainerExecCreateParameters Parameters { get; }
 
         private SqlCommand(
             string command,
             ContainerResourceSettings settings)
         {
-            _command.Append($"mysql -u root -p{settings.Password} -e \"{command}\";");
+            Parameters = GetContainerExecParameters(command, settings);
         }
 
-        internal static ContainerExecCreateParameters ExecuteFile(
+        internal static ContainerExecCreateParameters Execute(
             string inputFile,
             string dbName,
             ContainerResourceSettings settings)
-            => new SqlCommand($"Use {dbName}; {inputFile}", settings)
-             .ToContainerExecCreateParameters();
+            => new SqlCommand($"Use {dbName}; {inputFile}", settings).Parameters;
 
-        public string Command => _command.ToString();
+        public string Command => string.Join(" ", Parameters.Cmd);
     }
 }

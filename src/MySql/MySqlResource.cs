@@ -60,7 +60,7 @@ namespace Squadron
 
         public async Task RunSqlScriptAsync(string script, string dbName)
         {
-            await Manager.InvokeCommandAsync(SqlCommand.ExecuteFile(script, dbName, Settings));
+            await Manager.InvokeCommandAsync(SqlCommand.Execute(script, dbName, Settings));
         }
     }
 }

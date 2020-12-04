@@ -7,6 +7,9 @@
     <ProjectReference Include="..\MySql\MySql.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Resources\Init2.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Init1.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1,30 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Docker.DotNet.Models;
 
 namespace Squadron
 {
-    /// <summary>
-    /// MySql CreateDb command
-    /// </summary>
-    public class CreateDbCommand : ICommand
+    internal class CreateDbCommand : SqlCommandBase, ICommand
     {
-        private readonly StringBuilder _command = new StringBuilder();
+        public ContainerExecCreateParameters Parameters { get; }
 
         private CreateDbCommand(
             string dbname,
             ContainerResourceSettings settings)
         {
-            _command.Append($"mysql -u root -p {settings.Password} -e \"CREATE DATABASE {dbname}\";");
+            Parameters = GetContainerExecParameters(
+                $"CREATE DATABASE {dbname};" +
+                $"CREATE ROLE developer_{dbname};" +
+                $"GRANT alter,create,delete,drop,index,insert,select,update,trigger," +
+                $"alter routine,create routine, execute, create temporary tables " +
+                $"ON {dbname}.* TO '{settings.Username}';",
+                settings);
         }
 
-        internal static ContainerExecCreateParameters Execute(string name,
+        internal static ContainerExecCreateParameters Execute(string dbName,
             ContainerResourceSettings settings)
-            => new CreateDbCommand(name, settings)
-             .ToContainerExecCreateParameters();
+            => new CreateDbCommand(dbName, settings).Parameters;
 
-        /// <summary>
-        /// Command
-        /// </summary>
-        public string Command => _command.ToString();
+        public string Command => string.Join(" ", Parameters.Cmd);
     }
 }

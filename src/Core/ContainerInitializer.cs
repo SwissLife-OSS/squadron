@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,8 +62,9 @@ namespace Squadron
 
                 if (!status.IsReady)
                 {
+                    string logs = string.Join("\n",_manager.Instance.Logs.Distinct());
                     throw new InvalidOperationException(
-                        $"Initialize sequence timed-out. {status.Message}\r\n{_manager.Instance.Logs}");
+                         $"Initialize sequence timed-out. {status.Message}\r\n{logs}");
                 }
 
                 return status;

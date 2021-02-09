@@ -20,7 +20,7 @@ namespace Squadron
             return 
                 $"DefaultEndpointsProtocol=http;AccountName={dev.Credentials.AccountName};" +
                 $"AccountKey={dev.Credentials.ExportBase64EncodedKey()};" +
-                $"{endpoint}=http://{instance.Address}:{instance.HostPort}/" +
+                $"{endpoint}=http://{instance.IpAddress}:{instance.HostPort}/" +
                 $"{dev.Credentials.AccountName};";
         }
 

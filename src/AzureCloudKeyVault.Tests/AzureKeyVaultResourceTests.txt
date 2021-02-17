@@ -18,7 +18,7 @@ namespace Squadron.AzureKeyVault.Tests
             _resource = resource;
         }
 
-        [Fact(Skip = "Can not run without Azure credentials")]
+        [Fact]
         public async Task PrepareVault_CreateNew_NoError()
         {
             // Arrange

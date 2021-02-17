@@ -95,7 +95,7 @@ namespace Squadron
         /// Wether to always pull an image or look for a local one
         /// </summary>
         /// <value></value>
-        public bool PreferLocalImage {get; internal set;} = false;
+        public bool PreferLocalImage {get; internal set;} = true;
 
         /// <summary>
         /// Files to copy from local to the container

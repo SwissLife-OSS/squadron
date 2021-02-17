@@ -9,7 +9,7 @@ namespace Squadron
     {
         private readonly string _archiveFileName;
 
-        public TarArchiver(string sourceFile)
+        public TarArchiver(CopyContext CopyContext, bool overrideTargetName)
         {
             _archiveFileName = Path.GetTempFileName();
 
@@ -17,8 +17,12 @@ namespace Squadron
             using (Stream tarStream = new TarOutputStream(fileStream))
             using (TarArchive tarArchive = TarArchive.CreateOutputTarArchive(tarStream))
             {
-                TarEntry tarEntry = TarEntry.CreateEntryFromFile(sourceFile);
-                tarEntry.Name = sourceFile.Split('\\', '/').Last();
+                TarEntry tarEntry = TarEntry.CreateEntryFromFile(CopyContext.Source);
+
+                tarEntry.Name = overrideTargetName
+                    ? CopyContext.Destination.Split('\\', '/').Last()
+                    : CopyContext.Source.Split('\\', '/').Last();
+
                 tarArchive.WriteEntry(tarEntry, true);
             }
 

@@ -102,6 +102,7 @@ namespace Squadron
                 .InternalPort(80)
                 .Image(LocalImageTests.LocalTagName)
                 .Tag(LocalImageTests.LocalTagVersion)
+                .CopyFileToContainer("appsettings.json", "/appsettings.json")
                 .PreferLocalImage();
         }
     }

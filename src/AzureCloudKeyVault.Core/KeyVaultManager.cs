@@ -8,7 +8,6 @@ using Squadron.AzureCloud;
 namespace Squadron
 {
     public class KeyVaultManager
-
     {
         IKeyVaultManagementClient _client = null;
         private readonly AzureCredentials _azureCredentials;
@@ -40,6 +39,7 @@ namespace Squadron
         {
             await EnsureAuthenticatedAsync();
             var name = $"squadron-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+            _identifier.Name = name;
 
             await _client.Vaults.CreateOrUpdateAsync(
                 _identifier.ResourceGroupName,
@@ -56,8 +56,6 @@ namespace Squadron
                             new Permissions(null, new[] { "all" })) }
                     }
                 });
-
-            _identifier.Name = name;
 
             return name;
         }

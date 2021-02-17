@@ -208,7 +208,7 @@ namespace Squadron
                     (string stdout, string stderr) output = await stream
                         .ReadOutputToEndAsync(CancellationToken.None);
 
-                    if (!string.IsNullOrEmpty(output.stderr) && output.stderr.Contains("error"))
+                    if (!string.IsNullOrEmpty(output.stderr) && output.stderr.ToLowerInvariant().Contains("error"))
                     {
                         var error = new StringBuilder();
                         error.AppendLine($"Error when invoking command \"{string.Join(" ", parameters.Cmd)}\"");

@@ -9,7 +9,7 @@ namespace Squadron.AzureKeyVault.Tests
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
-                .AddUserSecrets<AzureKeyVaultCreateNewResourceTests>()
+                .AddUserSecrets<TestAzureConfigResolver>()
                 .AddEnvironmentVariables()
                 .Build();
 

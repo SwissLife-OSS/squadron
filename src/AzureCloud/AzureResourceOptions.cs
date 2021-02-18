@@ -39,6 +39,7 @@ namespace Squadron.AzureCloud
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
                 .AddJsonFile("appsettings.user.json", true)
+
                 .AddEnvironmentVariables()
                 .Build();
 

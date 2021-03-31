@@ -27,10 +27,8 @@ namespace Squadron
             _secretKey = secretKey;
         }
 
-
         public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-
             var config = new AmazonS3Config();
             config.ServiceURL = _host;
             config.ForcePathStyle = true;

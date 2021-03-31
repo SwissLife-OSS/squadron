@@ -29,7 +29,6 @@ namespace S3.Tests
             var putBucketRequest = new PutBucketRequest
             {
                 BucketName = bucketName,
-
             };
 
             // Act
@@ -87,6 +86,7 @@ namespace S3.Tests
         {
             using var memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
+
             return memoryStream.ToArray();
         }
 

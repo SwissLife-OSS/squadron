@@ -8,7 +8,7 @@ namespace Squadron
     public class S3Resource : S3Resource<S3DefaultOptions> { }
 
     /// <summary>
-    /// Represents a redis resource that can be used by unit tests.
+    /// Represents a S3 resource that can be used by unit tests.
     /// </summary>
     public class S3Resource<TOptions>
         : ContainerResource<TOptions>,
@@ -16,10 +16,16 @@ namespace Squadron
         where TOptions : S3DefaultOptions, new()
     {
         /// <summary>
-        /// ConnectionString
+        /// S3 host
         /// </summary>
         public string Host { get; private set; }
+        /// <summary>
+        /// S3 access key
+        /// </summary>
         public string AccessKey { get; private set; }
+        /// <summary>
+        /// S3 Secret key
+        /// </summary>
         public string SecretKey { get; private set; }
 
         public IAmazonS3 GetCLient()
@@ -35,10 +41,10 @@ namespace Squadron
         public async override Task InitializeAsync()
         {
             await base.InitializeAsync();
+
             Host = $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
             AccessKey = Settings.Username;
             SecretKey = Settings.Password;
-
 
             await Initializer.WaitAsync(new S3Status(Host, AccessKey, SecretKey));
         }

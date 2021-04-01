@@ -66,6 +66,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudKeyVault.Core", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudKeyVault.Tests", "AzureCloudKeyVault.Tests\AzureCloudKeyVault.Tests.csproj", "{A4A1379E-C93D-4216-9861-378FB7BBFA27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3", "S3\S3.csproj", "{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3.Tests", "S3.Tests\S3.Tests.csproj", "{217D9180-DBDE-43C1-88F3-53A06A35074A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -448,6 +452,30 @@ Global
 		{A4A1379E-C93D-4216-9861-378FB7BBFA27}.Release|x64.Build.0 = Release|Any CPU
 		{A4A1379E-C93D-4216-9861-378FB7BBFA27}.Release|x86.ActiveCfg = Release|Any CPU
 		{A4A1379E-C93D-4216-9861-378FB7BBFA27}.Release|x86.Build.0 = Release|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Debug|x64.Build.0 = Debug|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Debug|x86.Build.0 = Debug|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Release|x64.ActiveCfg = Release|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Release|x64.Build.0 = Release|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Release|x86.ActiveCfg = Release|Any CPU
+		{72F7FB56-AC1D-4BC3-AA79-61F52B59ED4A}.Release|x86.Build.0 = Release|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Debug|x64.Build.0 = Debug|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Debug|x86.Build.0 = Debug|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Release|x64.ActiveCfg = Release|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Release|x64.Build.0 = Release|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Release|x86.ActiveCfg = Release|Any CPU
+		{217D9180-DBDE-43C1-88F3-53A06A35074A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -25,6 +25,7 @@ To get more detailed information about Squadron, go to the [Squadron Docs](https
 - [x] MySQL
 - [x] MariaDB
 - [x] Neo4j
+- [x] S3 with [Minio](https://github.com/minio/minio)
 
 ### Cloud Providers
 

@@ -5,7 +5,7 @@ namespace Squadron
     /// <summary>
     /// Default Neo4j resource options
     /// </summary>
-    public class Neo4jDefaultOptions 
+    public class Neo4jDefaultOptions
         : ContainerResourceOptions
         , IComposableResourceOption
     {
@@ -21,7 +21,8 @@ namespace Squadron
                 .Name("neo4j")
                 .Image("neo4j:latest")
                 .InternalPort(7687)
-                .AddEnvironmentVariable("NEO4J_AUTH=none");
+                .AddEnvironmentVariable("NEO4J_AUTH=none")
+                .WaitTimeout(60);
         }
     }
 }

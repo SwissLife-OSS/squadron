@@ -5,6 +5,12 @@ namespace Squadron.Model
     /// </summary>
     public class EventHubModel
     {
-
+        /// <summary>
+        /// Gets or sets the namespace.
+        /// </summary>
+        /// <value>
+        /// The namespace.
+        /// </value>
+        public string Namespace { get; set; }
     }
 }

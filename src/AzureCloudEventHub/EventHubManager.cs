@@ -47,6 +47,7 @@ namespace Squadron
 
             EHNamespace res = await _client.Namespaces
                 .CreateOrUpdateAsync(_azureResourceIdentifier.ResourceGroupName, ns, pars);
+            res.KafkaEnabled = true;
 
             _azureResourceIdentifier.Name = res.Name;
             return res.Name;

@@ -56,6 +56,23 @@ namespace Squadron
             return res.Name;
         }
 
+        internal async Task<string> CreateNamespaceAsync(string location, string serviceBusNamespace)
+        {
+            await EnsureAuthenticatedAsync();
+
+            var pars = new SBNamespace
+            {
+                Sku = new SBSku(SkuName.Standard),
+                Location = location
+            };
+
+            SBNamespace res = await _client.Namespaces
+                .CreateOrUpdateAsync(_identifier.ResourceGroupName, serviceBusNamespace, pars);
+
+            _identifier.Name = res.Name;
+            return res.Name;
+        }
+
         internal async Task CreateTopic(ServiceBusTopicModel model)
         {
             await EnsureAuthenticatedAsync();

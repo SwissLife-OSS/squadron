@@ -7,7 +7,7 @@ namespace Squadron
     /// <summary>
     /// Azure ServiceBus model
     /// </summary>
-    public class ServiceBusModel 
+    public class ServiceBusModel
     {
         /// <summary>
         /// Gets or sets the namespace.
@@ -58,6 +58,11 @@ namespace Squadron
         /// <summary>
         /// Provision and delete resource
         /// </summary>
-        CreateAndDelete
+        CreateAndDelete,
+
+        /// <summary>
+        /// Create or update resource
+        /// </summary>
+        CreateOrUpdate
     }
 }

@@ -12,5 +12,30 @@ namespace Squadron.Model
         /// The namespace.
         /// </value>
         public string Namespace { get; set; }
+
+        /// <summary>
+        /// Gets or sets the provisioning mode.
+        /// </summary>
+        /// <value>
+        /// The provisioning mode.
+        /// </value>
+        internal EventHubProvisioningMode ProvisioningMode { get; set; }
+            = EventHubProvisioningMode.UseExisting;
+    }
+
+    /// <summary>
+    /// Defines Event Hub provisioning modes
+    /// </summary>
+    internal enum EventHubProvisioningMode
+    {
+        /// <summary>
+        /// The uan existing Azure resource
+        /// </summary>
+        UseExisting,
+
+        /// <summary>
+        /// Provision and delete resource
+        /// </summary>
+        CreateAndDelete
     }
 }

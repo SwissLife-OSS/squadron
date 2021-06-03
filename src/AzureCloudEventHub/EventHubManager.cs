@@ -51,5 +51,11 @@ namespace Squadron
             _azureResourceIdentifier.Name = res.Name;
             return res.Name;
         }
+
+        internal async Task DeleteNamespaceAsync()
+        {
+            await _client.Namespaces
+                .DeleteAsync(_azureResourceIdentifier.ResourceGroupName, _azureResourceIdentifier.Name);
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Squadron.AzureCloud;
 using Squadron.Model;
@@ -18,6 +20,7 @@ namespace Squadron
             await base.InitializeAsync();
             BuildOptions();
             InitializeEventHubManager();
+            await PrepareNamespaceAsync();
         }
 
         private void InitializeEventHubManager()
@@ -42,9 +45,33 @@ namespace Squadron
             _eventHubModel = builder.Build();
         }
 
-        public Task DisposeAsync()
+        private async Task PrepareNamespaceAsync()
         {
-            throw new System.NotImplementedException();
+            if (_eventHubModel.Namespace == null)
+            {
+                _eventHubModel.ProvisioningMode = EventHubProvisioningMode.CreateAndDelete;
+                _eventHubModel.Namespace = await
+                    _eventHubManager.CreateNamespaceAsync(AzureConfig.DefaultLocation);
+            }
+        }
+
+        public async Task DisposeAsync()
+        {
+            try
+            {
+                if (_eventHubModel.ProvisioningMode == EventHubProvisioningMode.CreateAndDelete)
+                {
+                    await _eventHubManager.DeleteNamespaceAsync();
+                }
+                else
+                {
+                    throw new System.NotImplementedException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceWarning($"Error cleaning up azure resources: {ex.Message}");
+            }
         }
     }
 }

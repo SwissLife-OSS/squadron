@@ -69,7 +69,7 @@ namespace Squadron
             await _client.EventHubs.CreateOrUpdateAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub.CreatedName, newEventHub);
 
-            var autRuleParams = new AuthorizationRule {Rights = new List<string> {"send"}};
+            var autRuleParams = new AuthorizationRule {Rights = new List<string> {"send", "listen"}};
             await _client.EventHubs.CreateOrUpdateAuthorizationRuleAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub.CreatedName, "sender", autRuleParams);
         }

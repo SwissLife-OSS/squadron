@@ -96,15 +96,11 @@ namespace Squadron
         public async Task<string> GetConnectionStringAsync(string eventHub)
         {
             await EnsureAuthenticatedAsync();
-            //AccessKeys keys = await _client.Namespaces
-            //    .ListKeysAsync(_azureResourceIdentifier.ResourceGroupName,
-            //        _azureResourceIdentifier.Name,
-            //        "RootManageSharedAccessKey");
 
-            var keys = await _client.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
+            var responseKeys = await _client.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub, "sender");
 
-            
+            var keys = responseKeys.Body;
 
             var eventHubNamespaceUri = new Uri($"sb://{_azureResourceIdentifier.Name}.servicebus.windows.net");
             var connectionStringBuilder = new EventHubsConnectionStringBuilder(eventHubNamespaceUri, eventHub, keys.KeyName, keys.PrimaryKey);

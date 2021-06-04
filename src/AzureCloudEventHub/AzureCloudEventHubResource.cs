@@ -39,6 +39,19 @@ namespace Squadron
             return EventHubClient.CreateFromConnectionString(eventHubConnectionString);
         }
 
+        public async Task<PartitionReceiver> GetEventHubReceiverAsync(string name, string consumerGroup = "$default")
+        {
+            EventHubClient client = await GetEventHubClientAsync(name);
+            EventHubRuntimeInformation runtimeInfo = await client.GetRuntimeInformationAsync();
+
+            if (runtimeInfo.PartitionCount > 1)
+                throw new InvalidOperationException("No support for more then 1 partition");
+
+            var partitionId = runtimeInfo.PartitionIds[0];
+
+            return client.CreateReceiver(consumerGroup, partitionId, EventPosition.FromStart());
+        }
+
         private void InitializeEventHubManager()
         {
             _eventHubManager = new EventHubManager(

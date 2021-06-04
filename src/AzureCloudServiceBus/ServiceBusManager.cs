@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ServiceBus;
 using Microsoft.Azure.Management.ServiceBus.Models;
@@ -50,15 +50,31 @@ namespace Squadron
         {
             await EnsureAuthenticatedAsync();
 
-            var checkNameAvailability = new CheckNameAvailability {Name = serviceBusNamespace};
-            var response = await _client.Namespaces
-                .CheckNameAvailabilityMethodWithHttpMessagesAsync(checkNameAvailability);
-
-            if (response.Body.NameAvailable is true)
+            if (await CheckServiceBusNamespaceExists(serviceBusNamespace) == false)
                 return await CreateNamespaceAsync(location, serviceBusNamespace);
 
             _identifier.Name = serviceBusNamespace;
             return serviceBusNamespace;
+        }
+
+        private async Task<bool> CheckServiceBusNamespaceExists(string serviceBusNamespace)
+        {
+            var serviceBusNamespaces = new List<SBNamespace>();
+
+            var listByResourceGroupAsync = await _client.Namespaces.ListByResourceGroupAsync(_identifier.ResourceGroupName);
+            serviceBusNamespaces.AddRange(listByResourceGroupAsync);
+
+            var nextPageLink = listByResourceGroupAsync.NextPageLink;
+            while (nextPageLink != null)
+            {
+                listByResourceGroupAsync = await _client.Namespaces.ListByResourceGroupNextAsync(nextPageLink);
+                nextPageLink = listByResourceGroupAsync.Any(x => x.Name == serviceBusNamespace) ?
+                    null :
+                    listByResourceGroupAsync.NextPageLink;
+                serviceBusNamespaces.AddRange(listByResourceGroupAsync);
+            }
+
+            return serviceBusNamespaces.Any(x => x.Name == serviceBusNamespace);
         }
 
         private async Task<string> CreateNamespaceAsync(string location, string ns)

@@ -37,7 +37,7 @@ namespace Squadron
 
         private void BuildOptions()
         {
-            var builder = new EventHubOptionsBuilder();
+            var builder = EventHubOptionsBuilder.New();
             var options = new TOptions();
             options.Configure(builder);
             LoadResourceConfiguration(builder);

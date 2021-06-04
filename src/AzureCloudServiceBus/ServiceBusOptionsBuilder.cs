@@ -30,13 +30,13 @@ namespace Squadron
         /// Namespace
         /// </summary>
         /// <param name="ns">The namespace.</param>
-        /// <param name="createOrUpdate">creates namespace if doesn't exist.</param>
+        /// <param name="createIfNotExists">creates namespace if doesn't exist.</param>
         /// <returns></returns>
-        public ServiceBusOptionsBuilder Namespace(string ns, bool createOrUpdate = false)
+        public ServiceBusOptionsBuilder Namespace(string ns, bool createIfNotExists = false)
         {
             _model.Namespace = ns;
-            _model.ProvisioningMode = createOrUpdate
-                ? ServiceBusProvisioningMode.CreateOrUpdate
+            _model.ProvisioningMode = createIfNotExists
+                ? ServiceBusProvisioningMode.CreateIfNotExists
                 : ServiceBusProvisioningMode.UseExisting;
             return this;
         }

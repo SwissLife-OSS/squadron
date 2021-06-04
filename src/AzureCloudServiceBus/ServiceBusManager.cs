@@ -38,28 +38,31 @@ namespace Squadron
             }
         }
 
-        internal async Task<string> CreateNamespaceAsync(string location)
+        internal async Task<string> CreateRandomNamespaceAsync(string location)
         {
             await EnsureAuthenticatedAsync();
 
             var ns = $"squadron-{Guid.NewGuid().ToString("N").Substring(8)}";
-            var pars = new SBNamespace
-            {
-                Sku = new SBSku(SkuName.Standard),
-                Location = location
-            };
-
-            SBNamespace res = await _client.Namespaces
-                    .CreateOrUpdateAsync(_identifier.ResourceGroupName, ns, pars);
-
-            _identifier.Name = res.Name;
-            return res.Name;
+            return await CreateNamespaceAsync(location, ns);
         }
 
-        internal async Task<string> CreateNamespaceAsync(string location, string serviceBusNamespace)
+        internal async Task<string> CreateNamespaceIfNotExistsAsync(string location, string serviceBusNamespace)
         {
             await EnsureAuthenticatedAsync();
 
+            var checkNameAvailability = new CheckNameAvailability {Name = serviceBusNamespace};
+            var response = await _client.Namespaces
+                .CheckNameAvailabilityMethodWithHttpMessagesAsync(checkNameAvailability);
+
+            if (response.Body.NameAvailable is true)
+                return await CreateNamespaceAsync(location, serviceBusNamespace);
+
+            _identifier.Name = serviceBusNamespace;
+            return serviceBusNamespace;
+        }
+
+        private async Task<string> CreateNamespaceAsync(string location, string ns)
+        {
             var pars = new SBNamespace
             {
                 Sku = new SBSku(SkuName.Standard),
@@ -67,7 +70,7 @@ namespace Squadron
             };
 
             SBNamespace res = await _client.Namespaces
-                .CreateOrUpdateAsync(_identifier.ResourceGroupName, serviceBusNamespace, pars);
+                .CreateOrUpdateAsync(_identifier.ResourceGroupName, ns, pars);
 
             _identifier.Name = res.Name;
             return res.Name;

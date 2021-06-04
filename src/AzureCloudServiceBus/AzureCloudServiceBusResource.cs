@@ -175,14 +175,13 @@ namespace Squadron
             {
                 _serviceBusModel.ProvisioningMode = ServiceBusProvisioningMode.CreateAndDelete;
                 _serviceBusModel.Namespace = await
-                    _serviceBusManager.CreateNamespaceAsync(AzureConfig.DefaultLocation);
+                    _serviceBusManager.CreateRandomNamespaceAsync(AzureConfig.DefaultLocation);
             }
-            else if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.CreateOrUpdate)
+            else if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.CreateIfNotExists)
             {
                 _serviceBusModel.Namespace = await
-                    _serviceBusManager.CreateNamespaceAsync(AzureConfig.DefaultLocation, _serviceBusModel.Namespace);
+                    _serviceBusManager.CreateNamespaceIfNotExistsAsync(AzureConfig.DefaultLocation, _serviceBusModel.Namespace);
             }
-
         }
 
         private async Task PrepareQueuesAsync()

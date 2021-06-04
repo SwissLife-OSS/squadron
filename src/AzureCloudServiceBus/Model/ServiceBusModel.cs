@@ -63,6 +63,6 @@ namespace Squadron
         /// <summary>
         /// Create or update resource
         /// </summary>
-        CreateOrUpdate
+        CreateIfNotExists
     }
 }

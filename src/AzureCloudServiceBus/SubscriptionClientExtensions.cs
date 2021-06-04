@@ -53,14 +53,14 @@ namespace Squadron
             if (messageHandler == null) throw new ArgumentNullException(nameof(messageHandler));
 
             var completion = new TaskCompletionSource<T>();
+            using var timeoutToken = new CancellationTokenSource(cancelAfter);
+            timeoutToken.Token.Register(() => completion.SetCanceled(), useSynchronizationContext: false);
+
             client.RegisterMessageHandler((message, token) =>
             {
-                using var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
-                tokenSource.CancelAfter(cancelAfter);
-
                 try
                 {
-                    T payload = messageHandler.Invoke(message, tokenSource.Token);
+                    T payload = messageHandler.Invoke(message, token);
                     completion.SetResult(payload);
                 }
                 catch (Exception exception)
@@ -94,15 +94,14 @@ namespace Squadron
             if (messageHandler == null) throw new ArgumentNullException(nameof(messageHandler));
 
             var completion = new TaskCompletionSource<T>();
+            using var timeoutToken = new CancellationTokenSource(cancelAfter);
+            timeoutToken.Token.Register(() => completion.SetCanceled(), useSynchronizationContext: false);
 
             client.RegisterMessageHandler(async (message, token) =>
             {
-                using var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
-                tokenSource.CancelAfter(cancelAfter);
-
                 try
                 {
-                    T payload = await messageHandler.Invoke(message, tokenSource.Token);
+                    T payload = await messageHandler.Invoke(message, token);
                     completion.SetResult(payload);
                 }
                 catch (Exception exception)

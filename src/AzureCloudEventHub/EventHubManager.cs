@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.Management.EventHub;
 using Microsoft.Azure.Management.EventHub.Models;
-using Microsoft.Azure.Management.ServiceBus.Models;
 using Microsoft.Rest;
 using Squadron.AzureCloud;
-using SkuName = Microsoft.Azure.Management.EventHub.Models.SkuName;
 
 namespace Squadron
 {
@@ -57,6 +58,57 @@ namespace Squadron
         {
             await _client.Namespaces
                 .DeleteAsync(_azureResourceIdentifier.ResourceGroupName, _azureResourceIdentifier.Name);
+        }
+
+        public async Task CreateEventHubAsync(EventHubModel eventHub)
+        {
+            await EnsureAuthenticatedAsync();
+            Trace.WriteLine($"Create event hub: {eventHub.CreatedName}");
+
+            var newEventHub = new Eventhub{MessageRetentionInDays = 1, PartitionCount = 1};
+            await _client.EventHubs.CreateOrUpdateAsync(_azureResourceIdentifier.ResourceGroupName,
+                _azureResourceIdentifier.Name, eventHub.CreatedName, newEventHub);
+
+            var autRuleParams = new AuthorizationRule {Rights = new List<string> {"send"}};
+            await _client.EventHubs.CreateOrUpdateAuthorizationRuleAsync(_azureResourceIdentifier.ResourceGroupName,
+                _azureResourceIdentifier.Name, eventHub.CreatedName, "sender", autRuleParams);
+        }
+
+        public async Task DeleteEventHubAsync(EventHubModel eventHub)
+        {
+            await EnsureAuthenticatedAsync();
+            Trace.WriteLine($"Deletes event hub: {eventHub.CreatedName}");
+
+            await _client.EventHubs.DeleteAsync(_azureResourceIdentifier.ResourceGroupName,
+                _azureResourceIdentifier.Name, eventHub.CreatedName);
+        }
+
+        public async Task<string> GetConnectionStringAsync()
+        {
+            await EnsureAuthenticatedAsync();
+            AccessKeys keys = await _client.Namespaces
+                .ListKeysAsync(_azureResourceIdentifier.ResourceGroupName,
+                    _azureResourceIdentifier.Name,
+                    "RootManageSharedAccessKey");
+            return keys.PrimaryConnectionString;
+        }
+
+        public async Task<string> GetConnectionStringAsync(string eventHub)
+        {
+            await EnsureAuthenticatedAsync();
+            //AccessKeys keys = await _client.Namespaces
+            //    .ListKeysAsync(_azureResourceIdentifier.ResourceGroupName,
+            //        _azureResourceIdentifier.Name,
+            //        "RootManageSharedAccessKey");
+
+            var keys = await _client.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
+                _azureResourceIdentifier.Name, eventHub, "sender");
+
+            
+
+            var eventHubNamespaceUri = new Uri($"sb://{_azureResourceIdentifier.Name}.servicebus.windows.net");
+            var connectionStringBuilder = new EventHubsConnectionStringBuilder(eventHubNamespaceUri, eventHub, keys.KeyName, keys.PrimaryKey);
+            return connectionStringBuilder.ToString();
         }
     }
 }

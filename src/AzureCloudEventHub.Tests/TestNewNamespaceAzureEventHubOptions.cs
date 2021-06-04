@@ -4,7 +4,7 @@ namespace Squadron.AzureCloudEventHub.Tests
     {
         public override void Configure(EventHubOptionsBuilder builder)
         {
-            throw new System.NotImplementedException();
+            builder.AddEventHub("testEventHub");
         }
     }
 }

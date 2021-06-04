@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.Azure.EventHubs;
 using Squadron.AzureCloud;
 using Squadron.Model;
 using Xunit;
@@ -12,8 +13,9 @@ namespace Squadron
         where TOptions : AzureCloudEventHubOptions,
         new()
     {
-        private EventHubModel _eventHubModel;
+        private EventHubNamespaceModel _eventHubModel;
         private EventHubManager _eventHubManager;
+        private string _connectionString;
 
         public override async Task InitializeAsync()
         {
@@ -21,6 +23,20 @@ namespace Squadron
             BuildOptions();
             InitializeEventHubManager();
             await PrepareNamespaceAsync();
+            await PrepareEventHubsAsync();
+
+            _connectionString = await _eventHubManager.GetConnectionStringAsync();
+        }
+
+        /// <summary>
+        /// Get a EventHubClient
+        /// </summary>
+        /// <param name="name">EventHub name</param>
+        /// <returns></returns>
+        public async Task<EventHubClient> GetEventHubClientAsync(string name)
+        {
+            var eventHubConnectionString = await _eventHubManager.GetConnectionStringAsync(name);
+            return EventHubClient.CreateFromConnectionString(eventHubConnectionString);
         }
 
         private void InitializeEventHubManager()
@@ -55,6 +71,28 @@ namespace Squadron
             }
         }
 
+        private async Task PrepareEventHubsAsync()
+        {
+            foreach (EventHubModel eventHub in _eventHubModel.GetEventHubs())
+            {
+                await CreateEventHubAsync(eventHub);
+            }
+        }
+
+        private async Task<string> CreateEventHubAsync(EventHubModel eventHub)
+        {
+            if (_eventHubModel.ProvisioningMode == EventHubProvisioningMode.UseExisting)
+            {
+                eventHub.CreatedName = $"{eventHub.Name}_{DateTime.UtcNow.Ticks}";
+            }
+            else
+            {
+                eventHub.CreatedName = eventHub.Name;
+            }
+            await _eventHubManager.CreateEventHubAsync(eventHub);
+            return eventHub.CreatedName;
+        }
+
         public async Task DisposeAsync()
         {
             try
@@ -65,7 +103,10 @@ namespace Squadron
                 }
                 else
                 {
-                    throw new System.NotImplementedException();
+                    foreach (EventHubModel eventHub in _eventHubModel.GetEventHubs())
+                    {
+                        await _eventHubManager.DeleteEventHubAsync(eventHub);
+                    }
                 }
             }
             catch (Exception ex)

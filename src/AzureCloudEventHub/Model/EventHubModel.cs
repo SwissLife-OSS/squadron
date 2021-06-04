@@ -1,41 +1,34 @@
-namespace Squadron.Model
+namespace Squadron
 {
     /// <summary>
-    /// Azure Event Hub model
+    ///  ServiceBusQueue model
     /// </summary>
     public class EventHubModel
     {
         /// <summary>
-        /// Gets or sets the namespace.
+        /// Initializes a new instance of the <see cref="EventHubModel"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        public EventHubModel(string name)
+        {
+            Name = name;
+        }
+
+        /// <summary>
+        /// Gets or sets the name.
         /// </summary>
         /// <value>
-        /// The namespace.
+        /// The name.
         /// </value>
-        public string Namespace { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the provisioning mode.
+        /// Gets or sets the created name.
         /// </summary>
         /// <value>
-        /// The provisioning mode.
+        /// The name.
         /// </value>
-        internal EventHubProvisioningMode ProvisioningMode { get; set; }
-            = EventHubProvisioningMode.UseExisting;
+        internal string CreatedName { get; set; }
     }
 
-    /// <summary>
-    /// Defines Event Hub provisioning modes
-    /// </summary>
-    internal enum EventHubProvisioningMode
-    {
-        /// <summary>
-        /// The uan existing Azure resource
-        /// </summary>
-        UseExisting,
-
-        /// <summary>
-        /// Provision and delete resource
-        /// </summary>
-        CreateAndDelete
-    }
 }

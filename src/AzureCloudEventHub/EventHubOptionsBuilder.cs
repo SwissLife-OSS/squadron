@@ -9,7 +9,8 @@ namespace Squadron
     /// </summary>
     public class EventHubOptionsBuilder : AzureResourceOptionsBuilder
     {
-        private EventHubModel _model = new EventHubModel();
+        private EventHubNamespaceModel _model = new EventHubNamespaceModel();
+        private List<EventHubBuilder> _eventHubs = new List<EventHubBuilder>();
 
         /// <summary>
         /// Creates a new empty builder
@@ -34,11 +35,23 @@ namespace Squadron
             _model.Namespace = ns;
             return this;
         }
-        /// <summary>
-        /// Build an <see cref="EventHubModel"/> from options
-        /// </summary>
-        public EventHubModel Build()
+
+        public EventHubBuilder AddEventHub(string eventHubName)
         {
+            var eventHubBuilder = EventHubBuilder.New(eventHubName);
+            _eventHubs.Add(eventHubBuilder);
+            return eventHubBuilder;
+        }
+
+        /// <summary>
+        /// Build an <see cref="EventHubNamespaceModel"/> from options
+        /// </summary>
+        public EventHubNamespaceModel Build()
+        {
+            foreach (EventHubBuilder ev in _eventHubs)
+            {
+                _model.AddEventHub(ev.Build());
+            }
             return _model;
         }
     }

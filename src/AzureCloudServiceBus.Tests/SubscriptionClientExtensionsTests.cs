@@ -19,7 +19,7 @@ namespace Squadron.AzureServiceBus.Tests
             _serviceBusResource = serviceBusResource;
         }
 
-        [Fact]
+        [Fact(Skip = "Needs azure subscription")]
         public async Task ReceivedMessage_NoTask_DeserializeContent_CreateDto()
         {
             var fixture = new Fixture();
@@ -36,7 +36,7 @@ namespace Squadron.AzureServiceBus.Tests
             Assert.Equal(userCreated, result);
         }
 
-        [Fact]
+        [Fact(Skip = "Needs azure subscription")]
         public async Task ReceivedMessage_WithTask_DeserializeContent_CreateDto()
         {
             var fixture = new Fixture();
@@ -53,7 +53,7 @@ namespace Squadron.AzureServiceBus.Tests
             Assert.Equal(userCreated, result);
         }
 
-        [Fact]
+        [Fact(Skip = "Needs azure subscription")]
         public async Task NoMessage_Should_Trigger_Timeout()
         {
             ISubscriptionClient subscriptionClient = _serviceBusResource.GetSubscriptionClient("foo", "test1");
@@ -62,7 +62,7 @@ namespace Squadron.AzureServiceBus.Tests
                 subscriptionClient.AwaitMessageAsync(DeserializeAsync<UserCreated>, TimeSpan.FromSeconds(5)));
         }
 
-        [Fact]
+        [Fact(Skip = "Needs azure subscription")]
         public async Task ReceivedMessage_CanTrigger_Timeout()
         {
             var fixture = new Fixture();

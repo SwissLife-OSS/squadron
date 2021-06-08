@@ -6,6 +6,7 @@ using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.Management.EventHub;
 using Microsoft.Azure.Management.EventHub.Models;
 using Microsoft.Rest;
+using Microsoft.Rest.Azure;
 using Squadron.AzureCloud;
 
 namespace Squadron
@@ -97,10 +98,10 @@ namespace Squadron
         {
             await EnsureAuthenticatedAsync();
 
-            var responseKeys = await _client.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
+            AzureOperationResponse<AccessKeys> responseKeys = await _client.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub, "sender");
 
-            var keys = responseKeys.Body;
+            AccessKeys keys = responseKeys.Body;
 
             var eventHubNamespaceUri = new Uri($"sb://{_azureResourceIdentifier.Name}.servicebus.windows.net");
             var connectionStringBuilder = new EventHubsConnectionStringBuilder(eventHubNamespaceUri, eventHub, keys.KeyName, keys.PrimaryKey);

@@ -15,7 +15,6 @@ namespace Squadron
     {
         private EventHubNamespaceModel _eventHubModel;
         private EventHubManager _eventHubManager;
-        private string _connectionString;
 
         public override async Task InitializeAsync()
         {
@@ -24,8 +23,6 @@ namespace Squadron
             InitializeEventHubManager();
             await PrepareNamespaceAsync();
             await PrepareEventHubsAsync();
-
-            _connectionString = await _eventHubManager.GetConnectionStringAsync();
         }
 
         /// <summary>
@@ -92,7 +89,7 @@ namespace Squadron
             }
         }
 
-        private async Task<string> CreateEventHubAsync(EventHubModel eventHub)
+        private async Task CreateEventHubAsync(EventHubModel eventHub)
         {
             if (_eventHubModel.ProvisioningMode == EventHubProvisioningMode.UseExisting)
             {
@@ -103,7 +100,6 @@ namespace Squadron
                 eventHub.CreatedName = eventHub.Name;
             }
             await _eventHubManager.CreateEventHubAsync(eventHub);
-            return eventHub.CreatedName;
         }
 
         public async Task DisposeAsync()

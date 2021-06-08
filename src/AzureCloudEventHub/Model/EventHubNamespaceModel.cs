@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Microsoft.Azure.Amqp.Serialization;
 
 namespace Squadron.Model
 {

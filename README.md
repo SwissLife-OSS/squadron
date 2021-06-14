@@ -30,7 +30,7 @@ To get more detailed information about Squadron, go to the [Squadron Docs](https
 ### Cloud Providers
 
 - [x] [Azure Service Bus](https://swisslife-oss.github.io/squadron/docs/azure-cloud-servicebus)
-- [ ] Azure Event Hub
+- [x] Azure Event Hub
 - [x] Azure Storage
 
 ## Getting Started

@@ -17,7 +17,7 @@ namespace Squadron.AzureCloudEventHub.Tests
             _eventHubResource = eventHubResource;
         }
 
-        [Fact]
+        [Fact(Skip = "Can not run without Azure credentials")]
         public async Task PrepareAzureEventHubResource_NewNamespace_NoError()
         {
             var message = "Hello";

@@ -72,6 +72,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3.Tests", "S3.Tests\S3.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureCloudEventHub", "AzureCloudEventHub\AzureCloudEventHub.csproj", "{C44C1446-4B49-4104-B10D-91F44B6CD5A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureCloudEventHub.Tests", "AzureCloudEventHub.Tests\AzureCloudEventHub.Tests.csproj", "{318BAD57-72FF-474B-9A2C-7E404570AD41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -490,6 +492,18 @@ Global
 		{C44C1446-4B49-4104-B10D-91F44B6CD5A2}.Release|x64.Build.0 = Release|Any CPU
 		{C44C1446-4B49-4104-B10D-91F44B6CD5A2}.Release|x86.ActiveCfg = Release|Any CPU
 		{C44C1446-4B49-4104-B10D-91F44B6CD5A2}.Release|x86.Build.0 = Release|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Debug|x64.Build.0 = Debug|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Debug|x86.Build.0 = Debug|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Release|x64.ActiveCfg = Release|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Release|x64.Build.0 = Release|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Release|x86.ActiveCfg = Release|Any CPU
+		{318BAD57-72FF-474B-9A2C-7E404570AD41}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -501,6 +515,7 @@ Global
 		{8F877C8F-B46E-4684-95C5-53DA57B14BDC} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
 		{A4A1379E-C93D-4216-9861-378FB7BBFA27} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
 		{C44C1446-4B49-4104-B10D-91F44B6CD5A2} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
+		{318BAD57-72FF-474B-9A2C-7E404570AD41} = {5E244D5B-B032-458A-BBD2-0A403BBA61F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68767DE6-FA2A-4A9F-A7D3-AF07328CB620}

@@ -1,9 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
+  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
   <PropertyGroup>
     <RootNamespace>Squadron.AzureStorage.Tests</RootNamespace>
     <AssemblyName>Squadron.AzureStorage.Tests</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.9.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AzureStorage\AzureStorage.csproj" />

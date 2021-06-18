@@ -1,5 +1,8 @@
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using FluentAssertions;
 using Microsoft.Azure.Storage.Blob;
 using Xunit;
@@ -32,6 +35,30 @@ namespace Squadron.AzureStorage.Tests
             //Assert
             string downloaded = await textFile.DownloadTextAsync();
             downloaded.Should().Be(inputText);
+        }
+
+        [Fact]
+        public async Task BlobClient_UploadFile_ContentMatch()
+        {
+            //Arrange
+            var blobServiceClient = new BlobServiceClient(_azureStorageResource.ConnectionString);
+            BlobContainerClient containerClient =
+                blobServiceClient.GetBlobContainerClient("foo");
+            await containerClient.CreateIfNotExistsAsync();
+
+            string inputText = "Hello_AzureStorage";
+            var data = Encoding.UTF8.GetBytes(inputText);
+            var memoryStream = new MemoryStream(data);
+
+            //Act
+            BlobClient textFile = containerClient.GetBlobClient("test.txt");
+            await textFile.UploadAsync(memoryStream, overwrite: true, default);
+
+            //Assert
+            Azure.Response<BlobDownloadResult> downloadResult =
+                await textFile.DownloadContentAsync();
+
+            downloadResult.Value.Content.ToArray().Should().BeEquivalentTo(data);
         }
 
         [Fact]

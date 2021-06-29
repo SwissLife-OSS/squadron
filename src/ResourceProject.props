@@ -6,7 +6,6 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>Full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +20,4 @@
     <PackageReference Include="xunit.core" Version="$(xUnitVersion)" />
   </ItemGroup>
 
-  <ItemGroup>
-
-  </ItemGroup>
 </Project>

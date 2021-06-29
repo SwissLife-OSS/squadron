@@ -16,7 +16,7 @@ namespace Squadron
             var password = "_Qtp" + Guid.NewGuid().ToString("N");
             builder
                 .Name("mssql")
-                .Image("microsoft/mssql-server-linux:latest")
+                .Image("mcr.microsoft.com/mssql/server:2019-latest")
                 .InternalPort(1433)
                 .Username("sa")
                 .Password(password)

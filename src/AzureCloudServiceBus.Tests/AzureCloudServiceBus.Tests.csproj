@@ -1,13 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
+  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
   <PropertyGroup>
     <RootNamespace>Squadron.AzureCloudServiceBus.Tests</RootNamespace>
     <AssemblyName>Squadron.AzureCloudServiceBus.Tests</AssemblyName>
   </PropertyGroup>
-
-  <ItemGroup>
-
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AzureCloudServiceBus\AzureCloudServiceBus.csproj" />
@@ -24,6 +20,10 @@
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoFixture" Version="4.17.0" />
   </ItemGroup>
 
 

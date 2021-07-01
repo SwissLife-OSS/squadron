@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AzureCloudEventHub\AzureCloudEventHub.csproj" />
   </ItemGroup>
 
@@ -24,7 +20,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 
 </Project>
 

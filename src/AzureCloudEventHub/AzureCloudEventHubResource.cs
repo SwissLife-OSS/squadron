@@ -91,14 +91,7 @@ namespace Squadron
 
         private async Task CreateEventHubAsync(EventHubModel eventHub)
         {
-            if (_eventHubModel.ProvisioningMode == EventHubProvisioningMode.UseExisting)
-            {
-                eventHub.CreatedName = $"{eventHub.Name}_{DateTime.UtcNow.Ticks}";
-            }
-            else
-            {
-                eventHub.CreatedName = eventHub.Name;
-            }
+            eventHub.CreatedName = eventHub.Name;
             await _eventHubManager.CreateEventHubAsync(eventHub);
         }
 

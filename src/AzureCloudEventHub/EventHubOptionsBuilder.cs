@@ -18,11 +18,9 @@ namespace Squadron
         /// <returns></returns>
         public static EventHubOptionsBuilder New() => new EventHubOptionsBuilder();
 
-
         private EventHubOptionsBuilder()
             : base()
         {
-
         }
 
         /// <summary>

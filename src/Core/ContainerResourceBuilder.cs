@@ -40,13 +40,14 @@ namespace Squadron
         public ContainerResourceBuilder Image(string image)
         {
             var parts = image.Split(':');
-            if ( parts.Length > 1)
+            if (parts.Length > 1)
             {
                 _options.Image = parts[0];
                 _options.Tag = parts[1];
             }
             else
                 _options.Image = image;
+
             return this;
         }
 
@@ -126,10 +127,12 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Internals port.
+        /// Sets the main internal port of this container to the given value.
+        ///
+        /// If you want to expose multiple ports, you can use the <see cref="AddPortMapping"/>
+        /// method, to register additional port mappings.
         /// </summary>
-        /// <param name="port">The port.</param>
-        /// <returns></returns>
+        /// <param name="port">The internal port of a container that shall be exposed. </param>
         public ContainerResourceBuilder InternalPort(int port)
         {
             _options.InternalPort = port;
@@ -137,15 +140,47 @@ namespace Squadron
         }
 
         /// <summary>
-        /// Static external port
-        /// Use this setting only when a static port is required
-        /// When the port is allready in use container creation will fail
+        /// Sets the main external port of this container to the given value.
+        /// Use this setting only if a static external port is required.
+        /// If the given port is already in use by a container, the creation will fail.
+        ///
+        /// If you want to expose multiple ports, you can use the <see cref="AddPortMapping"/>
+        /// method, to register additional port mappings
         /// </summary>
-        /// <param name="port">The port.</param>
-        /// <returns></returns>
+        /// <param name="port">
+        /// The main external static port, to which the main internal port
+        /// of the container will be mapped.
+        /// </param>
         public ContainerResourceBuilder ExternalPort(int port)
         {
             _options.ExternalPort = port;
+            return this;
+        }
+
+
+        /// <summary>
+        /// If you only want to expose one port, please use <see cref="InternalPort"/> and
+        /// <see cref="ExternalPort"/> to so do!
+        /// Exposes additional port mappings for this container.
+        /// </summary>
+        /// <param name="internalPort">
+        /// The internal port of a container that shall be exposed.
+        /// </param>
+        /// <param name="externalPort">
+        /// The external static port of a container that the internal port will be mapped to.
+        /// Defaults to 0, which will let the OS choose a free port for you.
+        ///
+        /// Only provide an external port if a static external port is required.
+        /// When the given external port is already in use by a container, the creation will fail.
+        /// </param>
+        /// <returns></returns>
+        public ContainerResourceBuilder AddPortMapping(int internalPort, int externalPort = 0)
+        {
+            _options.AdditionalPortMappings.Add(
+                new ContainerPortMapping()
+                {
+                    ExternalPort = externalPort, InternalPort = internalPort
+                });
             return this;
         }
 

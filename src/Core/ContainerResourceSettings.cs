@@ -17,18 +17,25 @@ namespace Squadron
         /// Docker image path
         /// </summary>
         public string Image { get; internal set; }
+
         /// <summary>
-        /// Port of application inside container
+        /// Returns the main internal port of the container
         /// </summary>
         public int InternalPort { get; internal set; }
 
         /// <summary>
-        /// Gets the external port (Static).
+        /// Returns the main external port of the container
         /// </summary>
         /// <value>
         /// The external port.
         /// </value>
         public int ExternalPort { get; internal set; }
+
+        /// <summary>
+        /// A list of all additional port mappings that are active for this resources container
+        /// </summary>
+        public IList<ContainerPortMapping> AdditionalPortMappings { get; internal set; } =
+            new List<ContainerPortMapping>();
 
         /// <summary>
         /// Docker image tag

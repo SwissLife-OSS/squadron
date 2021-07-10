@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <Import Project="$(CCDependenciesProps)" Condition="Exists('$(CCDependenciesProps)')"/>
-
   <Import Project="$(CCSettingsProps)" Condition="Exists('$(CCSettingsProps)')"/>
   <Import Project="$(CCVersionProps)" Condition="Exists('$(CCVersionProps)')"/>
   <Import Project="$(CCPackageProps)" Condition="Exists('$(CCPackageProps)')"/>

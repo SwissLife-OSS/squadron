@@ -22,21 +22,11 @@ namespace Squadron.AzureServiceBus.Tests
 
 
         [Fact( Skip ="Can not run without Azure credentials")]
-        public async Task PrepareAzureServiceBusResource_ExistingNamespace_NoError()
+        public async Task PrepareAzureServiceBusResource_NewNamespace_NoError()
         {
             ITopicClient topicClient = _resource.GetTopicClient("foo");
-            ISubscriptionClient subscriptionClient =
-                _resource.GetSubscriptionClient("foo", "test1");
-
-            IQueueClient queueClient = _resource.GetQueueClient("bar");
-
-            //subscriptionClient.RegisterMessageHandler()
-
             await topicClient.SendAsync(new Message(Encoding.UTF8.GetBytes("Hello")));
-
-            ITopicClient newTopic = await _resource.CreateTopicAsync(b => b
-                                            .Name("adhoc")
-                                            .AddSubscription("test1"));
-        }   
+            IQueueClient queueClient = _resource.GetQueueClient("bar");
+        }
     }
 }

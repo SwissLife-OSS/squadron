@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -20,11 +21,12 @@ namespace Squadron
     /// <seealso cref="IDisposable"/>
     public class AzureStorageBlobResource<TOptions>
         : ContainerResource<TOptions>,
-          IAsyncLifetime
+          IAsyncLifetime,
+          IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
         CloudStorageAccount _storageAccount = null;
-
+        string _internalConnectionString = null;
         /// <summary>
         /// Connection string to the blob
         /// </summary>
@@ -35,6 +37,8 @@ namespace Squadron
         {
             await base.InitializeAsync();
             ConnectionString = CloudStorageAccountBuilder.GetForBlob(Manager.Instance);
+            _internalConnectionString
+                = CloudStorageAccountBuilder.GetForBlobInternal(Manager.Instance, Settings);
             _storageAccount = CloudStorageAccount.Parse(ConnectionString);
 
             await Initializer.WaitAsync(
@@ -48,6 +52,15 @@ namespace Squadron
         public CloudBlobClient CreateBlobClient()
         {
             return _storageAccount.CreateCloudBlobClient();
+        }
+
+        public override Dictionary<string, string> GetComposeExports()
+        {
+            Dictionary<string, string> exports = base.GetComposeExports();
+            exports.Add("CONNECTIONSTRING", ConnectionString);
+            exports.Add("CONNECTIONSTRING_INTERNAL", _internalConnectionString);
+
+            return exports;
         }
     }
 }

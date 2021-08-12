@@ -1,16 +1,10 @@
-using System;
-
 namespace Squadron
 {
     /// <summary>
     /// Default RavenDB resource options
     /// </summary>
-    public class RavenDBDefaultOptions
-        : ContainerResourceOptions,
-        IComposableResourceOption
+    public class RavenDBDefaultOptions : ContainerResourceOptions
     {
-        public Type ResourceType => typeof(RavenDBResource);
-
         /// <summary>
         /// Configure resource options
         /// </summary>

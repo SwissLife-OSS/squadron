@@ -5,14 +5,10 @@ namespace Squadron
     /// <summary>
     /// Default mySql resource options
     /// </summary>
-    public class MySqlDefaultOptions
-        : ContainerResourceOptions,
-        IComposableResourceOption
+    public class MySqlDefaultOptions : ContainerResourceOptions
     {
         const string Password = "mypassword";
         const string User = "user";
-
-        public Type ResourceType => typeof(MySqlResource);
 
         /// <summary>
         /// Configure resource options

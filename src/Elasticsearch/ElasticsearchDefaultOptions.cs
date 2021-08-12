@@ -1,14 +1,10 @@
-using System;
-
 namespace Squadron
 {
     /// <summary>
     /// Default Elasticsearch resource options
     /// </summary>
-    public class ElasticsearchDefaultOptions : ContainerResourceOptions, IComposableResourceOption
+    public class ElasticsearchDefaultOptions : ContainerResourceOptions
     {
-        public Type ResourceType => typeof(ElasticsearchResource);
-
         /// <summary>
         /// Configure resource options
         /// </summary>

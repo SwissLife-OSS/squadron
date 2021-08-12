@@ -5,12 +5,8 @@ namespace Squadron
     /// <summary>
     /// Default SqlServer resource options
     /// </summary>
-    public class SqlServerDefaultOptions
-        : ContainerResourceOptions,
-        IComposableResourceOption
+    public class SqlServerDefaultOptions : ContainerResourceOptions
     {
-        public Type ResourceType => typeof(SqlServerResource);
-
         /// <summary>
         /// Configure resource options
         /// </summary>

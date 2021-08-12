@@ -7,8 +7,10 @@ namespace Squadron
     /// <summary>
     /// Default S3 resource options
     /// </summary>
-    public class S3DefaultOptions : ContainerResourceOptions
+    public class S3DefaultOptions : ContainerResourceOptions, IComposableResourceOption
     {
+        public Type ResourceType => typeof(S3Resource);
+
         const string AccessKey = "minioadmin";
         const string SecretKey = "minioadmin";
 

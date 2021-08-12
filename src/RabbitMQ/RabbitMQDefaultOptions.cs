@@ -1,10 +1,16 @@
+using System;
+
 namespace Squadron
 {
     /// <summary>
     /// Default RabbitMQ resource options
     /// </summary>
-    public class RabbitMQDefaultOptions : ContainerResourceOptions
+    public class RabbitMQDefaultOptions
+        : ContainerResourceOptions,
+        IComposableResourceOption
     {
+        public Type ResourceType => typeof(RabbitMQResource);
+
         /// <summary>
         /// Configure resource options
         /// </summary>

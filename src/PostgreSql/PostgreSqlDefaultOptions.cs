@@ -5,8 +5,12 @@ namespace Squadron
     /// <summary>
     /// Default PostgreSQL resource options
     /// </summary>
-    public class PostgreSqlDefaultOptions : ContainerResourceOptions
+    public class PostgreSqlDefaultOptions
+        : ContainerResourceOptions,
+        IComposableResourceOption
     {
+        public Type ResourceType => typeof(PostgreSqlResource);
+
         /// <summary>
         /// Configure resource options
         /// </summary>

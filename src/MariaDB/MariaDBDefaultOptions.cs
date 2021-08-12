@@ -6,10 +6,13 @@ namespace Squadron
     /// Default MariaDB resource options
     /// </summary>
     public class MariaDBDefaultOptions
-        : ContainerResourceOptions
+        : ContainerResourceOptions,
+        IComposableResourceOption
     {
         const string Password = "mypassword";
         const string User = "user";
+
+        public Type ResourceType => typeof(MariaDBResource);
 
         /// <summary>
         /// Configure resource options

@@ -1,10 +1,16 @@
+using System;
+
 namespace Squadron
 {
     /// <summary>
     /// Default Redis resource options
     /// </summary>
-    public class RedisDefaultOptions : ContainerResourceOptions
+    public class RedisDefaultOptions
+        : ContainerResourceOptions,
+        IComposableResourceOption
     {
+        public Type ResourceType => typeof(RedisResource);
+
         /// <summary>
         /// Configure resource options
         /// </summary>

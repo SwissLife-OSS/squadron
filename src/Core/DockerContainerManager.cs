@@ -276,7 +276,8 @@ namespace Squadron
         {
             var hostConfig = new HostConfig
             {
-                PublishAllPorts = true
+                PublishAllPorts = true,
+                Memory = _settings.Memory,
             };
 
             if (_settings.ExternalPort > 0)

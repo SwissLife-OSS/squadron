@@ -408,11 +408,11 @@ namespace Squadron
 
         private async Task ResolveHostAddressAsync()
         {
+            bool bindingsResolved = false;
+
             using (var cancellation = new CancellationTokenSource())
             {
                 cancellation.CancelAfter(_settings.WaitTimeout);
-
-                bool bindingsResolved = false;
 
                 while (!cancellation.IsCancellationRequested && !bindingsResolved)
                 {
@@ -454,6 +454,11 @@ namespace Squadron
                         Trace.TraceWarning($"Container bindings not resolved: {ex.Message}");
                     }
                 }
+            }
+
+            if (!bindingsResolved)
+            {
+                throw new Exception($"Failed to resolve host all bindings.");
             }
         }
 

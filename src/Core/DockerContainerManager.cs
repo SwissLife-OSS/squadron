@@ -408,30 +408,53 @@ namespace Squadron
 
         private async Task ResolveHostAddressAsync()
         {
-            ContainerInspectResponse inspectResponse = await _client
-                .Containers
-                .InspectContainerAsync(Instance.Id);
-
-            ContainerAddressMode addressMode = GetAddressMode();
-
-            if (addressMode == ContainerAddressMode.Port)
+            using (var cancellation = new CancellationTokenSource())
             {
-                Instance.HostPort = ResolvePort(inspectResponse,$"{_settings.InternalPort}/tcp");
-                foreach (var portMapping in _settings.AdditionalPortMappings)
+                cancellation.CancelAfter(_settings.WaitTimeout);
+
+                bool bindingsResolved = false;
+
+                while (!cancellation.IsCancellationRequested && !bindingsResolved)
                 {
-                    Instance.AdditionalPorts.Add(new ContainerPortMapping()
+                    try
                     {
-                        InternalPort = portMapping.InternalPort,
-                        ExternalPort = ResolvePort(inspectResponse, $"{portMapping.InternalPort}/tcp")
-                    });
+                        ContainerInspectResponse inspectResponse = await _client
+                            .Containers
+                            .InspectContainerAsync(Instance.Id);
+
+                        ContainerAddressMode addressMode = GetAddressMode();
+
+                        if (addressMode == ContainerAddressMode.Port)
+                        {
+                            Instance.HostPort =
+                                ResolvePort(inspectResponse, $"{_settings.InternalPort}/tcp");
+                            foreach (ContainerPortMapping portMapping
+                                in _settings.AdditionalPortMappings)
+                            {
+                                Instance.AdditionalPorts.Add(new ContainerPortMapping()
+                                {
+                                    InternalPort = portMapping.InternalPort,
+                                    ExternalPort = ResolvePort(
+                                        inspectResponse,
+                                        $"{portMapping.InternalPort}/tcp")
+                                });
+                            }
+                        }
+                        else
+                        {
+                            Instance.Address = inspectResponse.NetworkSettings.IPAddress;
+                            Instance.HostPort = _settings.InternalPort;
+                        }
+                        Instance.IsRunning = inspectResponse.State.Running;
+
+                        bindingsResolved = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceWarning($"Container bindings not resolved: {ex.Message}");
+                    }
                 }
             }
-            else
-            {
-                Instance.Address = inspectResponse.NetworkSettings.IPAddress;
-                Instance.HostPort = _settings.InternalPort;
-            }
-            Instance.IsRunning = inspectResponse.State.Running;
         }
 
         private int ResolvePort(ContainerInspectResponse inspectResponse, string containerPort)

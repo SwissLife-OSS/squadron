@@ -276,6 +276,8 @@ namespace Squadron
         {
             var hostConfig = new HostConfig
             {
+                PublishAllPorts = true,
+                Memory = _settings.Memory,
                 PortBindings = new Dictionary<string, IList<PortBinding>>()
             };
 

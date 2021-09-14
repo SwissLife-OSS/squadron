@@ -243,6 +243,16 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Sets the memory in Bytes
+        /// </summary>
+        /// <returns></returns>
+        public ContainerResourceBuilder Memory(long memory)
+        {
+            _options.Memory = memory;
+            return this;
+        }
+
+        /// <summary>
         /// Builds the settings
         /// </summary>
         /// <returns></returns>

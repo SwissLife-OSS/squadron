@@ -110,6 +110,11 @@ namespace Squadron
         public IList<CopyContext> FilesToCopy { get; internal set; } = new List<CopyContext>();
 
         /// <summary>
+        /// Memory of the container in Bytes
+        /// </summary>
+        public long Memory { get; internal set; }
+
+        /// <summary>
         /// Gets the docker configuration resolver.
         /// </summary>
         /// <value>

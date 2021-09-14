@@ -1,10 +1,16 @@
+using System;
+
 namespace Squadron
 {
     /// <summary>
     /// Default AzureStorage blob resource options
     /// </summary>
-    public class AzureStorageBlobDefaultOptions : ContainerResourceOptions
+    public class AzureStorageBlobDefaultOptions
+        : ContainerResourceOptions,
+        IComposableResourceOption
     {
+        public Type ResourceType => typeof(AzureStorageBlobResource);
+
         /// <summary>
         /// Configure resource options
         /// </summary>

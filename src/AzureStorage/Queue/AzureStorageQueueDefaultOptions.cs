@@ -1,10 +1,16 @@
+using System;
+
 namespace Squadron
 {
     /// <summary>
     /// Default AzureStorage queue resource options
     /// </summary>
-    public class AzureStorageQueueDefaultOptions : ContainerResourceOptions
+    public class AzureStorageQueueDefaultOptions
+        : ContainerResourceOptions,
+        IComposableResourceOption
     {
+        public Type ResourceType => typeof(AzureStorageQueueResource);
+
         /// <summary>
         /// Configure resource options
         /// </summary>

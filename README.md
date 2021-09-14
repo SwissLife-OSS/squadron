@@ -25,11 +25,12 @@ To get more detailed information about Squadron, go to the [Squadron Docs](https
 - [x] MySQL
 - [x] MariaDB
 - [x] Neo4j
+- [x] S3 with [Minio](https://github.com/minio/minio)
 
 ### Cloud Providers
 
 - [x] [Azure Service Bus](https://swisslife-oss.github.io/squadron/docs/azure-cloud-servicebus)
-- [ ] Azure Event Hub
+- [x] Azure Event Hub
 - [x] Azure Storage
 
 ## Getting Started

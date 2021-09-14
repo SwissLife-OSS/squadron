@@ -1,11 +1,11 @@
 using System;
 
-namespace Squadron
+namespace Squadron.Resources
 {
     /// <summary>
-    /// Default SqlServer resource options
+    /// SqlServer 2019 options
     /// </summary>
-    public class SqlServerDefaultOptions : ContainerResourceOptions
+    public class SqlServer2019Options : ContainerResourceOptions
     {
         /// <summary>
         /// Configure resource options

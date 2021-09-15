@@ -27,7 +27,7 @@ namespace Squadron
             try
             {
                 await ftpClient.ConnectAsync(cancellationToken);
-                await ftpClient.GetListingAsync("",cancellationToken);
+                await ftpClient.GetListingAsync("/",cancellationToken);
 
                 return new Status
                 {

@@ -22,7 +22,6 @@ namespace Squadron
         public async Task UploadFile_DownloadedFileMatchLocal()
         {
             // Arrange
-            FtpServerConfiguration configuration = _ftpServerResource.FtpServerConfiguration;
             using Stream sampleFileStream = GetEmbeddedResource(SampleFileName);
 
             var localFileContent = ToByteArray(sampleFileStream);
@@ -32,8 +31,8 @@ namespace Squadron
             await _ftpServerResource.UploadAsync(sampleFileStream, SampleFileName, "/", default);
 
             //Assert
-            byte[] downloadedFile = await _ftpServerResource.DownloadAsync(
-                SampleFileName, "/", default);
+            byte[] downloadedFile =
+                await _ftpServerResource.DownloadAsync(SampleFileName, "/", default);
 
             downloadedFile.Should().BeEquivalentTo(localFileContent);
         }

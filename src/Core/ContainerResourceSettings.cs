@@ -38,6 +38,12 @@ namespace Squadron
             new List<ContainerPortMapping>();
 
         /// <summary>
+        /// A list of runtime variables resolved dynamically
+        /// </summary>
+        public IList<RuntimeVariable> RuntimeVariables { get; internal set; } =
+            new List<RuntimeVariable>();
+
+        /// <summary>
         /// Docker image tag
         /// </summary>
         public string Tag { get; internal set; }

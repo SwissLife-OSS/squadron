@@ -11,22 +11,24 @@ namespace Squadron
         const string Password = "password";
         const string Username = "username";
 
+        const string DynamicPort1VariableName = "DYNAMIC_PORT_1";
+
         public override void Configure(ContainerResourceBuilder builder)
         {
             builder
                 .Name("ftp-server")
                 .Image("fauria/vsftpd")
-                //.AddRuntimeVariable("DYNAMIC_PORT_1", RuntimeVariableType.DynamicPort)
+                .AddRuntimeVariable(DynamicPort1VariableName, RuntimeVariableType.DynamicPort)
                 .AddEnvironmentVariable($"FTP_USER={Username}")
                 .AddEnvironmentVariable($"FTP_PASS={Password}")
                 .AddEnvironmentVariable($"PASV_ADDRESS=127.0.0.1")
-                .AddEnvironmentVariable("PASV_MIN_PORT=50000")
-                .AddEnvironmentVariable("PASV_MAX_PORT=50000")
+                .AddEnvironmentVariable($"PASV_MIN_PORT={{{DynamicPort1VariableName}}}")
+                .AddEnvironmentVariable($"PASV_MAX_PORT={{{DynamicPort1VariableName}}}")
                 .AddEnvironmentVariable($"PASV_ENABLE=YES")
                 .Username(Username)
                 .Password(Password)
                 .InternalPort(21)
-                .AddPortMapping(new ContainerPortMap(50000))
+                .AddPortMapping(DynamicPort1VariableName, DynamicPort1VariableName)
                 .WaitTimeout(60)
                 .PreferLocalImage();
         }

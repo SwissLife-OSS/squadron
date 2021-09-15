@@ -43,6 +43,12 @@ namespace Squadron
         public int HostPort { get; set; }
 
         /// <summary>
+        /// A list of additional ports, that were exposed in addition to the main port
+        /// </summary>
+        public IList<ContainerPortMapping> AdditionalPorts { get; } =
+            new List<ContainerPortMapping>();
+
+        /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
         /// <value>

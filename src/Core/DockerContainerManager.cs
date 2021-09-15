@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -95,8 +94,6 @@ namespace Squadron
 #endif
         }
 
-
-
         /// <inheritdoc/>
         public async Task CreateAndStartContainerAsync()
         {
@@ -109,12 +106,12 @@ namespace Squadron
             await StartContainerAsync();
             await ConnectToNetworksAsync();
             await ResolveHostAddressAsync();
+            await CreateLogStreamAsync();
 
             if (!Instance.IsRunning)
             {
-                var logs = await ConsumeLogsAsync(TimeSpan.FromSeconds(5));
-                throw new ContainerException(
-                    $"Container exited with following logs: \r\n {logs}");
+                await ConsumeLogsAsync(TimeSpan.FromSeconds(5));
+                throw new ContainerException("Container could not be started (see test output).");
             }
         }
 
@@ -220,10 +217,10 @@ namespace Squadron
             }
         }
 
-
-        /// <inheritdoc/>
-        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
+        private async Task CreateLogStreamAsync()
         {
+            _settings.Logger.Verbose("Create log stream");
+
             var containerStatsParameters = new ContainerLogsParameters
             {
                 Follow = true,
@@ -231,16 +228,17 @@ namespace Squadron
                 ShowStdout = true
             };
 
-            Stream logStream = await _client
+            Instance.LogStream = await _client
                 .Containers
-                .GetContainerLogsAsync(
-                    Instance.Id,
-                    containerStatsParameters,
-                    default);
+                .GetContainerLogsAsync(Instance.Id, containerStatsParameters);
+        }
 
-            var logs = await ReadAsync(logStream, timeout);
+        /// <inheritdoc/>
+        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
+        {
+            var logs = await ReadAsync(timeout);
             Instance.Logs.Add(logs);
-            Trace.TraceInformation(logs);
+            _settings.Logger.ContainerLogs(logs);
             return logs;
         }
 
@@ -253,24 +251,28 @@ namespace Squadron
                 await retryPolicy
                     .ExecuteAsync(async () =>
                     {
+                        _settings.Logger.Verbose("Try start container");
                         bool started = await _client.Containers.StartContainerAsync(
                             Instance.Id,
                             containerStartParameters);
 
                         if (!started)
                         {
+                            _settings.Logger.Warning("Container didn't start");
                             throw new ContainerException(
                                 "Docker container creation/startup failed.");
                         }
+
+                        _settings.Logger.Information("Container started");
                     });
             }
             catch (Exception ex)
             {
+                _settings.Logger.Error("Container start failed", ex);
                 throw new ContainerException(
                     $"Error in StartContainer: {_settings.UniqueContainerName}", ex);
             }
         }
-
 
         private async Task CreateContainerAsync()
         {
@@ -312,12 +314,15 @@ namespace Squadron
                 await retryPolicy
                     .ExecuteAsync(async () =>
                     {
+                        _settings.Logger.Verbose("Try create container");
+                        _settings.Logger.StartParameters(startParams);
                         CreateContainerResponse response = await _client
                             .Containers
                             .CreateContainerAsync(startParams);
 
                         if (string.IsNullOrEmpty(response.ID))
                         {
+                            _settings.Logger.Warning("Container was not created");
                             throw new ContainerException(
                                 "Could not create the container");
                         }
@@ -332,6 +337,7 @@ namespace Squadron
             }
             catch (Exception ex)
             {
+                _settings.Logger.Error("Container creation failed", ex);
                 throw new ContainerException(
                     $"Error in CreateContainer: {_settings.UniqueContainerName}", ex);
             }
@@ -449,60 +455,57 @@ namespace Squadron
             return addressMode;
         }
 
-        private async Task<string> ReadAsync(
-            Stream logStream,
-            TimeSpan timeout)
+        private async Task<string> ReadAsync(TimeSpan timeout)
         {
             var result = new StringBuilder();
             var timeoutTask = Task.Delay(timeout);
-            using (logStream)
+            const int size = 256;
+            byte[] buffer = new byte[size];
+
+            if (Instance.LogStream == null)
             {
-                const int size = 256;
-                byte[] buffer = new byte[size];
-
-                while (true)
-                {
-                    Task<int> readTask = logStream.ReadAsync(
-                        buffer, 0, size);
-
-                    if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
-                    {
-                        logStream.Close();
-                        break;
-                    }
-
-                    var read = await readTask;
-                    if (read <= 0)
-                    {
-                        break;
-                    }
-
-                    char[] chunkChars = new char[read * 2];
-
-                    int consumed = 0;
-                    for (int i = 0; i < read; i++)
-                    {
-                        if (buffer[i] > 31 && buffer[i] < 128)
-                        {
-                            chunkChars[consumed++] = (char)buffer[i];
-                        }
-                        else if (buffer[i] == (byte)'\n')
-                        {
-                            chunkChars[consumed++] = '\r';
-                            chunkChars[consumed++] = '\n';
-                        }
-                        else if (buffer[i] == (byte)'\t')
-                        {
-                            chunkChars[consumed++] = '\t';
-                        }
-                    }
-
-                    string chunk = new string(
-                        chunkChars, 0, consumed);
-
-                    result.Append(chunk);
-                }
+                return "No log stream";
             }
+
+            while (true)
+            {
+                Task<int> readTask = Instance.LogStream.ReadAsync(buffer, 0, size);
+
+                if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
+                {
+                    break;
+                }
+
+                var read = await readTask;
+                if (read <= 0)
+                {
+                    break;
+                }
+
+                char[] chunkChars = new char[read * 2];
+
+                int consumed = 0;
+                for (int i = 0; i < read; i++)
+                {
+                    if (buffer[i] > 31 && buffer[i] < 128)
+                    {
+                        chunkChars[consumed++] = (char)buffer[i];
+                    }
+                    else if (buffer[i] == (byte)'\n')
+                    {
+                        chunkChars[consumed++] = '\r';
+                        chunkChars[consumed++] = '\n';
+                    }
+                    else if (buffer[i] == (byte)'\t')
+                    {
+                        chunkChars[consumed++] = '\t';
+                    }
+                }
+
+                string chunk = new string(chunkChars, 0, consumed);
+                result.Append(chunk);
+            }
+
             return result.ToString();
         }
 
@@ -566,6 +569,12 @@ namespace Squadron
                         await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
                     }
                 });
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            Instance?.Dispose();
         }
     }
 }

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Squadron
 {
     /// <summary>Respresents a created docker container</summary>
-    public class ContainerInstance
+    public class ContainerInstance : IDisposable
     {
         /// <summary>
         /// Gets or sets the identifier.
@@ -57,5 +59,12 @@ namespace Squadron
         /// The logs.
         /// </value>
         public IList<string> Logs { get; set; } = new List<string>();
+
+        internal Stream? LogStream { get; set; }
+
+        public void Dispose()
+        {
+            LogStream?.Dispose();
+        }
     }
 }

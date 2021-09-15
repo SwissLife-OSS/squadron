@@ -13,7 +13,8 @@ namespace Squadron
     {
         private readonly IDockerContainerManager _manager;
         private readonly ContainerResourceSettings _settings;
-        private readonly TimeSpan _consumeLogsInterval = TimeSpan.FromSeconds(3);
+        private readonly TimeSpan _consumeLogsInterval = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan _delayNotReady = TimeSpan.FromSeconds(3);
         private readonly TimeSpan _readyTimeout = TimeSpan.FromSeconds(5);
 
         /// <summary>Initializes a new instance of the <see cref="ContainerInitializer"/> class.</summary>
@@ -35,6 +36,8 @@ namespace Squadron
         {
             using (var cancellation = new CancellationTokenSource())
             {
+                _settings.Logger.Verbose($"Wait to start for {_settings.WaitTimeout}");
+                var retries = 1;
                 cancellation.CancelAfter(_settings.WaitTimeout);
                 Status status = Status.NotReady;
 
@@ -44,27 +47,29 @@ namespace Squadron
                     {
                         using (var singleRunCancellation = new CancellationTokenSource())
                         {
+                            _settings.Logger.Verbose($"Try read container status [run {retries++}]");
                             singleRunCancellation.CancelAfter(_readyTimeout);
                             status = await statusProvider.IsReadyAsync(singleRunCancellation.Token);
+                            _settings.Logger.ContainerStatus(status);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Trace.TraceWarning($"Container status error. {_settings.Name} -> {ex.Message}");
+                        _settings.Logger.Verbose("Container status error", ex);
                     }
 
                     if (!status.IsReady)
                     {
-                        await _manager.ConsumeLogsAsync(_consumeLogsInterval);
-                        Trace.TraceWarning($"Container is not yet {_settings.Name} not ready. --> {status.Message}");
+                        await Task.Delay(_delayNotReady, cancellation.Token);
+                        _settings.Logger.Verbose("Container is not ready");
                     }
                 }
 
                 if (!status.IsReady)
                 {
-                    string logs = string.Join("\n",_manager.Instance.Logs.Distinct());
+                    await _manager.ConsumeLogsAsync(_consumeLogsInterval);
                     throw new InvalidOperationException(
-                         $"Initialize sequence timed-out. {status.Message}\r\n{logs}");
+                        $"Initialize sequence timed-out (see test output). {status.Message}");
                 }
 
                 return status;

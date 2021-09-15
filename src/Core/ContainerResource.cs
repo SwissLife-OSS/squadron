@@ -139,6 +139,7 @@ namespace Squadron
             {
                 await Manager.StopContainerAsync();
                 await Manager.RemoveContainerAsync();
+                Manager.Dispose();
             }
             catch ( Exception ex)
             {

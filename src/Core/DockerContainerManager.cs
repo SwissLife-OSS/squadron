@@ -148,24 +148,19 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task RemoveContainerAsync()
         {
-            var removeOptions = new ContainerRemoveParameters
-            {
-                Force = true,
-                RemoveVolumes = true
-            };
-
             try
             {
                 await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
-                        foreach (string network in _settings.Networks)
-                        {
-                            await DisconnectAndRemoveNetwork(network, Instance.Id);
-                        }
+                        ContainersPruneResponse containersPrune = await _client.Containers.PruneContainersAsync();
+                        _settings.Logger.Information($"Containers pruned: {string.Join("; ", containersPrune.ContainersDeleted)}");
 
-                        await _client.Containers
-                            .RemoveContainerAsync(Instance.Id, removeOptions);
+                        NetworksPruneResponse networksPrune = await _client.Networks.PruneNetworksAsync();
+                        _settings.Logger.Information($"Networks pruned: {string.Join("; ", networksPrune.NetworksDeleted)}");
+
+                        VolumesPruneResponse volumesPrune = await _client.Volumes.PruneAsync();
+                        _settings.Logger.Information($"Volumes pruned: {string.Join("; ", volumesPrune.VolumesDeleted)}");
                     });
             }
             catch (Exception ex)
@@ -618,43 +613,6 @@ namespace Squadron
 
             Networks.Add(networkName, uniqueNetworkName);
             return response.ID;
-        }
-
-        private async Task DisconnectAndRemoveNetwork(string networkName, string containerId)
-        {
-            string uniqueNetworkName = Networks[networkName];
-            await _retryPolicy
-                .ExecuteAsync(async () =>
-                {
-                    NetworkResponse? inspectResponse = (await _client.Networks.ListNetworksAsync())
-                        .FirstOrDefault(n => n.Name == uniqueNetworkName);
-
-                    if (inspectResponse != null)
-                    {
-                        _settings.Logger.Information($"Try disconnect {containerId} from {inspectResponse.ID}");
-                        await InspectNetwork(inspectResponse.ID, "before disconnect");
-                        await _client.Networks.DisconnectNetworkAsync(inspectResponse.ID,
-                            new NetworkDisconnectParameters
-                            {
-                                Container = containerId,
-                                Force = true
-                            });
-                        await InspectNetwork(inspectResponse.ID, "after disconnect");
-
-                        if (inspectResponse.Containers.All(c => c.Key == containerId))
-                        {
-                            _settings.Logger.Information($"Try delete network {inspectResponse.ID}");
-                            
-                            await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
-                        }
-                    }
-                });
-        }
-
-        private async Task InspectNetwork(string id, string message)
-        {
-            NetworkResponse inspect = await _client.Networks.InspectNetworkAsync(id);
-            _settings.Logger.Information($"Inspect network {message} {Environment.NewLine}{JsonConvert.SerializeObject(inspect, Formatting.Indented)}");
         }
 
         public void Dispose()

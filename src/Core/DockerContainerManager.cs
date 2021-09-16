@@ -166,7 +166,7 @@ namespace Squadron
 
                         foreach (string network in _settings.Networks)
                         {
-                            await RemoveNetworkIfUnused(network);
+                            await RemoveNetworkIfUnused(network, Instance.Id);
                         }
                     });
             }
@@ -617,17 +617,24 @@ namespace Squadron
             return response.ID;
         }
 
-        private async Task RemoveNetworkIfUnused(string networkName)
+        private async Task RemoveNetworkIfUnused(string networkName, string containerId)
         {
             string uniqueNetworkName = _uniqueNetworkNames[networkName];
             await retryPolicy
                 .ExecuteAsync(async () =>
                 {
-                    NetworkResponse inspectResponse = (await _client.Networks.ListNetworksAsync())
-                        .Single(n => n.Name == uniqueNetworkName);
+                    NetworkResponse? inspectResponse = (await _client.Networks.ListNetworksAsync())
+                        .FirstOrDefault(n => n.Name == uniqueNetworkName);
 
-                    if (!inspectResponse.Containers.Any())
+                    if (inspectResponse != null && !inspectResponse.Containers.Any())
                     {
+                        await _client.Networks.DisconnectNetworkAsync(inspectResponse.ID,
+                            new NetworkDisconnectParameters
+                            {
+                                Container = containerId,
+                                Force = true
+                            });
+
                         await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
                     }
                 });

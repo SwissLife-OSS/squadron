@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using Newtonsoft.Json;
 using Polly;
 using Version = System.Version;
 
@@ -148,19 +147,25 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task RemoveContainerAsync()
         {
+            var removeOptions = new ContainerRemoveParameters
+            {
+                Force = true,
+                RemoveVolumes = true,
+                RemoveLinks = true
+            };
+
             try
             {
                 await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
-                        ContainersPruneResponse containersPrune = await _client.Containers.PruneContainersAsync();
-                        _settings.Logger.Information($"Containers pruned: {string.Join("; ", containersPrune.ContainersDeleted)}");
+                        await _client.Containers
+                            .RemoveContainerAsync(Instance.Id, removeOptions);
 
-                        NetworksPruneResponse networksPrune = await _client.Networks.PruneNetworksAsync();
-                        _settings.Logger.Information($"Networks pruned: {string.Join("; ", networksPrune.NetworksDeleted)}");
-
-                        VolumesPruneResponse volumesPrune = await _client.Volumes.PruneAsync();
-                        _settings.Logger.Information($"Volumes pruned: {string.Join("; ", volumesPrune.VolumesDeleted)}");
+                        foreach (string network in _settings.Networks)
+                        {
+                            await RemoveNetworkIfUnused(network);
+                        }
                     });
             }
             catch (Exception ex)
@@ -613,6 +618,29 @@ namespace Squadron
 
             Networks.Add(networkName, uniqueNetworkName);
             return response.ID;
+        }
+
+        private async Task RemoveNetworkIfUnused(string networkName)
+        {
+            string uniqueNetworkName = Networks[networkName];
+            await _retryPolicy
+                .ExecuteAsync(async () =>
+                {
+                    NetworkResponse? inspectResponse = (await _client.Networks.ListNetworksAsync())
+                        .FirstOrDefault(n => n.Name == uniqueNetworkName);
+
+                    if (inspectResponse != null && !inspectResponse.Containers.Any())
+                    {
+                        try
+                        {
+                            await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
+                        }
+                        catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+                        {
+                            _settings.Logger.Warning($"Cloud not remove network {inspectResponse.ID}. {ex.ResponseBody}");
+                        }
+                    }
+                });
         }
 
         public void Dispose()

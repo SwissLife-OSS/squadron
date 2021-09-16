@@ -426,7 +426,7 @@ namespace Squadron
                     {
                         ContainerInspectResponse inspectResponse = await _client
                             .Containers
-                            .InspectContainerAsync(Instance.Id);
+                            .InspectContainerAsync(Instance.Id, cancellation.Token);
 
                         ContainerAddressMode addressMode = GetAddressMode();
 
@@ -457,14 +457,14 @@ namespace Squadron
                     }
                     catch (Exception ex)
                     {
-                        Trace.TraceWarning($"Container bindings not resolved: {ex.Message}");
+                        _settings.Logger.Error("Container bindings not resolved", ex);
                     }
                 }
             }
 
             if (!bindingsResolved)
             {
-                throw new Exception($"Failed to resolve host all bindings.");
+                throw new ContainerException("Failed to resolve host all bindings.");
             }
         }
 
@@ -473,7 +473,7 @@ namespace Squadron
             Instance.Address = "localhost";
             if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
             {
-                throw new Exception($"Failed to resolve host port for {containerPort}");
+                throw new ContainerException($"Failed to resolve host port for {containerPort}");
             }
 
             PortBinding binding = inspectResponse
@@ -483,7 +483,7 @@ namespace Squadron
 
             if (binding == null || string.IsNullOrEmpty(binding.HostPort))
             {
-                throw new Exception($"The resolved port binding is empty");
+                throw new ContainerException($"The resolved port binding is empty");
             }
 
             return int.Parse(binding.HostPort);

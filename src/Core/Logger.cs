@@ -42,8 +42,7 @@ namespace Squadron
 
         public void Error(string message, Exception ex)
         {
-            _traceSource.TraceEvent(TraceEventType.Error, 1, CreateMessage(message));
-            _traceSource.TraceEvent(TraceEventType.Error, 1, $"[{DateTime.UtcNow}] Exception: {ex.Message} | {ex.InnerException?.Message}");
+            _traceSource.TraceEvent(TraceEventType.Error, 1, $"{CreateMessage(message)}{Environment.NewLine}{ex}");
         }
 
         public void Warning(string message)

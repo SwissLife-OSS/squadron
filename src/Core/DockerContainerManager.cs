@@ -126,6 +126,11 @@ namespace Squadron
             bool stopped = await _client.Containers
                 .StopContainerAsync(Instance.Id, stopOptions, default);
 
+            if (stopped)
+            {
+                _settings.Logger.Information("Container stopped");
+            }
+
             return stopped;
         }
 

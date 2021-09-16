@@ -280,19 +280,36 @@ namespace Squadron
             {
                 PublishAllPorts = true,
                 Memory = _settings.Memory,
+                PortBindings = new Dictionary<string, IList<PortBinding>>()
             };
 
-            if (_settings.ExternalPort > 0)
+            var allPorts = new List<ContainerPortMapping>
             {
-                hostConfig.PublishAllPorts = false;
-                hostConfig.PortBindings = new Dictionary<string, IList<PortBinding>> {
+                new ContainerPortMapping()
                 {
-                    _settings.InternalPort + "/tcp", new List<PortBinding> {
-                        new PortBinding {
-                            HostPort = _settings.ExternalPort.ToString()
-                        }
-                    }
-                }};
+                    InternalPort = _settings.InternalPort,
+                    ExternalPort = _settings.ExternalPort,
+                }
+            };
+            allPorts.AddRange(_settings.AdditionalPortMappings);
+
+            foreach (ContainerPortMapping containerPortMapping in allPorts)
+            {
+                var portMapping =
+                    new KeyValuePair<string, IList<PortBinding>>(
+                        containerPortMapping.InternalPort + "/tcp",
+                        new List<PortBinding>());
+
+                portMapping.Value.Add(
+                    new PortBinding()
+                    {
+                        HostIP = "",
+                        HostPort = containerPortMapping.ExternalPort != 0 ?
+                            containerPortMapping.ExternalPort.ToString()
+                            : ""
+                    });
+
+                hostConfig.PortBindings.Add(portMapping);
             }
 
             var startParams = new CreateContainerParameters
@@ -397,39 +414,79 @@ namespace Squadron
 
         private async Task ResolveHostAddressAsync()
         {
-            ContainerInspectResponse inspectResponse = await _client
-                .Containers
-                .InspectContainerAsync(Instance.Id);
+            bool bindingsResolved = false;
 
-            ContainerAddressMode addressMode = GetAddressMode();
-
-            if (addressMode == ContainerAddressMode.Port)
+            using (var cancellation = new CancellationTokenSource())
             {
-                Instance.Address = "localhost";
-                string containerPort = $"{_settings.InternalPort}/tcp";
-                if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
+                cancellation.CancelAfter(_settings.WaitTimeout);
+
+                while (!cancellation.IsCancellationRequested && !bindingsResolved)
                 {
-                    throw new Exception($"Failed to resolve host port for {containerPort}");
+                    try
+                    {
+                        ContainerInspectResponse inspectResponse = await _client
+                            .Containers
+                            .InspectContainerAsync(Instance.Id);
+
+                        ContainerAddressMode addressMode = GetAddressMode();
+
+                        if (addressMode == ContainerAddressMode.Port)
+                        {
+                            Instance.HostPort =
+                                ResolvePort(inspectResponse, $"{_settings.InternalPort}/tcp");
+                            foreach (ContainerPortMapping portMapping
+                                in _settings.AdditionalPortMappings)
+                            {
+                                Instance.AdditionalPorts.Add(new ContainerPortMapping()
+                                {
+                                    InternalPort = portMapping.InternalPort,
+                                    ExternalPort = ResolvePort(
+                                        inspectResponse,
+                                        $"{portMapping.InternalPort}/tcp")
+                                });
+                            }
+                        }
+                        else
+                        {
+                            Instance.Address = inspectResponse.NetworkSettings.IPAddress;
+                            Instance.HostPort = _settings.InternalPort;
+                        }
+                        Instance.IsRunning = inspectResponse.State.Running;
+
+                        bindingsResolved = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceWarning($"Container bindings not resolved: {ex.Message}");
+                    }
                 }
-
-                PortBinding binding = inspectResponse
-                    .NetworkSettings
-                    .Ports[containerPort]
-                    .FirstOrDefault();
-
-                if (binding == null || string.IsNullOrEmpty(binding.HostPort))
-                {
-                    throw new Exception($"The resolved port binding is empty");
-                }
-
-                Instance.HostPort = int.Parse(binding.HostPort);
             }
-            else
+
+            if (!bindingsResolved)
             {
-                Instance.Address = inspectResponse.NetworkSettings.IPAddress;
-                Instance.HostPort = _settings.InternalPort;
+                throw new Exception($"Failed to resolve host all bindings.");
             }
-            Instance.IsRunning = inspectResponse.State.Running;
+        }
+
+        private int ResolvePort(ContainerInspectResponse inspectResponse, string containerPort)
+        {
+            Instance.Address = "localhost";
+            if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
+            {
+                throw new Exception($"Failed to resolve host port for {containerPort}");
+            }
+
+            PortBinding binding = inspectResponse
+                .NetworkSettings
+                .Ports[containerPort]
+                .FirstOrDefault();
+
+            if (binding == null || string.IsNullOrEmpty(binding.HostPort))
+            {
+                throw new Exception($"The resolved port binding is empty");
+            }
+
+            return int.Parse(binding.HostPort);
         }
 
         private ContainerAddressMode GetAddressMode()

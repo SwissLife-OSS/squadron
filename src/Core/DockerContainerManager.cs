@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using Newtonsoft.Json;
 using Polly;
 using Version = System.Version;
 
@@ -628,6 +629,7 @@ namespace Squadron
 
                     if (inspectResponse != null)
                     {
+                        _settings.Logger.Information($"Try disconnect {containerId} from {inspectResponse.ID}");
                         await _client.Networks.DisconnectNetworkAsync(inspectResponse.ID,
                             new NetworkDisconnectParameters
                             {
@@ -637,6 +639,9 @@ namespace Squadron
 
                         if (inspectResponse.Containers.All(c => c.Key == containerId))
                         {
+                            _settings.Logger.Information($"Try delete network {inspectResponse.ID}");
+                            NetworkResponse inspect = await _client.Networks.InspectNetworkAsync(inspectResponse.ID);
+                            _settings.Logger.Information($"Inspect network {Environment.NewLine}{JsonConvert.SerializeObject(inspect, Formatting.Indented)}");
                             await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
                         }
                     }

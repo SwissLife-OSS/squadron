@@ -20,23 +20,20 @@ namespace Squadron
     /// <seealso cref="Squadron.IDockerContainerManager" />
     public class DockerContainerManager : IDockerContainerManager
     {
+        private static readonly IDictionary<string, string> Networks = new Dictionary<string, string>();
+        private static readonly SemaphoreSlim SyncNetworks = new(1, 1);
+
         /// <inheritdoc/>
         public ContainerInstance Instance { get; } = new ContainerInstance();
 
         private readonly ContainerResourceSettings _settings;
         private readonly DockerConfiguration _dockerConfiguration;
         private readonly AuthConfig _authConfig = null;
-
         private readonly DockerClient _client = null;
 
-        private static IDictionary<string, string> _uniqueNetworkNames =
-            new Dictionary<string, string>();
-
-        private static readonly object _createNetworkLock = new object();
-
-        private readonly AsyncPolicy retryPolicy = Policy
-                .Handle<TimeoutException>()
-                .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
+        private readonly AsyncPolicy _retryPolicy = Policy
+            .Handle<TimeoutException>()
+            .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
@@ -159,7 +156,7 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
                         foreach (string network in _settings.Networks)
@@ -254,7 +251,7 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
                         _settings.Logger.Verbose("Try start container");
@@ -334,7 +331,7 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
                         _settings.Logger.Verbose("Try create container");
@@ -370,7 +367,7 @@ namespace Squadron
         {
             try
             {
-                return await retryPolicy
+                return await _retryPolicy
                      .ExecuteAsync(async () =>
                          {
                              IEnumerable<ImagesListResponse> listResponse =
@@ -402,7 +399,7 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                    {
                        await _client.Images.CreateImageAsync(
@@ -576,9 +573,9 @@ namespace Squadron
         {
             foreach (string networkName in _settings.Networks)
             {
-                string networkId = GetNetworkId(networkName);
+                string networkId = await GetNetworkId(networkName);
 
-                await retryPolicy.ExecuteAsync(async () =>
+                await _retryPolicy.ExecuteAsync(async () =>
                     {
                         await _client.Networks.ConnectNetworkAsync(
                             networkId,
@@ -590,38 +587,43 @@ namespace Squadron
             }
         }
 
-        private string GetNetworkId(string networkName)
+        private async Task<string> GetNetworkId(string networkName)
         {
-            // Lock to ensure thread safety of static list
-            lock (_createNetworkLock)
+            await SyncNetworks.WaitAsync();
+
+            try
             {
-                if (_uniqueNetworkNames.ContainsKey(networkName))
+                if (Networks.ContainsKey(networkName))
                 {
-                    return _uniqueNetworkNames[networkName];
+                    return Networks[networkName];
                 }
 
-                return CreateNetwork(networkName);
+                return await CreateNetwork(networkName);
+            }
+            finally
+            {
+                SyncNetworks.Release();
             }
         }
 
-        private string CreateNetwork(string networkName)
+        private async Task<string> CreateNetwork(string networkName)
         {
             string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
 
-            NetworksCreateResponse response = _client.Networks.CreateNetworkAsync(
-                new NetworksCreateParameters()
+            NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
+                new NetworksCreateParameters
                 {
                     Name = uniqueNetworkName
-                }).Result;
+                });
 
-            _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
+            Networks.Add(networkName, uniqueNetworkName);
             return response.ID;
         }
 
         private async Task DisconnectAndRemoveNetwork(string networkName, string containerId)
         {
-            string uniqueNetworkName = _uniqueNetworkNames[networkName];
-            await retryPolicy
+            string uniqueNetworkName = Networks[networkName];
+            await _retryPolicy
                 .ExecuteAsync(async () =>
                 {
                     NetworkResponse? inspectResponse = (await _client.Networks.ListNetworksAsync())
@@ -630,22 +632,29 @@ namespace Squadron
                     if (inspectResponse != null)
                     {
                         _settings.Logger.Information($"Try disconnect {containerId} from {inspectResponse.ID}");
+                        await InspectNetwork(inspectResponse.ID, "before disconnect");
                         await _client.Networks.DisconnectNetworkAsync(inspectResponse.ID,
                             new NetworkDisconnectParameters
                             {
                                 Container = containerId,
                                 Force = true
                             });
+                        await InspectNetwork(inspectResponse.ID, "after disconnect");
 
                         if (inspectResponse.Containers.All(c => c.Key == containerId))
                         {
                             _settings.Logger.Information($"Try delete network {inspectResponse.ID}");
-                            NetworkResponse inspect = await _client.Networks.InspectNetworkAsync(inspectResponse.ID);
-                            _settings.Logger.Information($"Inspect network {Environment.NewLine}{JsonConvert.SerializeObject(inspect, Formatting.Indented)}");
+                            
                             await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
                         }
                     }
                 });
+        }
+
+        private async Task InspectNetwork(string id, string message)
+        {
+            NetworkResponse inspect = await _client.Networks.InspectNetworkAsync(id);
+            _settings.Logger.Information($"Inspect network {message} {Environment.NewLine}{JsonConvert.SerializeObject(inspect, Formatting.Indented)}");
         }
 
         public void Dispose()

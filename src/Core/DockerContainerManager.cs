@@ -150,8 +150,7 @@ namespace Squadron
             var removeOptions = new ContainerRemoveParameters
             {
                 Force = true,
-                RemoveVolumes = true,
-                RemoveLinks = true
+                RemoveVolumes = true
             };
 
             try

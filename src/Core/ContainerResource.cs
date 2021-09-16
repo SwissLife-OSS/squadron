@@ -143,7 +143,7 @@ namespace Squadron
             }
             catch (Exception ex)
             {
-                Settings.Logger.Error("Could not cleanup container", ex);
+                Settings.Logger.Error($"Could not cleanup container [id: {Manager.Instance.Id}]", ex);
             }
         }
     }

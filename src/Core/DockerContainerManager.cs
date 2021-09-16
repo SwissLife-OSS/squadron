@@ -161,13 +161,13 @@ namespace Squadron
                 await retryPolicy
                     .ExecuteAsync(async () =>
                     {
-                        await _client.Containers
-                            .RemoveContainerAsync(Instance.Id, removeOptions);
-
                         foreach (string network in _settings.Networks)
                         {
                             await RemoveNetworkIfUnused(network, Instance.Id);
                         }
+
+                        await _client.Containers
+                            .RemoveContainerAsync(Instance.Id, removeOptions);
                     });
             }
             catch (Exception ex)

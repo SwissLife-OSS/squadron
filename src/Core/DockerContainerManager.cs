@@ -636,7 +636,13 @@ namespace Squadron
                         }
                         catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
                         {
-                            _settings.Logger.Warning($"Cloud not remove network {inspectResponse.ID}. {ex.ResponseBody}");
+                            _settings.Logger.Warning(
+                                $"Cloud not remove network {inspectResponse.ID}. {ex.ResponseBody}");
+                        }
+                        catch (DockerNetworkNotFoundException)
+                        {
+                            _settings.Logger.Information(
+                                $"Network {inspectResponse.ID} has already been removed.");
                         }
                     }
                 });

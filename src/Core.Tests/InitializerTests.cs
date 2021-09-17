@@ -33,7 +33,7 @@ namespace Squadron
         }
 
         [Fact]
-        public async Task WaitAsync_Ready_IsReadyAndConsumeLogsCalledOnce()
+        public async Task WaitAsync_Ready_IsReady()
         {
             //act
             Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
@@ -50,8 +50,6 @@ namespace Squadron
 
             // assert
             result.IsReady.Should().BeTrue();
-            managerMock.Verify(m => m.ConsumeLogsAsync(It.IsAny<TimeSpan>()),
-                            Times.Once);
         }
 
         private static Mock<IDockerContainerManager> ArrangeContainerManagerMock()

@@ -58,9 +58,9 @@ namespace Squadron
                         _settings.Logger.Verbose("Container status error", ex);
                     }
 
-                    if (!status.IsReady)
+                    if (!status.IsReady && !cancellation.IsCancellationRequested)
                     {
-                        await Task.Delay(_delayNotReady, cancellation.Token);
+                        await Task.Delay(_delayNotReady);
                         _settings.Logger.Verbose("Container is not ready");
                     }
                 }

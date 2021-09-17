@@ -7,7 +7,7 @@ namespace Squadron
     /// <summary>
     /// DockerContainerManager interface
     /// </summary>
-    public interface IDockerContainerManager
+    public interface IDockerContainerManager : IDisposable
     {
         /// <summary>
         /// Gets the container instance.

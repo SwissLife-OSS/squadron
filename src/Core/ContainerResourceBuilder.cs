@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Squadron
 {
@@ -11,6 +12,7 @@ namespace Squadron
         protected readonly ContainerResourceSettings _options = new ContainerResourceSettings();
 
         private readonly List<string> _cmd = new List<string>();
+        private SourceLevels _logLevel = SourceLevels.Information;
 
         /// <summary>
         /// Craeates an new empty builder
@@ -357,14 +359,22 @@ namespace Squadron
         }
 
         /// <summary>
+        /// Sets Squadron logging level
+        /// </summary>
+        public ContainerResourceBuilder WithLogLevel(SourceLevels level)
+        {
+            _logLevel = level;
+            return this;
+        }
+
+        /// <summary>
         /// Builds the settings
         /// </summary>
         /// <returns></returns>
         public virtual ContainerResourceSettings Build()
         {
-            if (_options.DockerConfigResolver == null)
-                _options.DockerConfigResolver =
-                    ContainerResourceOptions.DefaultDockerConfigResolver;
+            _options.DockerConfigResolver ??= ContainerResourceOptions.DefaultDockerConfigResolver;
+            _options.Logger = new Logger(_logLevel, _options);
             _options.Cmd = _cmd;
             return _options;
         }

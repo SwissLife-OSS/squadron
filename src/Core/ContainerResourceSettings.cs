@@ -128,5 +128,6 @@ namespace Squadron
         /// </value>
         public Func<DockerConfiguration> DockerConfigResolver { get; internal set; }
 
+        internal Logger Logger { get; set; }
     }
 }

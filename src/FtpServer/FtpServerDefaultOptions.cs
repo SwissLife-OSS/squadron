@@ -18,7 +18,7 @@ namespace Squadron
             builder
                 .Name("ftp-server")
                 .Image("fauria/vsftpd")
-                .AddRuntimeVariable(DynamicPort1VariableName, RuntimeVariableType.DynamicPort)
+                .AddVariable(DynamicPort1VariableName, VariableType.DynamicPort)
                 .AddEnvironmentVariable($"FTP_USER={Username}")
                 .AddEnvironmentVariable($"FTP_PASS={Password}")
                 .AddEnvironmentVariable($"PASV_ADDRESS=127.0.0.1")

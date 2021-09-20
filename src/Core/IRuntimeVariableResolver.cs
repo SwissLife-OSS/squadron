@@ -4,9 +4,10 @@ using System.Text;
 
 namespace Squadron
 {
-    internal interface IRuntimeVariableResolver
+    internal interface IVariableResolver
+
     {
         T Resolve<T>(string dynamicVariableName);
-        bool CanHandle(RuntimeVariableType type);
+        bool CanHandle(VariableType type);
     }
 }

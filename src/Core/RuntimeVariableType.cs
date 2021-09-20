@@ -1,6 +1,7 @@
 namespace Squadron
 {
-    public enum RuntimeVariableType
+    public enum VariableType
+
     {
         DynamicPort
     }

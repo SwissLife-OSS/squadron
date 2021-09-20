@@ -5,21 +5,21 @@ using System.Net.Sockets;
 
 namespace Squadron
 {
-    internal class DynamicPortRuntimeVariableResolver : IRuntimeVariableResolver
+    internal class DynamicPortVariableResolver: IVariableResolver
     {
         private static readonly IPEndPoint DefaultLoopbackEndpoint =
             new IPEndPoint(IPAddress.Loopback, port: 0);
 
         public IDictionary<string, int> _resolvedPorts;
 
-        public DynamicPortRuntimeVariableResolver()
+        public DynamicPortVariableResolver()
         {
             _resolvedPorts = new Dictionary<string, int>();
         }
 
-        public bool CanHandle(RuntimeVariableType type)
+        public bool CanHandle(VariableType type)
         {
-            return type == RuntimeVariableType.DynamicPort;
+            return type == VariableType.DynamicPort;
         }
 
         public T Resolve<T>(string dynamicVariableName)
@@ -27,7 +27,7 @@ namespace Squadron
             if (typeof(T) != typeof(int) && typeof(T) != typeof(string))
             {
                 throw new NotSupportedException(
-                    $"The resolver {nameof(DynamicPortRuntimeVariableResolver)} cannot " +
+                    $"The resolver {nameof(DynamicPortVariableResolver)} cannot " +
                     $"resolve the type '{nameof(T)}'. Only the type 'int' is supported");
             }
 

@@ -195,22 +195,22 @@ namespace Squadron
         /// <param name="internalPort">
         /// The internal port of a container that shall be exposed.
         /// </param>
-        /// <param name="externalRuntimeVariableName">
+        /// <param name="externalPortVariableName">
         /// The external port number will be resolved before the container creation and stored in
-        /// runtime variable.
+        /// variable.
         /// Only provide an external port if a static external port is required.
         /// When the given external port is already in use by a container, the creation will fail.
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
             int internalPort,
-            string externalRuntimeVariableName)
+            string externalPortVariableName)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
                     InternalPort = internalPort,
-                    ExternalRuntimeVariableName = externalRuntimeVariableName,
+                    ExternalPortVariableName = externalPortVariableName,
                 });
             return this;
         }
@@ -221,9 +221,9 @@ namespace Squadron
         /// <see cref="ExternalPort"/> to so do!
         /// Exposes additional port mappings for this container.
         /// </summary>
-        /// <param name="internalRuntimeVariableName">
+        /// <param name="internalPortVariableName">
         /// The internal port number will be resolved before the container creation and stored
-        /// in runtime variable.
+        /// in variable.
         /// </param>
         /// <param name="externalPort">
         /// The external static port of a container that the internal port will be mapped to.
@@ -234,13 +234,13 @@ namespace Squadron
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
-            string internalRuntimeVariableName,
+            string internalPortVariableName,
             int externalPort = 0)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
-                    InternalRuntimeVariableName = internalRuntimeVariableName,
+                    InternalPortVariableName = internalPortVariableName,
                     ExternalPort = externalPort,
                 });
             return this;
@@ -251,41 +251,41 @@ namespace Squadron
         /// <see cref="ExternalPort"/> to so do!
         /// Exposes additional port mappings for this container.
         /// </summary>
-        /// <param name="internalRuntimeVariableName">
+        /// <param name="internalPortVariableName">
         /// The internal port number will be resolved before the container creation and stored
-        /// in runtime variable.
+        /// in variable.
         /// </param>
-        /// <param name="externalRuntimeVariableName">
+        /// <param name="externalPortVariableName">
         /// The external port number will be resolved before the container creation and stored in
-        /// runtime variable.
+        /// variable.
         /// Only provide an external port if a static external port is required.
         /// When the given external port is already in use by a container, the creation will fail.
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
-            string internalRuntimeVariableName,
-            string externalRuntimeVariableName)
+            string internalPortVariableName,
+            string externalPortVariableName)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
-                    InternalRuntimeVariableName = internalRuntimeVariableName,
-                    ExternalRuntimeVariableName = externalRuntimeVariableName
+                    InternalPortVariableName = internalPortVariableName,
+                    ExternalPortVariableName = externalPortVariableName
                 });
             return this;
         }
 
         /// <summary>
-        /// Runtime variables that will be resolved before container is created. They can be then
+        /// Variables that will be resolved before container is created. They can be then
         /// used in port AdditionalPortMappings and EnvironmentVariables (referenced between
         /// '{}' brackets eg. {RUNTIME_VARIABLE_1}.)
         /// </summary>
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public ContainerResourceBuilder AddRuntimeVariable(string name, RuntimeVariableType type)
+        public ContainerResourceBuilder AddVariable(string name, VariableType type)
         {
-            _options.RuntimeVariables.Add(new RuntimeVariable(name, type));
+            _options.Variables.Add(new Variable(name, type));
 
             return this;
         }

@@ -11,9 +11,9 @@ namespace Squadron
         public int InternalPort { get; internal set; }
 
         /// <summary>
-        /// Internal port that value will be resolved from runtime variable
+        /// Internal port that value will be resolved from variable
         /// </summary>
-        public string InternalRuntimeVariableName { get; internal set; }
+        public string InternalPortVariableName { get; internal set; }
 
         /// <summary>
         /// Gets the external port (Static).
@@ -24,8 +24,8 @@ namespace Squadron
         public int ExternalPort { get; internal set; }
 
         /// <summary>
-        /// External port that value will be resolved from runtime variable
+        /// External port that value will be resolved from variable
         /// </summary>
-        public string ExternalRuntimeVariableName { get; internal set; }
+        public string ExternalPortVariableName { get; internal set; }
     }
 }

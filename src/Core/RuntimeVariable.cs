@@ -4,17 +4,18 @@ using System.Text;
 
 namespace Squadron
 {
-    public class RuntimeVariable
+    public class Variable
     {
-        public RuntimeVariable(
+        public Variable
+            (
             string name,
-            RuntimeVariableType type)
+            VariableType type)
         {
             Name = name;
             Type = type;
         }
 
         public string Name { get; }
-        public RuntimeVariableType Type { get; }
+        public VariableType Type { get; }
     }
 }

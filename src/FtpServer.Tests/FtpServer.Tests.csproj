@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
+  <PropertyGroup>
+    <AssemblyName>Squadron.FtpServer.Tests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="SampleFile.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SampleFile.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FtpServer\FtpServer.csproj" />
+  </ItemGroup>
+
+</Project>

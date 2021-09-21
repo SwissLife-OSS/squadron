@@ -34,6 +34,8 @@ namespace Squadron
             .Handle<TimeoutException>()
             .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
 
+        private readonly VariableResolver _variableResolver;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
         /// </summary>
@@ -51,6 +53,7 @@ namespace Squadron
                  )
              .CreateClient(Version.Parse("1.25"));
             _authConfig = GetAuthConfig();
+            _variableResolver = new VariableResolver(_settings.Variables);
         }
 
         private AuthConfig GetAuthConfig()
@@ -278,6 +281,8 @@ namespace Squadron
 
         private async Task CreateContainerAsync()
         {
+            ResolveAndReplaceVariables();
+
             var hostConfig = new HostConfig
             {
                 PublishAllPorts = true,
@@ -325,7 +330,8 @@ namespace Squadron
                 Tty = false,
                 HostConfig = hostConfig,
                 Env = _settings.EnvironmentVariables,
-                Cmd = _settings.Cmd
+                Cmd = _settings.Cmd,
+                ExposedPorts = allPorts.ToDictionary(k => $"{k.InternalPort}/tcp", v => new EmptyStruct()),
             };
 
             try
@@ -359,6 +365,42 @@ namespace Squadron
                 _settings.Logger.Error("Container creation failed", ex);
                 throw new ContainerException(
                     $"Error in CreateContainer: {_settings.UniqueContainerName}", ex);
+            }
+        }
+
+        private void ResolveAndReplaceVariables()
+        {
+            ResolveAdditionalPortsVariables();
+            ReplaceVariablesInEnvironmentalVariables();
+        }
+
+        private void ReplaceVariablesInEnvironmentalVariables()
+        {
+            foreach (Variable variable in _settings.Variables)
+            {
+                _settings.EnvironmentVariables = _settings.EnvironmentVariables
+                    .Select(p => p.Replace(
+                        $"{{{variable.Name}}}",
+                        _variableResolver.Resolve<string>(variable.Name)))
+                    .ToList();
+            }
+        }
+
+        private void ResolveAdditionalPortsVariables()
+        {
+            foreach (ContainerPortMapping additionalPort in _settings.AdditionalPortMappings)
+            {
+                if (!string.IsNullOrEmpty(additionalPort.InternalPortVariableName))
+                {
+                    additionalPort.InternalPort = _variableResolver.Resolve<int>(
+                        additionalPort.InternalPortVariableName);
+                }
+
+                if (!string.IsNullOrEmpty(additionalPort.ExternalPortVariableName))
+                {
+                    additionalPort.ExternalPort = _variableResolver.Resolve<int>(
+                        additionalPort.ExternalPortVariableName);
+                }
             }
         }
 

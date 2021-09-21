@@ -9,7 +9,6 @@ namespace Squadron
 {
     public class FtpServerResource : FtpServerResource<FtpServerDefaultOptions>
     {
-
     }
 
     /// <summary>

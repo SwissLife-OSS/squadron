@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -20,23 +19,22 @@ namespace Squadron
     /// <seealso cref="Squadron.IDockerContainerManager" />
     public class DockerContainerManager : IDockerContainerManager
     {
+        private static readonly IDictionary<string, string> Networks = new Dictionary<string, string>();
+        private static readonly SemaphoreSlim SyncNetworks = new(1, 1);
+
         /// <inheritdoc/>
         public ContainerInstance Instance { get; } = new ContainerInstance();
 
         private readonly ContainerResourceSettings _settings;
         private readonly DockerConfiguration _dockerConfiguration;
         private readonly AuthConfig _authConfig = null;
-
         private readonly DockerClient _client = null;
 
-        private static IDictionary<string, string> _uniqueNetworkNames =
-            new Dictionary<string, string>();
+        private readonly AsyncPolicy _retryPolicy = Policy
+            .Handle<TimeoutException>()
+            .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
 
-        private static readonly object _createNetworkLock = new object();
-
-        private readonly AsyncPolicy retryPolicy = Policy
-                .Handle<TimeoutException>()
-                .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
+        private readonly VariableResolver _variableResolver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DockerContainerManager"/> class.
@@ -55,6 +53,7 @@ namespace Squadron
                  )
              .CreateClient(Version.Parse("1.25"));
             _authConfig = GetAuthConfig();
+            _variableResolver = new VariableResolver(_settings.Variables);
         }
 
         private AuthConfig GetAuthConfig()
@@ -95,8 +94,6 @@ namespace Squadron
 #endif
         }
 
-
-
         /// <inheritdoc/>
         public async Task CreateAndStartContainerAsync()
         {
@@ -109,12 +106,12 @@ namespace Squadron
             await StartContainerAsync();
             await ConnectToNetworksAsync();
             await ResolveHostAddressAsync();
+            await CreateLogStreamAsync();
 
             if (!Instance.IsRunning)
             {
-                var logs = await ConsumeLogsAsync(TimeSpan.FromSeconds(5));
-                throw new ContainerException(
-                    $"Container exited with following logs: \r\n {logs}");
+                await ConsumeLogsAsync(TimeSpan.FromSeconds(5));
+                throw new ContainerException("Container could not be started (see test output).");
             }
         }
 
@@ -128,6 +125,11 @@ namespace Squadron
 
             bool stopped = await _client.Containers
                 .StopContainerAsync(Instance.Id, stopOptions, default);
+
+            if (stopped)
+            {
+                _settings.Logger.Information("Container stopped");
+            }
 
             return stopped;
         }
@@ -156,7 +158,7 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
                         await _client.Containers
@@ -220,10 +222,10 @@ namespace Squadron
             }
         }
 
-
-        /// <inheritdoc/>
-        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
+        private async Task CreateLogStreamAsync()
         {
+            _settings.Logger.Verbose("Create log stream");
+
             var containerStatsParameters = new ContainerLogsParameters
             {
                 Follow = true,
@@ -231,16 +233,17 @@ namespace Squadron
                 ShowStdout = true
             };
 
-            Stream logStream = await _client
+            Instance.LogStream = await _client
                 .Containers
-                .GetContainerLogsAsync(
-                    Instance.Id,
-                    containerStatsParameters,
-                    default);
+                .GetContainerLogsAsync(Instance.Id, containerStatsParameters);
+        }
 
-            var logs = await ReadAsync(logStream, timeout);
+        /// <inheritdoc/>
+        public async Task<string> ConsumeLogsAsync(TimeSpan timeout)
+        {
+            var logs = await ReadAsync(timeout);
             Instance.Logs.Add(logs);
-            Trace.TraceInformation(logs);
+            _settings.Logger.ContainerLogs(logs);
             return logs;
         }
 
@@ -250,30 +253,36 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
+                        _settings.Logger.Verbose("Try start container");
                         bool started = await _client.Containers.StartContainerAsync(
                             Instance.Id,
                             containerStartParameters);
 
                         if (!started)
                         {
+                            _settings.Logger.Warning("Container didn't start");
                             throw new ContainerException(
                                 "Docker container creation/startup failed.");
                         }
+
+                        _settings.Logger.Information("Container started");
                     });
             }
             catch (Exception ex)
             {
+                _settings.Logger.Error("Container start failed", ex);
                 throw new ContainerException(
                     $"Error in StartContainer: {_settings.UniqueContainerName}", ex);
             }
         }
 
-
         private async Task CreateContainerAsync()
         {
+            ResolveAndReplaceVariables();
+
             var hostConfig = new HostConfig
             {
                 PublishAllPorts = true,
@@ -321,20 +330,24 @@ namespace Squadron
                 Tty = false,
                 HostConfig = hostConfig,
                 Env = _settings.EnvironmentVariables,
-                Cmd = _settings.Cmd
+                Cmd = _settings.Cmd,
+                ExposedPorts = allPorts.ToDictionary(k => $"{k.InternalPort}/tcp", v => new EmptyStruct()),
             };
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
+                        _settings.Logger.Verbose("Try create container");
+                        _settings.Logger.StartParameters(startParams);
                         CreateContainerResponse response = await _client
                             .Containers
                             .CreateContainerAsync(startParams);
 
                         if (string.IsNullOrEmpty(response.ID))
                         {
+                            _settings.Logger.Warning("Container was not created");
                             throw new ContainerException(
                                 "Could not create the container");
                         }
@@ -349,8 +362,45 @@ namespace Squadron
             }
             catch (Exception ex)
             {
+                _settings.Logger.Error("Container creation failed", ex);
                 throw new ContainerException(
                     $"Error in CreateContainer: {_settings.UniqueContainerName}", ex);
+            }
+        }
+
+        private void ResolveAndReplaceVariables()
+        {
+            ResolveAdditionalPortsVariables();
+            ReplaceVariablesInEnvironmentalVariables();
+        }
+
+        private void ReplaceVariablesInEnvironmentalVariables()
+        {
+            foreach (Variable variable in _settings.Variables)
+            {
+                _settings.EnvironmentVariables = _settings.EnvironmentVariables
+                    .Select(p => p.Replace(
+                        $"{{{variable.Name}}}",
+                        _variableResolver.Resolve<string>(variable.Name)))
+                    .ToList();
+            }
+        }
+
+        private void ResolveAdditionalPortsVariables()
+        {
+            foreach (ContainerPortMapping additionalPort in _settings.AdditionalPortMappings)
+            {
+                if (!string.IsNullOrEmpty(additionalPort.InternalPortVariableName))
+                {
+                    additionalPort.InternalPort = _variableResolver.Resolve<int>(
+                        additionalPort.InternalPortVariableName);
+                }
+
+                if (!string.IsNullOrEmpty(additionalPort.ExternalPortVariableName))
+                {
+                    additionalPort.ExternalPort = _variableResolver.Resolve<int>(
+                        additionalPort.ExternalPortVariableName);
+                }
             }
         }
 
@@ -358,7 +408,7 @@ namespace Squadron
         {
             try
             {
-                return await retryPolicy
+                return await _retryPolicy
                      .ExecuteAsync(async () =>
                          {
                              IEnumerable<ImagesListResponse> listResponse =
@@ -390,7 +440,7 @@ namespace Squadron
 
             try
             {
-                await retryPolicy
+                await _retryPolicy
                     .ExecuteAsync(async () =>
                    {
                        await _client.Images.CreateImageAsync(
@@ -420,7 +470,7 @@ namespace Squadron
                     {
                         ContainerInspectResponse inspectResponse = await _client
                             .Containers
-                            .InspectContainerAsync(Instance.Id);
+                            .InspectContainerAsync(Instance.Id, cancellation.Token);
 
                         ContainerAddressMode addressMode = GetAddressMode();
 
@@ -451,14 +501,14 @@ namespace Squadron
                     }
                     catch (Exception ex)
                     {
-                        Trace.TraceWarning($"Container bindings not resolved: {ex.Message}");
+                        _settings.Logger.Error("Container bindings not resolved", ex);
                     }
                 }
             }
 
             if (!bindingsResolved)
             {
-                throw new Exception($"Failed to resolve host all bindings.");
+                throw new ContainerException("Failed to resolve host all bindings.");
             }
         }
 
@@ -467,7 +517,7 @@ namespace Squadron
             Instance.Address = "localhost";
             if (!inspectResponse.NetworkSettings.Ports.ContainsKey(containerPort))
             {
-                throw new Exception($"Failed to resolve host port for {containerPort}");
+                throw new ContainerException($"Failed to resolve host port for {containerPort}");
             }
 
             PortBinding binding = inspectResponse
@@ -477,7 +527,7 @@ namespace Squadron
 
             if (binding == null || string.IsNullOrEmpty(binding.HostPort))
             {
-                throw new Exception($"The resolved port binding is empty");
+                throw new ContainerException($"The resolved port binding is empty");
             }
 
             return int.Parse(binding.HostPort);
@@ -506,60 +556,57 @@ namespace Squadron
             return addressMode;
         }
 
-        private async Task<string> ReadAsync(
-            Stream logStream,
-            TimeSpan timeout)
+        private async Task<string> ReadAsync(TimeSpan timeout)
         {
             var result = new StringBuilder();
             var timeoutTask = Task.Delay(timeout);
-            using (logStream)
+            const int size = 256;
+            byte[] buffer = new byte[size];
+
+            if (Instance.LogStream == null)
             {
-                const int size = 256;
-                byte[] buffer = new byte[size];
-
-                while (true)
-                {
-                    Task<int> readTask = logStream.ReadAsync(
-                        buffer, 0, size);
-
-                    if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
-                    {
-                        logStream.Close();
-                        break;
-                    }
-
-                    var read = await readTask;
-                    if (read <= 0)
-                    {
-                        break;
-                    }
-
-                    char[] chunkChars = new char[read * 2];
-
-                    int consumed = 0;
-                    for (int i = 0; i < read; i++)
-                    {
-                        if (buffer[i] > 31 && buffer[i] < 128)
-                        {
-                            chunkChars[consumed++] = (char)buffer[i];
-                        }
-                        else if (buffer[i] == (byte)'\n')
-                        {
-                            chunkChars[consumed++] = '\r';
-                            chunkChars[consumed++] = '\n';
-                        }
-                        else if (buffer[i] == (byte)'\t')
-                        {
-                            chunkChars[consumed++] = '\t';
-                        }
-                    }
-
-                    string chunk = new string(
-                        chunkChars, 0, consumed);
-
-                    result.Append(chunk);
-                }
+                return "No log stream";
             }
+
+            while (true)
+            {
+                Task<int> readTask = Instance.LogStream.ReadAsync(buffer, 0, size);
+
+                if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
+                {
+                    break;
+                }
+
+                var read = await readTask;
+                if (read <= 0)
+                {
+                    break;
+                }
+
+                char[] chunkChars = new char[read * 2];
+
+                int consumed = 0;
+                for (int i = 0; i < read; i++)
+                {
+                    if (buffer[i] > 31 && buffer[i] < 128)
+                    {
+                        chunkChars[consumed++] = (char)buffer[i];
+                    }
+                    else if (buffer[i] == (byte)'\n')
+                    {
+                        chunkChars[consumed++] = '\r';
+                        chunkChars[consumed++] = '\n';
+                    }
+                    else if (buffer[i] == (byte)'\t')
+                    {
+                        chunkChars[consumed++] = '\t';
+                    }
+                }
+
+                string chunk = new string(chunkChars, 0, consumed);
+                result.Append(chunk);
+            }
+
             return result.ToString();
         }
 
@@ -567,9 +614,9 @@ namespace Squadron
         {
             foreach (string networkName in _settings.Networks)
             {
-                string networkId = GetNetworkId(networkName);
+                string networkId = await GetNetworkId(networkName);
 
-                await retryPolicy.ExecuteAsync(async () =>
+                await _retryPolicy.ExecuteAsync(async () =>
                     {
                         await _client.Networks.ConnectNetworkAsync(
                             networkId,
@@ -581,48 +628,72 @@ namespace Squadron
             }
         }
 
-        private string GetNetworkId(string networkName)
+        private async Task<string> GetNetworkId(string networkName)
         {
-            // Lock to ensure thread safety of static list
-            lock (_createNetworkLock)
+            await SyncNetworks.WaitAsync();
+
+            try
             {
-                if (_uniqueNetworkNames.ContainsKey(networkName))
+                if (Networks.ContainsKey(networkName))
                 {
-                    return _uniqueNetworkNames[networkName];
+                    return Networks[networkName];
                 }
 
-                return CreateNetwork(networkName);
+                return await CreateNetwork(networkName);
+            }
+            finally
+            {
+                SyncNetworks.Release();
             }
         }
 
-        private string CreateNetwork(string networkName)
+        private async Task<string> CreateNetwork(string networkName)
         {
             string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
 
-            NetworksCreateResponse response = _client.Networks.CreateNetworkAsync(
-                new NetworksCreateParameters()
+            NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
+                new NetworksCreateParameters
                 {
                     Name = uniqueNetworkName
-                }).Result;
+                });
 
-            _uniqueNetworkNames.Add(networkName, uniqueNetworkName);
+            Networks.Add(networkName, uniqueNetworkName);
             return response.ID;
         }
 
         private async Task RemoveNetworkIfUnused(string networkName)
         {
-            string uniqueNetworkName = _uniqueNetworkNames[networkName];
-            await retryPolicy
+            string uniqueNetworkName = Networks[networkName];
+            await _retryPolicy
                 .ExecuteAsync(async () =>
                 {
-                    NetworkResponse inspectResponse = (await _client.Networks.ListNetworksAsync())
-                        .Single(n => n.Name == uniqueNetworkName);
+                    NetworkResponse? inspectResponse = (await _client.Networks.ListNetworksAsync())
+                        .FirstOrDefault(n => n.Name == uniqueNetworkName);
 
-                    if (!inspectResponse.Containers.Any())
+                    if (inspectResponse != null && !inspectResponse.Containers.Any())
                     {
-                        await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
+                        try
+                        {
+                            await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
+                        }
+                        catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+                        {
+                            _settings.Logger.Warning(
+                                $"Cloud not remove network {inspectResponse.ID}. {ex.ResponseBody}");
+                        }
+                        catch (DockerNetworkNotFoundException)
+                        {
+                            _settings.Logger.Information(
+                                $"Network {inspectResponse.ID} has already been removed.");
+                        }
                     }
                 });
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            Instance?.Dispose();
         }
     }
 }

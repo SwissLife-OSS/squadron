@@ -18,6 +18,7 @@ namespace Squadron
                 .Name("mssql")
                 .Image("mcr.microsoft.com/mssql/server:2019-latest")
                 .InternalPort(1433)
+                .WaitTimeout(60)
                 .Username("sa")
                 .Password(password)
                 .AddEnvironmentVariable("ACCEPT_EULA=Y")

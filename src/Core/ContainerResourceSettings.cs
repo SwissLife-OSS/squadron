@@ -38,6 +38,12 @@ namespace Squadron
             new List<ContainerPortMapping>();
 
         /// <summary>
+        /// A list of variables resolved dynamically
+        /// </summary>
+        public IList<Variable> Variables { get; internal set; } =
+            new List<Variable>();
+
+        /// <summary>
         /// Docker image tag
         /// </summary>
         public string Tag { get; internal set; }
@@ -122,5 +128,6 @@ namespace Squadron
         /// </value>
         public Func<DockerConfiguration> DockerConfigResolver { get; internal set; }
 
+        internal Logger Logger { get; set; }
     }
 }

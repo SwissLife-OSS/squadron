@@ -139,10 +139,11 @@ namespace Squadron
             {
                 await Manager.StopContainerAsync();
                 await Manager.RemoveContainerAsync();
+                Manager.Dispose();
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
-                Trace.TraceWarning($"Could not cleanup container. {ex.Message}");
+                Settings.Logger.Error($"Could not cleanup container [id: {Manager.Instance.Id}]", ex);
             }
         }
     }

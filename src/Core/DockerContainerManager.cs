@@ -287,7 +287,8 @@ namespace Squadron
             {
                 PublishAllPorts = true,
                 Memory = _settings.Memory,
-                PortBindings = new Dictionary<string, IList<PortBinding>>()
+                PortBindings = new Dictionary<string, IList<PortBinding>>(),
+                Binds = _settings.Volumes
             };
 
             var allPorts = new List<ContainerPortMapping>
@@ -323,7 +324,6 @@ namespace Squadron
             {
                 Name = _settings.UniqueContainerName,
                 Image = _settings.ImageFullname,
-                Volumes = _settings.Volumes.ToDictionary(k => k, v => new EmptyStruct()),
                 AttachStdout = true,
                 AttachStderr = true,
                 AttachStdin = false,

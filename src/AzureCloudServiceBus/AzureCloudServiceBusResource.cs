@@ -13,7 +13,7 @@ using Xunit.Sdk;
 namespace Squadron
 {
     /// <summary>
-    /// Defines a Azure Cloud ServiceBus namespace 
+    /// Defines a Azure Cloud ServiceBus namespace
     /// </summary>
     /// <typeparam name="TOptions">Option to initialize the resource</typeparam>
     public class AzureCloudServiceBusResource<TOptions>
@@ -175,7 +175,12 @@ namespace Squadron
             {
                 _serviceBusModel.ProvisioningMode = ServiceBusProvisioningMode.CreateAndDelete;
                 _serviceBusModel.Namespace = await
-                    _serviceBusManager.CreateNamespaceAsync(AzureConfig.DefaultLocation);
+                    _serviceBusManager.CreateRandomNamespaceAsync(AzureConfig.DefaultLocation);
+            }
+            else if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.CreateIfNotExists)
+            {
+                _serviceBusModel.Namespace = await
+                    _serviceBusManager.CreateNamespaceIfNotExistsAsync(AzureConfig.DefaultLocation, _serviceBusModel.Namespace);
             }
         }
 

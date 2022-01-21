@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ServiceBus;
 using Microsoft.Azure.Management.ServiceBus.Models;
@@ -38,11 +38,47 @@ namespace Squadron
             }
         }
 
-        internal async Task<string> CreateNamespaceAsync(string location)
+        internal async Task<string> CreateRandomNamespaceAsync(string location)
         {
             await EnsureAuthenticatedAsync();
 
             var ns = $"squadron-{Guid.NewGuid().ToString("N").Substring(8)}";
+            return await CreateNamespaceAsync(location, ns);
+        }
+
+        internal async Task<string> CreateNamespaceIfNotExistsAsync(string location, string serviceBusNamespace)
+        {
+            await EnsureAuthenticatedAsync();
+
+            if (await CheckServiceBusNamespaceExists(serviceBusNamespace) == false)
+                return await CreateNamespaceAsync(location, serviceBusNamespace);
+
+            _identifier.Name = serviceBusNamespace;
+            return serviceBusNamespace;
+        }
+
+        private async Task<bool> CheckServiceBusNamespaceExists(string serviceBusNamespace)
+        {
+            var serviceBusNamespaces = new List<SBNamespace>();
+
+            var listByResourceGroupAsync = await _client.Namespaces.ListByResourceGroupAsync(_identifier.ResourceGroupName);
+            serviceBusNamespaces.AddRange(listByResourceGroupAsync);
+
+            var nextPageLink = listByResourceGroupAsync.NextPageLink;
+            while (nextPageLink != null)
+            {
+                listByResourceGroupAsync = await _client.Namespaces.ListByResourceGroupNextAsync(nextPageLink);
+                nextPageLink = listByResourceGroupAsync.Any(x => x.Name == serviceBusNamespace) ?
+                    null :
+                    listByResourceGroupAsync.NextPageLink;
+                serviceBusNamespaces.AddRange(listByResourceGroupAsync);
+            }
+
+            return serviceBusNamespaces.Any(x => x.Name == serviceBusNamespace);
+        }
+
+        private async Task<string> CreateNamespaceAsync(string location, string ns)
+        {
             var pars = new SBNamespace
             {
                 Sku = new SBSku(SkuName.Standard),
@@ -50,7 +86,7 @@ namespace Squadron
             };
 
             SBNamespace res = await _client.Namespaces
-                    .CreateOrUpdateAsync(_identifier.ResourceGroupName, ns, pars);
+                .CreateOrUpdateAsync(_identifier.ResourceGroupName, ns, pars);
 
             _identifier.Name = res.Name;
             return res.Name;

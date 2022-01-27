@@ -1,7 +1,10 @@
+using System;
 using System.Text;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using FluentAssertions;
-using Microsoft.Azure.Storage.Blob;
 using Xunit;
 
 namespace Squadron.AzureStorage.Tests
@@ -19,19 +22,20 @@ namespace Squadron.AzureStorage.Tests
         public async Task CreateBlobClient_UploadFile_ContentMatch()
         {
             //Arrange
-            CloudBlobClient blobClient = _azureStorageResource.CreateBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("foo");
-            await container.CreateIfNotExistsAsync();
+            BlobServiceClient blobServiceClient = _azureStorageResource.CreateBlobServiceClient();
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("foo");
+            await containerClient.CreateIfNotExistsAsync();
             string inputText = "Hello_AzureStorage";
             var data = Encoding.UTF8.GetBytes(inputText);
 
             //Act
-            CloudBlockBlob textFile = container.GetBlockBlobReference("test.txt");
-            await textFile.UploadFromByteArrayAsync(data, 0, data.Length);
+            BlobClient textFile = containerClient.GetBlobClient("test.txt");
+            await textFile.UploadAsync(new BinaryData(data));
 
             //Assert
-            string downloaded = await textFile.DownloadTextAsync();
-            downloaded.Should().Be(inputText);
+            Response<BlobDownloadResult> downloaded = await textFile.DownloadContentAsync();
+            var downloadedFileContent = Encoding.UTF8.GetString(downloaded.Value.Content.ToArray());
+            downloadedFileContent.Should().Be(inputText);
         }
 
         [Fact]

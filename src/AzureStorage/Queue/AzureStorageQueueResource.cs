@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.Queue;
+using Azure.Storage.Queues;
 using Xunit;
 
 namespace Squadron
@@ -24,7 +22,6 @@ namespace Squadron
           IAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
     {
-        CloudStorageAccount _storageAccount = null;
         string _internalConnectionString = null;
         /// <summary>
         /// Connection string to access to queue
@@ -38,11 +35,10 @@ namespace Squadron
 
             ConnectionString = CloudStorageAccountBuilder.GetForQueue(Manager.Instance);
             _internalConnectionString
-                = CloudStorageAccountBuilder.GetForBlobInternal(Manager.Instance, Settings);
-            _storageAccount = CloudStorageAccount.Parse(ConnectionString);
+                = CloudStorageAccountBuilder.GetForBlobInternal(Settings);
 
             await Initializer.WaitAsync(
-                new AzureStorageQueueStatus(_storageAccount));
+                new AzureStorageQueueStatus(ConnectionString));
         }
 
 
@@ -50,9 +46,9 @@ namespace Squadron
         /// Creates a Queue client
         /// </summary>
         /// <returns></returns>
-        public CloudQueueClient CreateQueueClient()
+        public QueueServiceClient CreateQueueServiceClient()
         {
-            return _storageAccount.CreateCloudQueueClient();
+            return new QueueServiceClient(ConnectionString);
         }
 
         public override Dictionary<string, string> GetComposeExports()

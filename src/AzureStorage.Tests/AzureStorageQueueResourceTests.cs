@@ -1,6 +1,9 @@
+using System.Text;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using FluentAssertions;
-using Microsoft.Azure.Storage.Queue;
 using Xunit;
 
 namespace Squadron.AzureStorage.Tests
@@ -18,19 +21,18 @@ namespace Squadron.AzureStorage.Tests
         public async Task CreateQueueClient_AddMessage_Peeked()
         {
             //Arrange
-            CloudQueueClient queueClient = _azureStorageResource.CreateQueueClient();
-            CloudQueue queue = queueClient.GetQueueReference("foo");
+            QueueServiceClient queueServiceClient =
+                _azureStorageResource.CreateQueueServiceClient();
+            QueueClient queue = queueServiceClient.GetQueueClient("foo");
             string messageText = "Hello_AzureStorage";
-
             await queue.CreateIfNotExistsAsync();
-            var message = new CloudQueueMessage(messageText);
 
             //Act
-            queue.AddMessage(message);
+            await queue.SendMessageAsync(messageText);
 
             //Assert
-            CloudQueueMessage peekedMessage = await queue.PeekMessageAsync();
-            peekedMessage.AsString.Should().Be(messageText);
+            Response<PeekedMessage> peekedMessage = await queue.PeekMessageAsync();
+            Encoding.UTF8.GetString(peekedMessage.Value.Body.ToArray()).Should().Be(messageText);
         }
 
         [Fact]

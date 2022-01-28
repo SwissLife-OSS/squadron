@@ -1,19 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
+using Azure.Storage.Blobs;
 using Xunit;
 
 namespace Squadron
 {
-
     /// <inheritdoc/>
     public class AzureStorageBlobResource
         : AzureStorageBlobResource<AzureStorageBlobDefaultOptions>
     {
     }
-
 
     /// <summary>
     /// Represents a AzureStorage blob resource that can be used by unit tests.
@@ -25,7 +22,6 @@ namespace Squadron
           IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
-        CloudStorageAccount _storageAccount = null;
         string _internalConnectionString = null;
         /// <summary>
         /// Connection string to the blob
@@ -38,20 +34,19 @@ namespace Squadron
             await base.InitializeAsync();
             ConnectionString = CloudStorageAccountBuilder.GetForBlob(Manager.Instance);
             _internalConnectionString
-                = CloudStorageAccountBuilder.GetForBlobInternal(Manager.Instance, Settings);
-            _storageAccount = CloudStorageAccount.Parse(ConnectionString);
+                = CloudStorageAccountBuilder.GetForBlobInternal(Settings);
 
             await Initializer.WaitAsync(
-                new AzureStorageBlobStatus(_storageAccount));
+                new AzureStorageBlobStatus(ConnectionString));
         }
 
         /// <summary>
         /// Creates a Blob client
         /// </summary>
         /// <returns></returns>
-        public CloudBlobClient CreateBlobClient()
+        public BlobServiceClient CreateBlobServiceClient()
         {
-            return _storageAccount.CreateCloudBlobClient();
+            return new BlobServiceClient(ConnectionString);
         }
 
         public override Dictionary<string, string> GetComposeExports()

@@ -1,9 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.Queue;
-using Microsoft.Azure.Storage.Shared.Protocol;
+using Azure;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 
 namespace Squadron
 {
@@ -13,14 +12,14 @@ namespace Squadron
     /// <seealso cref="IResourceStatusProvider" />
     public class AzureStorageQueueStatus : IResourceStatusProvider
     {
-        private readonly CloudStorageAccount _account;
+        private readonly string _connectionString;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureStorageQueueStatus"/> class.
         /// </summary>
-        public AzureStorageQueueStatus(CloudStorageAccount account)
+        public AzureStorageQueueStatus(string connectionString)
         {
-            _account = account;
+            _connectionString = connectionString;
         }
 
         /// <summary>
@@ -28,15 +27,16 @@ namespace Squadron
         /// </summary>
         public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-            CloudQueueClient blobClient = _account.CreateCloudQueueClient();
-            ServiceProperties serviceProperties =
-                            await blobClient.GetServicePropertiesAsync(
-                                                            new QueueRequestOptions(),
-                                                            default);
+            QueueServiceClient queueServiceClient = new QueueServiceClient(_connectionString);
+            Response<QueueServiceProperties> serviceProperties =
+                            await queueServiceClient.GetPropertiesAsync(cancellationToken);
             return new Status
             {
                 IsReady = serviceProperties != null,
-                Message = _account.QueueStorageUri.ToString()
+                Message =
+                    $"MinuteMetrics: {serviceProperties.Value.MinuteMetrics}, " +
+                    $"HourMetrics: {serviceProperties.Value.HourMetrics}, " +
+                    $"Cors: {serviceProperties.Value.Cors}"
             };
         }
     }

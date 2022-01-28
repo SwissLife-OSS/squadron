@@ -1,19 +1,21 @@
-using Microsoft.Azure.Storage;
-
 namespace Squadron
 {
     internal static class CloudStorageAccountBuilder
     {
+
+        private const string DevStorageAccountName = "devstoreaccount1";
+        private const string DevKey=
+            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+
         internal static string GetForBlob(ContainerInstance instance)
         {
             return BuildConnectionString("BlobEndpoint", instance);
         }
 
         internal static string GetForBlobInternal(
-            ContainerInstance instance,
             ContainerResourceSettings settings)
         {
-            return BuildInternalConnectionString("BlobEndpoint", instance, settings);
+            return BuildInternalConnectionString("BlobEndpoint", settings);
         }
 
         internal static string GetForQueue(ContainerInstance instance)
@@ -22,33 +24,29 @@ namespace Squadron
         }
 
         internal static string GetForQueueInternal(
-            ContainerInstance instance,
             ContainerResourceSettings settings)
         {
-            return BuildInternalConnectionString("QueueEndpoint", instance, settings);
+            return BuildInternalConnectionString("QueueEndpoint", settings);
         }
 
         private static string BuildConnectionString(string endpoint, ContainerInstance instance)
         {
-            CloudStorageAccount dev = CloudStorageAccount.DevelopmentStorageAccount;
             return
-                $"DefaultEndpointsProtocol=http;AccountName={dev.Credentials.AccountName};" +
-                $"AccountKey={dev.Credentials.ExportBase64EncodedKey()};" +
-                $"{endpoint}=http://{instance.Address}:{instance.HostPort}/" +
-                $"{dev.Credentials.AccountName};";
+                $"DefaultEndpointsProtocol=http;AccountName={DevStorageAccountName};" +
+                $"AccountKey={DevKey};" +
+                $"{endpoint}=http://127.0.0.1:{instance.HostPort}/" +
+                $"{DevStorageAccountName};";
         }
 
         private static string BuildInternalConnectionString(
             string endpoint,
-            ContainerInstance instance,
             ContainerResourceSettings settings)
         {
-            CloudStorageAccount dev = CloudStorageAccount.DevelopmentStorageAccount;
             return
-                $"DefaultEndpointsProtocol=http;AccountName={dev.Credentials.AccountName};" +
-                $"AccountKey={dev.Credentials.ExportBase64EncodedKey()};" +
-                $"{endpoint}=http://{instance.Address}:{settings.InternalPort}/" +
-                $"{dev.Credentials.AccountName};";
+                $"DefaultEndpointsProtocol=http;AccountName={DevStorageAccountName};" +
+                $"AccountKey={DevKey};" +
+                $"{endpoint}=http://127.0.0.1:{settings.InternalPort}/" +
+                $"{DevStorageAccountName};";
         }
 
     }

@@ -1,8 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.Shared.Protocol;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace Squadron
 {
@@ -12,14 +11,14 @@ namespace Squadron
     /// <seealso cref="IResourceStatusProvider" />
     public class AzureStorageBlobStatus : IResourceStatusProvider
     {
-        private readonly CloudStorageAccount _account;
+        private readonly string _connectionString;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureStorageBlobStatus"/> class.
         /// </summary>
-        public AzureStorageBlobStatus(CloudStorageAccount account)
+        public AzureStorageBlobStatus(string connectionString)
         {
-            _account = account;
+            _connectionString = connectionString;
         }
 
         /// <summary>
@@ -27,15 +26,13 @@ namespace Squadron
         /// </summary>
         public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-            CloudBlobClient blobClient = _account.CreateCloudBlobClient();
-            ServiceProperties serviceProperties =
-                            await blobClient.GetServicePropertiesAsync(
-                                                            new BlobRequestOptions(),
-                                                            default);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_connectionString);
+            Azure.Response<BlobServiceProperties> serviceProperties =
+                            await blobServiceClient.GetPropertiesAsync(cancellationToken);
             return new Status
             {
                 IsReady = serviceProperties != null,
-                Message = _account.BlobStorageUri.ToString()
+                Message = $"Service version: {serviceProperties.Value.DefaultServiceVersion}."
             };
         }
     }

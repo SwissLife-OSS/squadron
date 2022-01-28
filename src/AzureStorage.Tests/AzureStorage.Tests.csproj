@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
   <PropertyGroup>
     <RootNamespace>Squadron.AzureStorage.Tests</RootNamespace>

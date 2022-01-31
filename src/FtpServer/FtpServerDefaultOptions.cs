@@ -29,7 +29,7 @@ namespace Squadron
                 .Password(Password)
                 .InternalPort(21)
                 .AddPortMapping(DynamicPort1VariableName, DynamicPort1VariableName)
-                .WaitTimeout(60)
+                .WaitTimeout(120)
                 .PreferLocalImage();
         }
     }

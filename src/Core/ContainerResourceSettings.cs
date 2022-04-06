@@ -121,6 +121,12 @@ namespace Squadron
         public long Memory { get; internal set; }
 
         /// <summary>
+        /// Key value store
+        /// </summary>
+        public IDictionary<string, object> KeyValueStore { get; internal set; }
+            = new Dictionary<string, object>();
+
+        /// <summary>
         /// Gets the docker configuration resolver.
         /// </summary>
         /// <value>

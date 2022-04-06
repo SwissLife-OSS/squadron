@@ -40,7 +40,8 @@ namespace Squadron
 
             if (directoryNameObj is null || directoryNameObj is not string directoryName)
             {
-                throw new VariableNotSetException(VariableType.DirectoryName);
+                throw new ContainerException(
+                    $"Key {WellKnown.DirectoryName} not set int {nameof(Settings.KeyValueStore)}.");
             }
 
             return new SFtpServerConfiguration(

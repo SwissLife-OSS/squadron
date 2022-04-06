@@ -10,7 +10,7 @@ namespace Squadron
     {
         const string Username = "username";
         const string Password = "password";
-        const string Directory = "Uploads";
+        const string Directory = "uploads";
 
         public override void Configure(ContainerResourceBuilder builder)
         {

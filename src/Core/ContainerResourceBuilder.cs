@@ -20,6 +20,13 @@ namespace Squadron
         /// <returns></returns>
         public static ContainerResourceBuilder New() => new ContainerResourceBuilder();
 
+        public ContainerResourceBuilder AddKeyValue(string key, object value)
+        {
+            _options.KeyValueStore.Add(key, value);
+
+            return this;
+        }
+
 
         /// <summary>
         /// Container name

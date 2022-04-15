@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
@@ -52,12 +54,10 @@ namespace Squadron
             where TIndexType : class
         {
             string indexName = Guid.NewGuid().ToString();
-            ICreateIndexResponse createIndexResponse = await Client.CreateIndexAsync(
+            CreateIndexResponse createIndexResponse = await Client.Indices.CreateAsync(
                 index: indexName,
                 selector: descriptor => descriptor
-                    .Mappings(mappingsDescriptor => mappingsDescriptor
-                        .Map<TIndexType>(mappingDescriptor => mappingDescriptor
-                            .AutoMap<TIndexType>())));
+                    .Map<TIndexType>(mappingDescriptor => mappingDescriptor.AutoMap<TIndexType>()));
 
             if (!createIndexResponse.IsValid)
             {
@@ -92,16 +92,17 @@ namespace Squadron
                     .Document(request.Document)
                     .Id(request.Id));
 
-            BulkDescriptor bulkDescriptor = new BulkDescriptor()
-                .Index(index);
+            BulkDescriptor bulkDescriptor = new BulkDescriptor().Index(index);
 
             foreach (BulkCreateDescriptor<TDocument> bulkCreateDescriptor in createDescriptors)
             {
                 bulkDescriptor.AddOperation(bulkCreateDescriptor);
             }
 
-            BulkResponse bulkResponse = await Client.LowLevel.BulkPutAsync<BulkResponse>(
-                index, typeof(TDocument).Name.ToLowerInvariant(), PostData.Serializable(bulkDescriptor));
+            var postData = new SerializableData<IBulkRequest>(bulkDescriptor);
+            BulkResponse bulkResponse = await Client.LowLevel
+                .BulkAsync<BulkResponse>(index, postData);
+
             if (!bulkResponse.IsValid)
             {
                 throw new InvalidOperationException(
@@ -109,7 +110,7 @@ namespace Squadron
                     bulkResponse.OriginalException);
             }
 
-            await Client.RefreshAsync(Indices.All);
+            await Client.Indices.RefreshAsync(Indices.All);
         }
 
         /// <summary>
@@ -137,7 +138,7 @@ namespace Squadron
                 aliasDescriptor.Add(aliasAddDescriptor);
             }
 
-            IBulkAliasResponse bulkAliasResponse = await Client.AliasAsync(aliasDescriptor);
+            BulkAliasResponse bulkAliasResponse = await Client.Indices.BulkAliasAsync(aliasDescriptor);
             if (!bulkAliasResponse.IsValid)
             {
                 throw new InvalidOperationException(
@@ -145,7 +146,7 @@ namespace Squadron
                     bulkAliasResponse.OriginalException);
             }
 
-            await Client.RefreshAsync(Indices.All);
+            await Client.Indices.RefreshAsync(Indices.All);
             return alias;
         }
     }

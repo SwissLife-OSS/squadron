@@ -196,14 +196,14 @@ namespace Squadron
         public async Task InvokeCommandAsync(
                 ContainerExecCreateParameters parameters)
         {
-            ContainerExecCreateResponse response = await _client.Containers
+            ContainerExecCreateResponse response = await _client.Exec
                 .ExecCreateContainerAsync(
                     Instance.Id,
                     parameters);
 
             if (!string.IsNullOrEmpty(response.ID))
             {
-                using (MultiplexedStream stream = await _client.Containers
+                using (MultiplexedStream stream = await _client.Exec
                     .StartAndAttachContainerExecAsync(
                         response.ID, false))
                 {
@@ -413,7 +413,15 @@ namespace Squadron
                          {
                              IEnumerable<ImagesListResponse> listResponse =
                              await _client.Images.ListImagesAsync(
-                                 new ImagesListParameters { MatchName = _settings.ImageFullname });
+                                 new ImagesListParameters {
+                                     Filters = new Dictionary<string, IDictionary<string, bool>>
+                                     {
+                                         ["reference"] = new Dictionary<string, bool>
+                                         {
+                                             [_settings.ImageFullname] = true
+                                         }
+                                     }
+                                 });
 
                              return listResponse.Any();
                          }

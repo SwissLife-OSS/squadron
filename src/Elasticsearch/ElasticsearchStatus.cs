@@ -30,8 +30,8 @@ namespace Squadron
             {
                 WaitForStatus = WaitForStatus.Green
             };
-            IClusterHealthResponse healthResponse = await _client
-                .ClusterHealthAsync(healthRequest, cancellationToken);
+            ClusterHealthResponse healthResponse = await _client
+                .Cluster.HealthAsync(healthRequest, cancellationToken);
 
             return new Status
             {

@@ -14,7 +14,7 @@ namespace Squadron
             var name = "elastic";
             builder
                 .Name(name)
-                .Image("docker.elastic.co/elasticsearch/elasticsearch:8.1.2")
+                .Image("docker.elastic.co/elasticsearch/elasticsearch:7.17.2")
                 .InternalPort(9200)
                 .WaitTimeout(60)
                 .AddEnvironmentVariable("discovery.type=single-node")

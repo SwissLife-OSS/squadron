@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <AssemblyName>Squadron.Samples.Redis</AssemblyName>
     <RootNamespace>Squadron.Samples.Redis</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -20,5 +20,5 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\..\src\Redis\Redis.csproj" />
   </ItemGroup>
-  
+
 </Project>

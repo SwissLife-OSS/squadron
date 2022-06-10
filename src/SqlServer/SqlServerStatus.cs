@@ -29,13 +29,14 @@ namespace Squadron
             {
                 await connection.OpenAsync(cancellationToken);
 
-                Microsoft.Data.SqlClient.SqlCommand command = connection.CreateCommand();
-                command.CommandText = "SELECT Count(name) FROM sys.databases";
-
-                return new Status
+                using (Microsoft.Data.SqlClient.SqlCommand command = connection.CreateCommand())
                 {
-                    IsReady = (int)await command.ExecuteScalarAsync(cancellationToken) >= 4
-                };
+                    command.CommandText = "SELECT Count(name) FROM sys.databases";
+                    return new Status
+                    {
+                        IsReady = (int)await command.ExecuteScalarAsync(cancellationToken) >= 4
+                    };
+                }
             }
         }
     }

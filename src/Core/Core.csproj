@@ -38,8 +38,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Docker.DotNet" Version="3.125.5" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Polly" Version="7.1.1" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
   </ItemGroup>

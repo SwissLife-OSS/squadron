@@ -84,6 +84,13 @@ namespace Squadron
 
         private static Uri LocalDockerUri()
         {
+            var envHost = Environment.GetEnvironmentVariable("DOCKER_HOST");
+
+            if (!string.IsNullOrEmpty(envHost))
+            {
+                return new Uri(envHost);
+            }
+
 #if NET461
             return new Uri("npipe://./pipe/docker_engine");
 #else

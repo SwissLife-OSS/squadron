@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Squadron
 {
     /// <summary>
-    /// Status checker for Redis
+    /// Status checker for Nats
     /// </summary>
     /// <seealso cref="IResourceStatusProvider" />
     public class NatsStatus : IResourceStatusProvider, IDisposable
@@ -65,7 +65,7 @@ namespace Squadron
         }
 
         // ReSharper disable once IdentifierTypo
-        internal class HealthzResponse
+        private class HealthzResponse
         {
             public string Status { get; set; }
         }

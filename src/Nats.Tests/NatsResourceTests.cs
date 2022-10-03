@@ -18,7 +18,7 @@ public class NatsResourceTests : IClassFixture<NatsResource>
         _nats = nats;
         _helper = helper;
     }
-    
+
     [Fact]
     public async Task Client_Will_Connect()
     {
@@ -72,6 +72,5 @@ public class NatsResourceTests : IClassFixture<NatsResource>
         _helper.WriteLine("NATS Client disconnected.");
 
         Assert.True(true);
-
     }
 }

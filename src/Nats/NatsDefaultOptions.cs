@@ -6,8 +6,8 @@ namespace Squadron
     /// Default NATS resource options
     /// </summary>
     public class NatsDefaultOptions
-        : ContainerResourceOptions,
-        IComposableResourceOption
+        : ContainerResourceOptions
+        , IComposableResourceOption
     {
         public Type ResourceType => typeof(NatsResource);
 

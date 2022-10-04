@@ -21,21 +21,18 @@ namespace Squadron
         /// <param name="host">Hostname</param>
         public NatsStatus(string host)
         {
-            Debug.Assert(
-                Uri.TryCreate($"http://{host}/", UriKind.Absolute, out Uri uri),
-                $"Bad host string '{host}'");
-
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(5),
-                BaseAddress = uri
+                BaseAddress = new Uri($"http://{host}/")
             };
         }
 
         /// <inheritdoc/>
         public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-            try {
+            try
+            {
                 HealthzResponse response = await _httpClient.GetFromJsonAsync<HealthzResponse>(
                     new Uri("/healthz", UriKind.Relative), cancellationToken);
 

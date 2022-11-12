@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+<ItemGroup>
+  <ProjectReference Include="..\Core\Core.csproj" />
+</ItemGroup>
 <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
@@ -6,5 +9,9 @@
     <Language>latest</Language>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+        <PackageReference Include="System.Text.Json" Version="6.0.6" />
+    </ItemGroup>
 
 </Project>

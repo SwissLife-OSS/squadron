@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
+
+  <PropertyGroup>
+    <AssemblyName>Squadron.Opa</AssemblyName>
+    <Language>latest</Language>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

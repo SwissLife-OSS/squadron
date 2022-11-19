@@ -22,7 +22,7 @@ namespace Squadron
         public OpaStatus(string host)
         {
             Debug.Assert(
-                Uri.TryCreate($"http://{host}/", UriKind.Absolute, out Uri uri),
+                Uri.TryCreate($"http://{host}/", UriKind.Absolute, out Uri? uri),
                 $"Bad host string '{host}'");
 
             _httpClient = new HttpClient

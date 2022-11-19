@@ -21,9 +21,10 @@ namespace Squadron
         /// <param name="host">Hostname</param>
         public NatsStatus(string host)
         {
-            Debug.Assert(
-                Uri.TryCreate($"http://{host}/", UriKind.Absolute, out Uri uri),
-                $"Bad host string '{host}'");
+            if (!Uri.TryCreate($"http://{host}/", UriKind.Absolute, out Uri uri))
+            {
+                throw new InvalidOperationException($"Bad host string '{host}'");
+            }
 
             _httpClient = new HttpClient
             {

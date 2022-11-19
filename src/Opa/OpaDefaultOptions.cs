@@ -3,7 +3,7 @@ using System;
 namespace Squadron
 {
     /// <summary>
-    /// Default Mongo resource options
+    /// Default OPA resource options
     /// </summary>
     public class OpaDefaultOptions : ContainerResourceOptions, IComposableResourceOption
     {

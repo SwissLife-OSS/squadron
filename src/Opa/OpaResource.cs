@@ -24,6 +24,7 @@ namespace Squadron
         where TOptions : ContainerResourceOptions, new()
     {
         private HttpClient _client = new();
+        public HttpClient Client => _client;
 
         /// <inheritdoc cref="IAsyncLifetime"/>
         public override async Task InitializeAsync()
@@ -33,7 +34,7 @@ namespace Squadron
                 $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
 
             _client = GetClient(baseAddress);
-            await Initializer.WaitAsync(new OpaStatus(baseAddress));
+            await Initializer.WaitAsync(new OpaStatus(_client));
         }
 
         public async Task<T?> ListPolicies<T>()

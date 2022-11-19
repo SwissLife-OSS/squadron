@@ -19,17 +19,9 @@ namespace Squadron
         /// Initializes a new instance of the <see cref="NatsStatus"/> class.
         /// </summary>
         /// <param name="host">Hostname</param>
-        public OpaStatus(string host)
+        public OpaStatus(HttpClient httpClient)
         {
-            Debug.Assert(
-                Uri.TryCreate($"http://{host}/", UriKind.Absolute, out Uri? uri),
-                $"Bad host string '{host}'");
-
-            _httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(5),
-                BaseAddress = uri
-            };
+            _httpClient = httpClient;
         }
 
         /// <inheritdoc/>
@@ -37,10 +29,10 @@ namespace Squadron
         {
             try
             {
-                HttpResponseMessage? response = await _httpClient.GetAsync(
-                    new Uri("/health", UriKind.Relative), cancellationToken);
+                // HttpResponseMessage? response = await _httpClient.GetAsync(
+                //     new Uri("health", UriKind.Relative), cancellationToken);
 
-                Debug.Assert(response?.StatusCode == HttpStatusCode.OK);
+                // Debug.Assert(response?.StatusCode == HttpStatusCode.OK);
 
                 return new Status
                 {

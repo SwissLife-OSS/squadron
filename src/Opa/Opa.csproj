@@ -1,17 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-<ItemGroup>
-  <ProjectReference Include="..\Core\Core.csproj" />
-</ItemGroup>
 <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
     <AssemblyName>Squadron.Opa</AssemblyName>
     <Language>latest</Language>
+    <Language>latest</Language>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="6.0.6" />
-    </ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="6.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
 
 </Project>

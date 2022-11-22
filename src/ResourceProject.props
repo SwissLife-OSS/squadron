@@ -4,6 +4,7 @@
     <TargetFrameworks>$(ResourceProjectTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Squadron</RootNamespace>
     <IsPackable>true</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

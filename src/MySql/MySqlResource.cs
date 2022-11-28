@@ -8,18 +8,17 @@ namespace Squadron
     /// <inheritdoc/>
     public class MySqlResource : MySqlResource<MySqlDefaultOptions>
     {
-
     }
 
     /// <summary>
     /// Represents a MySql resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MySqlResource<TOptions>
-        : ContainerResource<TOptions>,
-          IAsyncLifetime
+    public class MySqlResource<TOptions> :
+        ContainerResource<TOptions>,
+        IAsyncLifetime
         where TOptions : ContainerResourceOptions, new()
-    { 
+    {
         /// <summary>
         /// Connection string to access to queue
         /// </summary>
@@ -53,9 +52,16 @@ namespace Squadron
             return new MySqlConnection($"{ConnectionString}database={dbName}");
         }
 
-        public async Task CreateDatabaseAsync(string dbName)
+        /// <summary>
+        /// Create database with <see cref="dbName"/> and <see cref="grant"/> permissions to configured user.
+        /// Default <see cref="grant"/> to ALL.
+        /// </summary>
+        public async Task<MySqlConnection> CreateDatabaseAsync(
+            string dbName,
+            string? grant = default)
         {
-            await Manager.InvokeCommandAsync(CreateDbCommand.Execute(dbName, Settings));
+            await Manager.InvokeCommandAsync(CreateDbCommand.Execute(dbName, grant, Settings));
+            return GetConnection(dbName);
         }
 
         public async Task RunSqlScriptAsync(string script, string dbName)

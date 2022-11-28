@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using Docker.DotNet.Models;
 
 namespace Squadron
@@ -12,21 +8,24 @@ namespace Squadron
 
         private CreateDbCommand(
             string dbname,
+            string? grant,
             ContainerResourceSettings settings)
         {
+            var grantAccess = grant ?? "ALL";
             Parameters = GetContainerExecParameters(
                 $@"CREATE DATABASE {dbname};
                    CREATE ROLE developer_{dbname};
-                   GRANT alter,create,delete,drop,index,insert,select,update,trigger,alter routine,
-                            create routine, execute, create temporary tables 
-                   ON {dbname}.* 
+                   GRANT {grantAccess}
+                   ON {dbname}.*
                    TO '{settings.Username}';",
                 settings);
         }
 
-        internal static ContainerExecCreateParameters Execute(string dbName,
+        internal static ContainerExecCreateParameters Execute(
+            string dbName,
+            string? grant,
             ContainerResourceSettings settings)
-            => new CreateDbCommand(dbName, settings).Parameters;
+            => new CreateDbCommand(dbName, grant, settings).Parameters;
 
         public string Command => string.Join(" ", Parameters.Cmd);
     }

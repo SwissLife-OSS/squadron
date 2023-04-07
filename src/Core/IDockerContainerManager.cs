@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Docker.DotNet;
 using Docker.DotNet.Models;
 
 namespace Squadron
@@ -16,6 +17,11 @@ namespace Squadron
         /// The instance.
         /// </value>
         ContainerInstance Instance { get; }
+        
+        /// <summary>
+        /// The client to interact with docker
+        /// </summary>
+        DockerClient Client { get; }
 
         /// <summary>
         /// Consumes container logs
@@ -41,7 +47,7 @@ namespace Squadron
         /// </summary>
         /// <param name="parameters">Command parameter</param>
         /// <exception cref="ContainerException"></exception>
-        Task InvokeCommandAsync(ContainerExecCreateParameters parameters);
+        Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters);
 
         /// <summary>
         /// Removes the container.

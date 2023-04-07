@@ -22,13 +22,9 @@ namespace Squadron
         private static readonly IDictionary<string, string> Networks = new Dictionary<string, string>();
         private static readonly SemaphoreSlim SyncNetworks = new(1, 1);
 
-        /// <inheritdoc/>
-        public ContainerInstance Instance { get; } = new ContainerInstance();
-
         private readonly ContainerResourceSettings _settings;
         private readonly DockerConfiguration _dockerConfiguration;
         private readonly AuthConfig _authConfig = null;
-        private readonly DockerClient _client = null;
 
         private readonly AsyncPolicy _retryPolicy = Policy
             .Handle<TimeoutException>()
@@ -46,7 +42,7 @@ namespace Squadron
         {
             _settings = settings;
             _dockerConfiguration = dockerConfiguration;
-            _client = new DockerClientConfiguration(
+            Client = new DockerClientConfiguration(
                  LocalDockerUri(),
                  null,
                  TimeSpan.FromMinutes(5)
@@ -55,6 +51,10 @@ namespace Squadron
             _authConfig = GetAuthConfig();
             _variableResolver = new VariableResolver(_settings.Variables);
         }
+        
+        public ContainerInstance Instance { get; } = new ContainerInstance();
+        
+        public DockerClient Client { get; }
 
         private AuthConfig GetAuthConfig()
         {
@@ -130,7 +130,7 @@ namespace Squadron
                 WaitBeforeKillSeconds = 5
             };
 
-            bool stopped = await _client.Containers
+            bool stopped = await Client.Containers
                 .StopContainerAsync(Instance.Id, stopOptions, default);
 
             if (stopped)
@@ -143,7 +143,7 @@ namespace Squadron
 
         public async Task PauseAsync(TimeSpan resumeAfter)
         {
-            await _client.Containers.PauseContainerAsync(Instance.Id);
+            await Client.Containers.PauseContainerAsync(Instance.Id);
             Task.Delay(resumeAfter)
                 .ContinueWith((c) => ResumeAsync())
                 .Start();
@@ -151,7 +151,7 @@ namespace Squadron
 
         public async Task ResumeAsync()
         {
-            await _client.Containers.UnpauseContainerAsync(Instance.Id);
+            await Client.Containers.UnpauseContainerAsync(Instance.Id);
         }
 
         /// <inheritdoc/>
@@ -168,7 +168,7 @@ namespace Squadron
                 await _retryPolicy
                     .ExecuteAsync(async () =>
                     {
-                        await _client.Containers
+                        await Client.Containers
                             .RemoveContainerAsync(Instance.Id, removeOptions);
 
                         foreach (string network in _settings.Networks)
@@ -189,7 +189,7 @@ namespace Squadron
         {
             using (var archiver = new TarArchiver(context, overrideTargetName))
             {
-                await _client.Containers.ExtractArchiveToContainerAsync(
+                await Client.Containers.ExtractArchiveToContainerAsync(
                     Instance.Id,
                     new ContainerPathStatParameters
                     {
@@ -200,33 +200,34 @@ namespace Squadron
         }
 
         /// <inheritdoc/>
-        public async Task InvokeCommandAsync(
-                ContainerExecCreateParameters parameters)
+        public async Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters)
         {
-            ContainerExecCreateResponse response = await _client.Exec
-                .ExecCreateContainerAsync(
-                    Instance.Id,
-                    parameters);
+            ContainerExecCreateResponse response = await Client.Exec
+                .ExecCreateContainerAsync( Instance.Id, parameters);
 
-            if (!string.IsNullOrEmpty(response.ID))
+            if (string.IsNullOrEmpty(response.ID))
             {
-                using (MultiplexedStream stream = await _client.Exec
-                    .StartAndAttachContainerExecAsync(
-                        response.ID, false))
-                {
-                    (string stdout, string stderr) output = await stream
-                        .ReadOutputToEndAsync(CancellationToken.None);
+                return null;
 
-                    if (!string.IsNullOrEmpty(output.stderr) && output.stderr.ToLowerInvariant().Contains("error"))
-                    {
-                        var error = new StringBuilder();
-                        error.AppendLine($"Error when invoking command \"{string.Join(" ", parameters.Cmd)}\"");
-                        error.AppendLine(output.stderr);
-
-                        throw new ContainerException(error.ToString());
-                    }
-                }
             }
+
+            using MultiplexedStream stream = 
+                    await Client.Exec.StartAndAttachContainerExecAsync(response.ID, false);
+                
+            (var stdout, var stderr) = await stream
+                .ReadOutputToEndAsync(CancellationToken.None);
+
+            if (!string.IsNullOrEmpty(stderr) && stderr.ToLowerInvariant().Contains("error"))
+            {
+                var error = new StringBuilder();
+                var command = string.Join(" ", parameters.Cmd);
+                error.AppendLine($"Error when invoking command \"{command}\"");
+                error.AppendLine(stderr);
+
+                throw new ContainerException(error.ToString());
+            }
+
+            return stdout;
         }
 
         private async Task CreateLogStreamAsync()
@@ -240,7 +241,7 @@ namespace Squadron
                 ShowStdout = true
             };
 
-            Instance.LogStream = await _client
+            Instance.LogStream = await Client
                 .Containers
                 .GetContainerLogsAsync(Instance.Id, containerStatsParameters);
         }
@@ -264,7 +265,7 @@ namespace Squadron
                     .ExecuteAsync(async () =>
                     {
                         _settings.Logger.Verbose("Try start container");
-                        bool started = await _client.Containers.StartContainerAsync(
+                        bool started = await Client.Containers.StartContainerAsync(
                             Instance.Id,
                             containerStartParameters);
 
@@ -348,7 +349,7 @@ namespace Squadron
                     {
                         _settings.Logger.Verbose("Try create container");
                         _settings.Logger.StartParameters(startParams);
-                        CreateContainerResponse response = await _client
+                        CreateContainerResponse response = await Client
                             .Containers
                             .CreateContainerAsync(startParams);
 
@@ -419,7 +420,7 @@ namespace Squadron
                      .ExecuteAsync(async () =>
                          {
                              IEnumerable<ImagesListResponse> listResponse =
-                             await _client.Images.ListImagesAsync(
+                             await Client.Images.ListImagesAsync(
                                  new ImagesListParameters {
                                      Filters = new Dictionary<string, IDictionary<string, bool>>
                                      {
@@ -458,7 +459,7 @@ namespace Squadron
                 await _retryPolicy
                     .ExecuteAsync(async () =>
                    {
-                       await _client.Images.CreateImageAsync(
+                       await Client.Images.CreateImageAsync(
                        new ImagesCreateParameters { FromImage = _settings.ImageFullname },
                        _authConfig,
                        new Progress<JSONMessage>(Handler));
@@ -483,7 +484,7 @@ namespace Squadron
                 {
                     try
                     {
-                        ContainerInspectResponse inspectResponse = await _client
+                        ContainerInspectResponse inspectResponse = await Client
                             .Containers
                             .InspectContainerAsync(Instance.Id, cancellation.Token);
 
@@ -633,7 +634,7 @@ namespace Squadron
 
                 await _retryPolicy.ExecuteAsync(async () =>
                     {
-                        await _client.Networks.ConnectNetworkAsync(
+                        await Client.Networks.ConnectNetworkAsync(
                             networkId,
                             new NetworkConnectParameters()
                             {
@@ -666,7 +667,7 @@ namespace Squadron
         {
             string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
 
-            NetworksCreateResponse response = await _client.Networks.CreateNetworkAsync(
+            NetworksCreateResponse response = await Client.Networks.CreateNetworkAsync(
                 new NetworksCreateParameters
                 {
                     Name = uniqueNetworkName
@@ -682,14 +683,14 @@ namespace Squadron
             await _retryPolicy
                 .ExecuteAsync(async () =>
                 {
-                    NetworkResponse? inspectResponse = (await _client.Networks.ListNetworksAsync())
+                    NetworkResponse? inspectResponse = (await Client.Networks.ListNetworksAsync())
                         .FirstOrDefault(n => n.Name == uniqueNetworkName);
 
                     if (inspectResponse != null && !inspectResponse.Containers.Any())
                     {
                         try
                         {
-                            await _client.Networks.DeleteNetworkAsync(inspectResponse.ID);
+                            await Client.Networks.DeleteNetworkAsync(inspectResponse.ID);
                         }
                         catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
                         {
@@ -707,7 +708,7 @@ namespace Squadron
 
         public void Dispose()
         {
-            _client?.Dispose();
+            Client?.Dispose();
             Instance?.Dispose();
         }
     }

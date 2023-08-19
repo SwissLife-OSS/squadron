@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
+  <PropertyGroup>
+    <AssemblyName>Squadron.ClickHouse.Tests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClickHouse\ClickHouse.csproj" />
+  </ItemGroup>
+</Project>

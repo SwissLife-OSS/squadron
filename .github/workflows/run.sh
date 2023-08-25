@@ -1,15 +1,11 @@
 run() {
-  local start_time=$(date '+%Y-%m-%d %H:%M:%S')
-  local cpu_core=$(grep -m1 'processor' /proc/cpuinfo | awk '{print $3}')
+  local cpu_core=$(taskset -c -p $$ 2>&1 | awk -F': ' '{print $2}')
+  local total_cores=$(nproc)
 
-  echo "Start Time: $start_time"
-  echo "Running on CPU Core: $cpu_core"
+  echo -e "Running on CPU Core: $cpu_core of $total_cores"
   echo -e "\033[0;34mRunning: $@\033[0m"
 
   "$@"
 
-  local end_time=$(date '+%Y-%m-%d %H:%M:%S')
-
-  echo "End Time: $end_time"
-  echo ""
+  echo -e "\n"
 }

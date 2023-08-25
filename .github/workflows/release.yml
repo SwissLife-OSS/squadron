@@ -1,20 +1,40 @@
-name: Pull Request
+name: Release
 
 on:
-  pull_request:
-    branches: ["master"]
+  push:
+    tags:
+      - "*"
 
 jobs:
-  tests:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use .NET SDK from global.json
+        uses: actions/setup-dotnet@v1
+
+      - name: Pack
+        run: |
+          source ./.github/workflows/run.sh && export -f run
+          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} --configuration Release --output ./out"'
+
+      # - name: Push NuGet package
+      #   run: |
+      #     source ./.github/workflows/run.sh && export -f run
+      #     find . -name '*.nupkg' | grep -v '.sources.nupkg' | parallel --jobs 0 \
+      #     'bash -c "run dotnet nuget push {} --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json"''
+
+  sonar:
     runs-on: ubuntu-latest
     env:
       SONAR_PROJECT_KEY: SwissLife-OSS_Squadron
       SONAR_NAME: squadron
       SONAR_HOST_URL: https://sonarcloud.io
       SONAR_ORG: swisslife
-      PR_NUMBER: ${{github.event.pull_request.number}}
-      PR_SOURCE_BRANCH: ${{github.head_ref}}
-      PR_TARGET_BRANCH: ${{github.base_ref}}
+      VERSION: ${{github.ref_name}}
       GITHUB_REPOSITORY: ${{github.repository}}
       # Add specific exclusions here if needed. It should start with a comma. e.g. ",**/MySpecialFile.cs"
       EXTENDED_SONAR_EXCLUSIONS: ""
@@ -49,10 +69,7 @@ jobs:
           dotnet sonarscanner begin /k:"${{env.SONAR_PROJECT_KEY}}" /n:"${{env.SONAR_NAME}}" \
           /d:sonar.login="${{secrets.SONAR_TOKEN}}" /d:sonar.host.url="${{env.SONAR_HOST_URL}}" /o:"${{env.SONAR_ORG}}" \
           /d:sonar.cs.opencover.reportsPaths="**/*.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" \
-          /d:sonar.pullrequest.key="${{env.PR_NUMBER}}" /d:sonar.pullrequest.branch="${{env.PR_SOURCE_BRANCH}}" \
-          /d:sonar.pullrequest.base="${{env.PR_TARGET_BRANCH}}" /d:sonar.pullrequest.provider="github" \
-          /d:sonar.pullrequest.github.repository="${{env.GITHUB_REPOSITORY}}" \
-          /d:sonar.exclusions="${{vars.SONAR_EXCLUSIONS}}${{env.EXTENDED_SONAR_EXCLUSIONS}}"
+          /v:"${{env.VERSION}}" /d:sonar.exclusions="${{vars.SONAR_EXCLUSIONS}}${{env.EXTENDED_SONAR_EXCLUSIONS}}"
 
       - name: Build project
         run: |

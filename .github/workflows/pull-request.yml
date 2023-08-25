@@ -25,7 +25,7 @@ jobs:
 
       - name: Prepare
         run: |
-          sudo apt-get install -y parallel && \
+          sudo apt-get install -y parallel
           echo 'run_and_echo() { echo "Running: $@"; "$@"; }' >> $GITHUB_ENV
 
       - name: Setup Java 17

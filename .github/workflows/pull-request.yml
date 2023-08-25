@@ -57,7 +57,7 @@ jobs:
       - name: Build project
         run: |
           source ./.github/workflows/run.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug /p:WarningLevel=0"'
+          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'
 
       - name: Run tests
         run: |

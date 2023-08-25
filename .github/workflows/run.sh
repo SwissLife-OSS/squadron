@@ -5,5 +5,5 @@ run() {
 
   "$@"
 
-  echo -e "\n"
+  echo -e "\n\n"
 }

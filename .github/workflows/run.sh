@@ -1,0 +1,4 @@
+run() {
+  echo "Running: $@"
+  "$@"
+}

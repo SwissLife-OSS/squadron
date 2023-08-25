@@ -8,8 +8,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      VERSION: ${{github.ref_name}}
 
     steps:
       - name: Checkout code
@@ -18,19 +16,25 @@ jobs:
       - name: Use .NET SDK from global.json
         uses: actions/setup-dotnet@v1
 
+      - name: Extract Version Information
+        run: |
+          source ./.github/workflows/utils.sh
+          PACKAGE_VERSION=$(package_version)
+          ASSEMBLY_VERSION=$(assembly_version $PACKAGE_VERSION)
+
       - name: Build projects
         run: |
-          source ./.github/workflows/run.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} /p:Version=${{env.VERSION}} /p:AssemblyVersion=${{env.VERSION}}.0 /p:FileVersion=${{env.VERSION}}.0 --configuration Release"'
+          source ./.github/workflows/utils.sh && export -f run
+          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} /p:Version=${{env.PACKAGE_VERSION}} /p:AssemblyVersion=${{env.ASSEMBLY_VERSION}} /p:FileVersion=${{env.ASSEMBLY_VERSION}} --configuration Release"'
 
       - name: Pack
         run: |
-          source ./.github/workflows/run.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} /p:PackageVersion=${{env.VERSION}} --no-build --configuration Release --include-symbols --include-source --verbosity Minimal --output ./out"'
+          source ./.github/workflows/utils.sh && export -f run
+          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} /p:PackageVersion=${{env.PACKAGE_VERSION}} --no-build --configuration Release --include-symbols --include-source --verbosity Minimal --output ./out"'
 
       # - name: Push NuGet package
       #   run: |
-      #     source ./.github/workflows/run.sh && export -f run
+      #     source ./.github/workflows/utils.sh && export -f run
       #     find . -name '*.nupkg' | grep -v '.sources.nupkg' | parallel --jobs 0 \
       #     'bash -c "run dotnet nuget push {} --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json"''
 
@@ -80,12 +84,12 @@ jobs:
 
       - name: Build projects
         run: |
-          source ./.github/workflows/run.sh && export -f run
+          source ./.github/workflows/utils.sh && export -f run
           find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'
 
       - name: Run tests
         run: |
-          source ./.github/workflows/run.sh && export -f run
+          source ./.github/workflows/utils.sh && export -f run
           find . -name '*.Tests.csproj' | parallel --jobs 0 'bash -c "run dotnet test {} \
             --configuration Debug \
             --no-restore \

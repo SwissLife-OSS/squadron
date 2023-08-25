@@ -56,12 +56,12 @@ jobs:
 
       - name: Build projects
         run: |
-          source ./.github/workflows/run.sh && export -f run
+          source ./.github/workflows/utils.sh && export -f run
           find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'
 
       - name: Run tests
         run: |
-          source ./.github/workflows/run.sh && export -f run
+          source ./.github/workflows/utils.sh && export -f run
           find . -name '*.Tests.csproj' | parallel --jobs 0 'bash -c "run dotnet test {} \
             --configuration Debug \
             --no-restore \

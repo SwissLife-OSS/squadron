@@ -23,8 +23,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install GNU Parallel
-        run: sudo apt-get install -y parallel
+      - name: Prepare
+        run: |
+          sudo apt-get install -y parallel && \
+          echo 'run_and_echo() { echo "Running: $@"; "$@"; }' >> $GITHUB_ENV
 
       - name: Setup Java 17
         uses: actions/setup-java@v2
@@ -54,19 +56,18 @@ jobs:
           /d:sonar.exclusions="${{ vars.SONAR_EXCLUSIONS }}${{ env.EXTENDED_SONAR_EXCLUSIONS }}"
 
       - name: Build project
-        run: find . -name '*.sln' -exec dotnet build {} --configuration Debug \;
+        run: find . -name '*.sln' -exec bash -c 'run_and_echo dotnet build "$1" --configuration Debug' _ {} \;
 
       - name: Run tests
         run: |
-          find . -name '*.Tests.csproj' | parallel --jobs 0 'dotnet test {} \
-            -exec dotnet test {} \
+          find . -name '*.Tests.csproj' | parallel --jobs 0 'bash -c "run_and_echo dotnet test {} \
             --configuration Debug \
             --no-restore \
             --no-build \
             --blame \
-            -p:"CollectCoverage=true" \
-            -p:"Exclude=[xunit.*]*" \
-            -p:"CoverletOutputFormat=opencover" \;
+            -p:\"CollectCoverage=true\" \
+            -p:\"Exclude=[xunit.*]*\" \
+            -p:\"CoverletOutputFormat=opencover\""'
 
       - name: SonarScanner End
         run: dotnet sonarscanner end /d:sonar.login="{{ secrets.SONAR_TOKEN }}"

@@ -32,11 +32,11 @@ jobs:
           source ./.github/workflows/utils.sh && export -f run
           find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} /p:PackageVersion=${{env.PACKAGE_VERSION}} --no-build --configuration Release --include-symbols --include-source --verbosity Minimal --output ./out"'
 
-      # - name: Push NuGet package
-      #   run: |
-      #     source ./.github/workflows/utils.sh && export -f run
-      #     find . -name '*.nupkg' | grep -v '.sources.nupkg' | parallel --jobs 0 \
-      #     'bash -c "run dotnet nuget push {} --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json"''
+      - name: Push NuGet package
+        run: |
+          source ./.github/workflows/utils.sh && export -f run
+          find . -name '*.nupkg' | grep -v '.sources.nupkg' | parallel --jobs 0 \
+          'bash -c "run dotnet nuget push {} --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json"''
 
   sonar:
     runs-on: ubuntu-latest

@@ -1,11 +1,11 @@
-name: Pull Request CI
+name: Pull Request
 
 on:
   pull_request:
     branches: ["master"]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     env:
       SONAR_PROJECT_KEY: SwissLife-OSS_Squadron
@@ -53,7 +53,7 @@ jobs:
           /d:sonar.pullrequest.key="${{ env.PR_NUMBER }}" /d:sonar.pullrequest.branch="${{ env.PR_SOURCE_BRANCH }}" \
           /d:sonar.pullrequest.base="${{ env.PR_TARGET_BRANCH }}" /d:sonar.pullrequest.provider="github" \
           /d:sonar.pullrequest.github.repository="${{ env.GITHUB_REPOSITORY }}" \
-          /d:sonar.exclusions="${{ env.SONAR_EXCLUSIONS }}${{ env.EXTENDED_SONAR_EXCLUSIONS }}"
+          /d:sonar.exclusions="${{ vars.SONAR_EXCLUSIONS }}${{ env.EXTENDED_SONAR_EXCLUSIONS }}"
 
       - name: Build project
         run: find . -name '*.sln' -exec dotnet build {} --configuration Debug \;

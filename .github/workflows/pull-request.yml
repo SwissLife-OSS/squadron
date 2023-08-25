@@ -1,0 +1,59 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SONAR_PROJECT_KEY: SwissLife-OSS_Squadron
+      SONAR_NAME: squadron
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: https://sonarcloud.io
+      SONAR_ORG: swisslife
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_SOURCE_BRANCH: ${{ github.head_ref }}
+      PR_TARGET_BRANCH: ${{ github.base_ref }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      SONAR_EXCLUSIONS: "${{ env.SONAR_EXCLUSIONS }}" # Add specific exclusions here if needed
+
+    strategy:
+      matrix:
+        dotnet: ["3.1.x", "6.0.x"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "17"
+
+      - name: Use .NET Core SDK from global.json
+        uses: actions/setup-dotnet@v1
+        with:
+          use-global-json: true
+
+      - name: Setup .NET Core SDK ${{ matrix.dotnet }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: SonarScanner Begin
+        run: dotnet sonarscanner begin /k:"$(SONAR_PROJECT_KEY)" /n:"$(SONAR_NAME)" /d:sonar.login="$(SONAR_TOKEN)" /d:sonar.host.url="$(SONAR_HOST_URL)" /o:"$(SONAR_ORG)" /d:sonar.cs.opencover.reportsPaths="**/*.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" /d:sonar.pullrequest.key="$(PR_NUMBER)" /d:sonar.pullrequest.branch="$(PR_SOURCE_BRANCH)" /d:sonar.pullrequest.base="$(PR_TARGET_BRANCH)" /d:sonar.pullrequest.provider="github" /d:sonar.pullrequest.github.repository="$(GITHUB_REPOSITORY)" /d:sonar.exclusions="$(SONAR_EXCLUSIONS)"
+
+      - name: Build project
+        run: find . -name '*.sln' -exec dotnet build {} --configuration Debug \;
+
+      - name: Run tests
+        run: find . -name '*.Tests.csproj' -exec dotnet test {} --configuration Debug --no-restore --no-build --blame -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover" \;
+
+      - name: SonarScanner End
+        run: dotnet sonarscanner end /d:sonar.login="$(SONAR_TOKEN)"

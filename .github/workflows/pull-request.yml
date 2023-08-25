@@ -54,12 +54,15 @@ jobs:
           /d:sonar.pullrequest.github.repository="${{ env.GITHUB_REPOSITORY }}" \
           /d:sonar.exclusions="${{ vars.SONAR_EXCLUSIONS }}${{ env.EXTENDED_SONAR_EXCLUSIONS }}"
 
-      - name: Debug - Show run.sh content
-        run: cat ./.github/workflows/run.sh
+      - name: Debug - Show run.sh content and permissions
+        run: |
+          cat ./.github/workflows/run.sh
+          chmod +x ./.github/workflows/run.sh
 
       - name: Build project
         run: |
           source ./.github/workflows/run.sh
+          type run
           find . -name '*.sln' -exec bash -c 'run dotnet build "$1" --configuration Debug' _ {} \;
 
       - name: Run tests

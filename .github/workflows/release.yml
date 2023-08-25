@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{github.ref_name}}
 
     steps:
       - name: Checkout code
@@ -16,10 +18,15 @@ jobs:
       - name: Use .NET SDK from global.json
         uses: actions/setup-dotnet@v1
 
+      - name: Build projects
+        run: |
+          source ./.github/workflows/run.sh && export -f run
+          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} /p:Version=${{env.VERSION}} /p:AssemblyVersion=${{env.VERSION}}.0 /p:FileVersion=${{env.VERSION}}.0 --configuration Release"'
+
       - name: Pack
         run: |
           source ./.github/workflows/run.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} --configuration Release --output ./out"'
+          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} /p:PackageVersion=${{env.VERSION}} --no-build --configuration Release --include-symbols --include-source --verbosity Minimal --output ./out"'
 
       # - name: Push NuGet package
       #   run: |
@@ -71,7 +78,7 @@ jobs:
           /d:sonar.cs.opencover.reportsPaths="**/*.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" \
           /v:"${{env.VERSION}}" /d:sonar.exclusions="${{vars.SONAR_EXCLUSIONS}}${{env.EXTENDED_SONAR_EXCLUSIONS}}"
 
-      - name: Build project
+      - name: Build projects
         run: |
           source ./.github/workflows/run.sh && export -f run
           find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'

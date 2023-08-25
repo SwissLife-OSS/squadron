@@ -54,7 +54,7 @@ jobs:
           /d:sonar.pullrequest.github.repository="${{env.GITHUB_REPOSITORY}}" \
           /d:sonar.exclusions="${{vars.SONAR_EXCLUSIONS}}${{env.EXTENDED_SONAR_EXCLUSIONS}}"
 
-      - name: Build project
+      - name: Build projects
         run: |
           source ./.github/workflows/run.sh && export -f run
           find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'

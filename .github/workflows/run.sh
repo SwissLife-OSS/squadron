@@ -4,7 +4,7 @@ run() {
 
   echo "Start Time: $start_time"
   echo "Running on CPU Core: $cpu_core"
-  echo "Running: $@"
+  echo -e "\033[0;34mRunning: $@\033[0m"
 
   "$@"
 

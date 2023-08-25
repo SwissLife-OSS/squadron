@@ -54,6 +54,9 @@ jobs:
           /d:sonar.pullrequest.github.repository="${{ env.GITHUB_REPOSITORY }}" \
           /d:sonar.exclusions="${{ vars.SONAR_EXCLUSIONS }}${{ env.EXTENDED_SONAR_EXCLUSIONS }}"
 
+      - name: Debug - Show run.sh content
+        run: cat ./.github/workflows/run.sh
+
       - name: Build project
         run: |
           source ./.github/workflows/run.sh

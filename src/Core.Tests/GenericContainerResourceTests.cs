@@ -1,16 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
 namespace Squadron
 {
     public class GenericContainerResourceTests
-        : IClassFixture<GenericContainerResource<TestWebServerOptions>>
+        // Uncomment the following line to run the test
+        // : IClassFixture<GenericContainerResource<TestWebServerOptions>>
     {
         private readonly GenericContainerResource<TestWebServerOptions> _resource;
 

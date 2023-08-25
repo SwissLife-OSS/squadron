@@ -18,9 +18,9 @@ jobs:
 
       - name: Extract Version Information
         run: |
-          source ./.github/workflows/utils.sh
-          PACKAGE_VERSION=$(package_version)
-          ASSEMBLY_VERSION=$(assembly_version $PACKAGE_VERSION)
+          echo "PACKAGE_VERSION=${{github.ref_name}}" >> $GITHUB_ENV
+          ASSEMBLY_VERSION="$(echo "${{ github.ref_name }}" | grep -o '^[0-9]*\.[0-9]*\.[0-9]*').0"
+          echo "ASSEMBLY_VERSION=$ASSEMBLY_VERSION" >> $GITHUB_ENV
 
       - name: Build projects
         run: |

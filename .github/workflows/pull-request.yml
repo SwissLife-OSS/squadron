@@ -72,4 +72,4 @@ jobs:
             -p:\"CoverletOutputFormat=opencover\""'
 
       - name: SonarScanner End
-        run: dotnet sonarscanner end /d:sonar.login="{{ secrets.SONAR_TOKEN }}"
+        run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

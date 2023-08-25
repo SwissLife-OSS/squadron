@@ -29,17 +29,12 @@ jobs:
           distribution: "adopt"
           java-version: "17"
 
-      - name: Setup .NET Core SDK 6.0.x
+      - name: Setup .NET SDK 6
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "6.x.x"
 
-      - name: Setup .NET Core SDK 3.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "3.1.x"
-
-      - name: Use .NET Core SDK from global.json
+      - name: Use .NET SDK from global.json
         uses: actions/setup-dotnet@v1
 
       - name: Restore tools

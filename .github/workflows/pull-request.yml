@@ -7,25 +7,9 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    env:
-      SONAR_PROJECT_KEY: SwissLife-OSS_Squadron
-      SONAR_NAME: squadron
-      SONAR_HOST_URL: https://sonarcloud.io
-      SONAR_ORG: swisslife
-      PR_NUMBER: ${{github.event.pull_request.number}}
-      PR_SOURCE_BRANCH: ${{github.head_ref}}
-      PR_TARGET_BRANCH: ${{github.base_ref}}
-      GITHUB_REPOSITORY: ${{github.repository}}
-      # Add specific exclusions here if needed. It should start with a comma. e.g. ",**/MySpecialFile.cs"
-      EXTENDED_SONAR_EXCLUSIONS: ""
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Prepare
-        run: |
-          sudo apt-get install -y parallel
 
       - name: Setup Java 17
         uses: actions/setup-java@v2
@@ -41,35 +25,12 @@ jobs:
       - name: Use .NET SDK from global.json
         uses: actions/setup-dotnet@v1
 
-      - name: Restore tools
-        run: dotnet tool restore
-
-      - name: SonarScanner Begin
-        run: |
-          dotnet sonarscanner begin /k:"${{env.SONAR_PROJECT_KEY}}" /n:"${{env.SONAR_NAME}}" \
-          /d:sonar.login="${{secrets.SONAR_TOKEN}}" /d:sonar.host.url="${{env.SONAR_HOST_URL}}" /o:"${{env.SONAR_ORG}}" \
-          /d:sonar.cs.opencover.reportsPaths="**/*.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" \
-          /d:sonar.pullrequest.key="${{env.PR_NUMBER}}" /d:sonar.pullrequest.branch="${{env.PR_SOURCE_BRANCH}}" \
-          /d:sonar.pullrequest.base="${{env.PR_TARGET_BRANCH}}" /d:sonar.pullrequest.provider="github" \
-          /d:sonar.pullrequest.github.repository="${{env.GITHUB_REPOSITORY}}" \
-          /d:sonar.exclusions="${{vars.SONAR_EXCLUSIONS}}${{env.EXTENDED_SONAR_EXCLUSIONS}}"
-
-      - name: Build projects
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'
-
-      - name: Run tests
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.Tests.csproj' | parallel --jobs 0 'bash -c "run dotnet test {} \
-            --configuration Debug \
-            --no-restore \
-            --no-build \
-            --blame \
-            -p:\"CollectCoverage=true\" \
-            -p:\"Exclude=[xunit.*]*\" \
-            -p:\"CoverletOutputFormat=opencover\""'
-
-      - name: SonarScanner End
-        run: dotnet sonarscanner end /d:sonar.login="${{secrets.SONAR_TOKEN}}"
+      - name: Build, Test and Sonar
+        uses: swisslife-oss/actions/pull-request@pr
+        with:
+          sonar_project_key: 'SwissLife-OSS_Squadron'
+          sonar_name: 'squadron'
+          pr_number: ${{ github.event.pull_request.number }}
+          pr_source_branch: ${{ github.head_ref }}
+          pr_target_branch: ${{ github.base_ref }}
+          github_repository: ${{ github.repository }}

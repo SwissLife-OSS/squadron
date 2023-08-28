@@ -12,92 +12,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Use .NET SDK from global.json
-        uses: actions/setup-dotnet@v1
-
-      - name: Extract Version Information
-        run: |
-          echo "PACKAGE_VERSION=${{github.ref_name}}" >> $GITHUB_ENV
-          ASSEMBLY_VERSION="$(echo "${{ github.ref_name }}" | grep -o '^[0-9]*\.[0-9]*\.[0-9]*').0"
-          echo "ASSEMBLY_VERSION=$ASSEMBLY_VERSION" >> $GITHUB_ENV
-
-      - name: Build projects
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} /p:Version=${{env.PACKAGE_VERSION}} /p:AssemblyVersion=${{env.ASSEMBLY_VERSION}} /p:FileVersion=${{env.ASSEMBLY_VERSION}} --configuration Release"'
-
-      - name: Pack
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet pack {} /p:PackageVersion=${{env.PACKAGE_VERSION}} --no-build --configuration Release --include-symbols --include-source --verbosity Minimal --output ./out"'
-
-      - name: Push NuGet package
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.nupkg' | grep -v '.sources.nupkg' | parallel --jobs 0 \
-          'bash -c "run dotnet nuget push {} --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json"''
+        uses: actions/setup-dotnet@v3
+      - name: Build, Test and Push
+        uses: swisslife-oss/actions/release-packages@pr
+        with:
+          tag: ${{ github.ref_name }}
+          nuget_api_key: ${{ secrets.NUGET_API_KEY }}
+          enable_push: 'no'
 
   sonar:
     runs-on: ubuntu-latest
-    env:
-      SONAR_PROJECT_KEY: SwissLife-OSS_Squadron
-      SONAR_NAME: squadron
-      SONAR_HOST_URL: https://sonarcloud.io
-      SONAR_ORG: swisslife
-      VERSION: ${{github.ref_name}}
-      GITHUB_REPOSITORY: ${{github.repository}}
-      # Add specific exclusions here if needed. It should start with a comma. e.g. ",**/MySpecialFile.cs"
-      EXTENDED_SONAR_EXCLUSIONS: ""
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Prepare
-        run: |
-          sudo apt-get install -y parallel
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          distribution: "adopt"
-          java-version: "17"
-
-      - name: Setup .NET SDK 6
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.x.x"
-
-      - name: Use .NET SDK from global.json
-        uses: actions/setup-dotnet@v1
-
+          dotnet-version: |
+            6
+            7
       - name: Restore tools
         run: dotnet tool restore
-
-      - name: SonarScanner Begin
-        run: |
-          dotnet sonarscanner begin /k:"${{env.SONAR_PROJECT_KEY}}" /n:"${{env.SONAR_NAME}}" \
-          /d:sonar.login="${{secrets.SONAR_TOKEN}}" /d:sonar.host.url="${{env.SONAR_HOST_URL}}" /o:"${{env.SONAR_ORG}}" \
-          /d:sonar.cs.opencover.reportsPaths="**/*.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" \
-          /v:"${{env.VERSION}}" /d:sonar.exclusions="${{vars.SONAR_EXCLUSIONS}}${{env.EXTENDED_SONAR_EXCLUSIONS}}"
-
-      - name: Build projects
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.sln' | parallel --jobs 0 'bash -c "run dotnet build {} --configuration Debug"'
-
-      - name: Run tests
-        run: |
-          source ./.github/workflows/utils.sh && export -f run
-          find . -name '*.Tests.csproj' | parallel --jobs 0 'bash -c "run dotnet test {} \
-            --configuration Debug \
-            --no-restore \
-            --no-build \
-            --blame \
-            -p:\"CollectCoverage=true\" \
-            -p:\"Exclude=[xunit.*]*\" \
-            -p:\"CoverletOutputFormat=opencover\""'
-
-      - name: SonarScanner End
-        run: dotnet sonarscanner end /d:sonar.login="${{secrets.SONAR_TOKEN}}"
+      - name: Build, Test and Sonar
+        uses: swisslife-oss/actions/release-sonar@pr
+        with:
+          tag: ${{ github.ref_name }}
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
+          sonar_project_key: 'SwissLife-OSS_Squadron'
+          sonar_project_name: "squadron"
+          sonar_exclusions: ${{ vars.SONAR_EXCLUSIONS }}

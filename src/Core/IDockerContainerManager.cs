@@ -31,7 +31,7 @@ namespace Squadron
         Task<string> ConsumeLogsAsync(TimeSpan timeout);
 
         /// <summary>
-        /// Copies files to the contaier
+        /// Copies files to the container
         /// </summary>
         /// <param name="context">The context.</param>
         Task CopyToContainerAsync(CopyContext context, bool overrideTargetName = false);

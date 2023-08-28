@@ -26,10 +26,6 @@ namespace Squadron
         private readonly DockerConfiguration _dockerConfiguration;
         private readonly AuthConfig _authConfig = null;
 
-        private readonly AsyncPolicy _retryPolicy = Policy
-            .Handle<TimeoutException>()
-            .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2));
-
         private readonly VariableResolver _variableResolver;
 
         /// <summary>
@@ -165,17 +161,16 @@ namespace Squadron
 
             try
             {
-                await _retryPolicy
-                    .ExecuteAsync(async () =>
-                    {
-                        await Client.Containers
-                            .RemoveContainerAsync(Instance.Id, removeOptions);
+                await Retry(async () =>
+                {
+                    await Client.Containers
+                        .RemoveContainerAsync(Instance.Id, removeOptions);
 
-                        foreach (string network in _settings.Networks)
-                        {
-                            await RemoveNetworkIfUnused(network);
-                        }
-                    });
+                    foreach (string network in _settings.Networks)
+                    {
+                        await RemoveNetworkIfUnused(network);
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -187,8 +182,10 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task CopyToContainerAsync(CopyContext context, bool overrideTargetName = false)
         {
-            using (var archiver = new TarArchiver(context, overrideTargetName))
+            await Retry(async () =>
             {
+                using var archiver = new TarArchiver(context, overrideTargetName);
+
                 await Client.Containers.ExtractArchiveToContainerAsync(
                     Instance.Id,
                     new ContainerPathStatParameters
@@ -196,7 +193,7 @@ namespace Squadron
                         AllowOverwriteDirWithFile = true,
                         Path = context.DestinationFolder.Replace("\\", "/")
                     }, archiver.Stream);
-            }
+            });
         }
 
         /// <inheritdoc/>
@@ -261,23 +258,23 @@ namespace Squadron
 
             try
             {
-                await _retryPolicy
-                    .ExecuteAsync(async () =>
+                await Retry(async () =>
+                {
+                    _settings.Logger.Verbose("Try start container");
+                    bool started = await Client.Containers.StartContainerAsync(
+                        Instance.Id,
+                        containerStartParameters);
+
+                    if (!started)
                     {
-                        _settings.Logger.Verbose("Try start container");
-                        bool started = await Client.Containers.StartContainerAsync(
-                            Instance.Id,
-                            containerStartParameters);
-
-                        if (!started)
-                        {
-                            _settings.Logger.Warning("Container didn't start");
-                            throw new ContainerException(
-                                "Docker container creation/startup failed.");
-                        }
-
+                        _settings.Logger.Warning("Container didn't start");
+                    }
+                    else
+                    {
                         _settings.Logger.Information("Container started");
-                    });
+                    }
+
+                });
             }
             catch (Exception ex)
             {
@@ -344,24 +341,24 @@ namespace Squadron
 
             try
             {
-                await _retryPolicy
-                    .ExecuteAsync(async () =>
-                    {
-                        _settings.Logger.Verbose("Try create container");
-                        _settings.Logger.StartParameters(startParams);
-                        CreateContainerResponse response = await Client
-                            .Containers
-                            .CreateContainerAsync(startParams);
+                await Retry(async () =>
+                {
+                    _settings.Logger.Verbose("Try create container");
+                    _settings.Logger.StartParameters(startParams);
+                    CreateContainerResponse response = await Client
+                        .Containers
+                        .CreateContainerAsync(startParams);
 
-                        if (string.IsNullOrEmpty(response.ID))
-                        {
-                            _settings.Logger.Warning("Container was not created");
-                            throw new ContainerException(
-                                "Could not create the container");
-                        }
+                    if (string.IsNullOrEmpty(response.ID))
+                    {
+                        _settings.Logger.Warning("Container was not created");
+                    }
+                    else
+                    {
                         Instance.Id = response.ID;
                         Instance.Name = startParams.Name;
-                    });
+                    }
+                });
 
                 foreach (CopyContext copyContext in _settings.FilesToCopy)
                 {
@@ -416,24 +413,23 @@ namespace Squadron
         {
             try
             {
-                return await _retryPolicy
-                     .ExecuteAsync(async () =>
-                         {
-                             IEnumerable<ImagesListResponse> listResponse =
-                             await Client.Images.ListImagesAsync(
-                                 new ImagesListParameters {
-                                     Filters = new Dictionary<string, IDictionary<string, bool>>
-                                     {
-                                         ["reference"] = new Dictionary<string, bool>
-                                         {
-                                             [_settings.ImageFullname] = true
-                                         }
-                                     }
-                                 });
+                return await Retry(async () =>
+                {
+                    IEnumerable<ImagesListResponse> listResponse =
+                        await Client.Images.ListImagesAsync(
+                            new ImagesListParameters
+                            {
+                                Filters = new Dictionary<string, IDictionary<string, bool>>
+                                {
+                                    ["reference"] = new Dictionary<string, bool>
+                                    {
+                                        [_settings.ImageFullname] = true
+                                    }
+                                }
+                            });
 
-                             return listResponse.Any();
-                         }
-                     );
+                    return listResponse.Any();
+                });
             }
             catch (Exception ex)
             {
@@ -456,14 +452,13 @@ namespace Squadron
 
             try
             {
-                await _retryPolicy
-                    .ExecuteAsync(async () =>
-                   {
-                       await Client.Images.CreateImageAsync(
-                       new ImagesCreateParameters { FromImage = _settings.ImageFullname },
-                       _authConfig,
-                       new Progress<JSONMessage>(Handler));
-                   });
+                await Retry(async () =>
+                {
+                    await Client.Images.CreateImageAsync(
+                        new ImagesCreateParameters { FromImage = _settings.ImageFullname },
+                        _authConfig,
+                        new Progress<JSONMessage>(Handler));
+                });
             }
             catch (Exception ex)
             {
@@ -632,15 +627,15 @@ namespace Squadron
             {
                 string networkId = await GetNetworkId(networkName);
 
-                await _retryPolicy.ExecuteAsync(async () =>
-                    {
-                        await Client.Networks.ConnectNetworkAsync(
-                            networkId,
-                            new NetworkConnectParameters()
-                            {
-                                Container = Instance.Id
-                            });
-                    });
+                await Retry(async () =>
+                {
+                    await Client.Networks.ConnectNetworkAsync(
+                        networkId,
+                        new NetworkConnectParameters
+                        {
+                            Container = Instance.Id
+                        });
+                });
             }
         }
 
@@ -680,8 +675,7 @@ namespace Squadron
         private async Task RemoveNetworkIfUnused(string networkName)
         {
             string uniqueNetworkName = Networks[networkName];
-            await _retryPolicy
-                .ExecuteAsync(async () =>
+            await Retry(async () =>
                 {
                     NetworkResponse? inspectResponse = (await Client.Networks.ListNetworksAsync())
                         .FirstOrDefault(n => n.Name == uniqueNetworkName);
@@ -704,6 +698,30 @@ namespace Squadron
                         }
                     }
                 });
+        }
+
+        private Task<TResult> Retry<TResult>(Func<Task<TResult>> execute)
+        {
+            return Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2), RetryAction)
+                .ExecuteAsync(async () => await execute());
+        }
+
+        private Task Retry(Func<Task> execute)
+        {
+            return Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2), RetryAction)
+                .ExecuteAsync(async () => await execute());
+        }
+
+        private async Task RetryAction(Exception exception, TimeSpan t, int retryCount, Context c)
+        {
+            _settings.Logger.Warning($"Docker command failed {retryCount}. {exception.Message}");
+            SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
+            _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
+            _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
         }
 
         public void Dispose()

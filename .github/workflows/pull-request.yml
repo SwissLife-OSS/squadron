@@ -2,7 +2,7 @@ name: Pull Request
 
 on:
   pull_request:
-    branches: ["master"]
+    branches: ['master']
 
 jobs:
   tests:
@@ -17,6 +17,13 @@ jobs:
           dotnet-version: |
             6
             7
+      - name: Docker Information
+        run: |
+          echo -e "\n\033[0;34mDocker System Info \033[0m"
+          docker system info
+          echo -e "\n\033[0;34mDocker Containers \033[0m"
+          docker ps -a
+        shell: bash
 
       - name: Build, Test and Sonar
         uses: swisslife-oss/actions/pull-request@pr

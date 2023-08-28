@@ -17,13 +17,12 @@ jobs:
           distribution: "adopt"
           java-version: "17"
 
-      - name: Setup .NET SDK 6
+      - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "6.x.x"
-
-      - name: Use .NET SDK from global.json
-        uses: actions/setup-dotnet@v1
+          dotnet-version: |
+            6
+            7
 
       - name: Build, Test and Sonar
         uses: swisslife-oss/actions/pull-request@pr

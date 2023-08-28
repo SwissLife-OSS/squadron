@@ -19,7 +19,7 @@ namespace Squadron
         {
             builder
                 .Name("mariadb")
-                .Image("mariadb:latest")
+                .Image("mariadb:10")
                 .AddEnvironmentVariable($"MYSQL_ROOT_PASSWORD={Password}")
                 .AddEnvironmentVariable($"MYSQL_USER={User}")
                 .AddEnvironmentVariable($"MYSQL_PASSWORD={Password}")

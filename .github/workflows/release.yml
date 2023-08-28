@@ -19,7 +19,7 @@ jobs:
         with:
           tag: ${{ github.ref_name }}
           nuget_api_key: ${{ secrets.NUGET_API_KEY }}
-          enable_push: 'no'
+          enable_push: 'yes'
 
   sonar:
     runs-on: ubuntu-latest

@@ -15,7 +15,7 @@ jobs:
       - name: Use .NET SDK from global.json
         uses: actions/setup-dotnet@v3
       - name: Build, Test and Push
-        uses: swisslife-oss/actions/release-packages@pr
+        uses: swisslife-oss/actions/release-packages@main
         with:
           tag: ${{ github.ref_name }}
           nuget_api_key: ${{ secrets.NUGET_API_KEY }}
@@ -35,7 +35,7 @@ jobs:
       - name: Restore tools
         run: dotnet tool restore
       - name: Build, Test and Sonar
-        uses: swisslife-oss/actions/release-sonar@pr
+        uses: swisslife-oss/actions/release-sonar@main
         with:
           tag: ${{ github.ref_name }}
           sonar_token: ${{ secrets.SONAR_TOKEN }}

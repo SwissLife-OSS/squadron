@@ -24,7 +24,7 @@ jobs:
           docker ps -a
         shell: bash
       - name: Build, Test and Sonar
-        uses: swisslife-oss/actions/pull-request@pr
+        uses: swisslife-oss/actions/pull-request@main
         with:
           sonar_token: ${{ secrets.SONAR_TOKEN }}
           sonar_project_key: 'SwissLife-OSS_Squadron'

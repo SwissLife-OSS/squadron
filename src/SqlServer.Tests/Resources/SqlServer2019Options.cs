@@ -20,6 +20,7 @@ namespace Squadron.Resources
                 .InternalPort(1433)
                 .Username("sa")
                 .Password(password)
+                .WaitTimeout(60 * 5)
                 .AddEnvironmentVariable("ACCEPT_EULA=Y")
                 .AddEnvironmentVariable($"SA_PASSWORD={password}");
         }

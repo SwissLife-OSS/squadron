@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.ServiceBus;
+using Azure.Core.Pipeline;
+using Azure.Messaging.ServiceBus;
 using Squadron.AzureCloud;
 using Xunit;
 using Xunit.Abstractions;
@@ -39,18 +38,45 @@ namespace Squadron
         /// ConnectionString to access the Azure ServiceBus
         /// </summary>
         public string ConnectionString { get; private set; }
+        
+        /// <summary>
+        /// ServiceBus client
+        /// </summary>
+        public ServiceBusClient ServiceBusClient { get; private set; }
 
         /// <summary>
-        /// Get a TopicClient
+        /// Get a ServiceBusSender fot topic
         /// </summary>
         /// <param name="name">Topic name</param>
-        /// <param name="retryPolicy">Retry policy</param>
         /// <returns></returns>
-        public ITopicClient GetTopicClient(string name,
-                                           RetryPolicy retryPolicy = null)
+        public ServiceBusSender GetTopicSender(string name)
         {
             var topicName = GetTopic(name);
-            return new TopicClient(ConnectionString, topicName, retryPolicy);
+
+            return ServiceBusClient.CreateSender(topicName);
+        }
+        
+        /// <summary>
+        /// Get a ServiceBusSender fot topic subscription
+        /// </summary>
+        /// <param name="name">Topic name</param>
+        /// <param name="subscriptionName">Subscription name</param>
+        /// <param name="receiveMode">Receive mode</param>
+        /// <returns></returns>
+        public ServiceBusReceiver GetTopicSubscriptionReceiver(
+            string name,
+            string subscriptionName,
+            ServiceBusReceiveMode receiveMode = ServiceBusReceiveMode.PeekLock)
+        {
+            var topicName = GetTopic(name);
+
+            return ServiceBusClient.CreateReceiver(
+                topicName, 
+                subscriptionName, 
+                new ServiceBusReceiverOptions
+            {
+                ReceiveMode = receiveMode
+            });
         }
 
 
@@ -59,7 +85,7 @@ namespace Squadron
         /// </summary>
         /// <param name="configure">The builder.</param>
         /// <returns>Client to access the created topic</returns>
-        public async Task<ITopicClient> CreateTopicAsync(Action<ServiceBusTopicBuilder> configure)
+        public async Task<ServiceBusSender> CreateTopicAsync(Action<ServiceBusTopicBuilder> configure)
         {
             var builder = ServiceBusTopicBuilder.New();
             configure(builder);
@@ -67,46 +93,40 @@ namespace Squadron
 
             await CreateTopicAsync(topic);
             _serviceBusModel.Topics.Add(topic);
-            return GetTopicClient(topic.Name);
+            
+            return GetTopicSender(topic.Name);
         }
 
         /// <summary>
-        /// Get a SubscriptionClient
-        /// </summary>
-        /// <param name="topic">Topic name</param>
-        /// <param name="name">Subscription name</param>
-        /// <param name="receiveMode">Receive Mode</param>
-        /// <param name="retryPolicy">Retry Policy</param>
-        /// <returns></returns>
-        public ISubscriptionClient GetSubscriptionClient(
-            string topic,
-            string name,
-            ReceiveMode receiveMode = ReceiveMode.PeekLock,
-            RetryPolicy retryPolicy = null)
-        {
-            var topicName = GetTopic(topic);
-            return new SubscriptionClient(
-                ConnectionString,
-                topicName,
-                name,
-                receiveMode,
-                retryPolicy);
-        }
-
-        /// <summary>
-        /// Get a QueueClient
+        /// Get a ServiceBusSender for queue
         /// </summary>
         /// <param name="name">Queue name</param>
-        /// <param name="receiveMode">Receive Mode</param>
-        /// <param name="retryPolicy">Retry Policy</param>
         /// <returns></returns>
-        public IQueueClient GetQueueClient(string name,
-                                   ReceiveMode receiveMode = ReceiveMode.PeekLock,
-                                   RetryPolicy retryPolicy = null)
+        public ServiceBusSender GetQueueSender(string name)
         {
             var queueName = GetQueue(name);
 
-            return new QueueClient(ConnectionString, queueName, receiveMode, retryPolicy);
+            return ServiceBusClient.CreateSender(queueName);
+        }
+        
+        /// <summary>
+        /// Get a ServiceBusSender for queue
+        /// </summary>
+        /// <param name="name">Queue name</param>
+        /// <param name="receiveMode">Receive mode</param>
+        /// <returns></returns>
+        public ServiceBusReceiver GetQueueReceiver(
+            string name,
+            ServiceBusReceiveMode receiveMode = ServiceBusReceiveMode.PeekLock)
+        {
+            var queueName = GetQueue(name);
+
+            return ServiceBusClient.CreateReceiver(
+                queueName, 
+                new ServiceBusReceiverOptions
+                {
+                    ReceiveMode = receiveMode
+                });
         }
 
         private string GetTopic(string name)
@@ -146,6 +166,7 @@ namespace Squadron
             await PrepareQueuesAsync();
 
             ConnectionString = await _serviceBusManager.GetConnectionString();
+            ServiceBusClient = new ServiceBusClient(ConnectionString);
         }
 
         private void BuildOptions()
@@ -226,6 +247,8 @@ namespace Squadron
         {
             try
             {
+                await ServiceBusClient.DisposeAsync();
+                
                 if (_serviceBusModel.ProvisioningMode == ServiceBusProvisioningMode.CreateAndDelete)
                 {
                     await _serviceBusManager.DeleteNamespaceAsync();

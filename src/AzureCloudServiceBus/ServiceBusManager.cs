@@ -1,9 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.ServiceBus;
+using Azure;
+using Azure.Core;
+using Azure.Identity;
+using Azure.ResourceManager;
+using Azure.ResourceManager.Resources;
+using Azure.ResourceManager.ServiceBus;
 using Microsoft.Azure.Management.ServiceBus.Models;
 using Microsoft.Rest;
 using Squadron.AzureCloud;
@@ -12,7 +15,7 @@ namespace Squadron
 {
     internal sealed class ServiceBusManager
     {
-        private IServiceBusManagementClient _client = null;
+        private ServiceBusNamespaceResource _client = null;
         private readonly AzureCredentials _azureCredentials;
         private readonly AzureResourceIdentifier _identifier;
 
@@ -29,12 +32,15 @@ namespace Squadron
         {
             if ( _client is null)
             {
-                var tm = new AzureAdTokenManager();
-                TokenCredentials token = await tm.RequestTokenAsync(_azureCredentials);
-                _client = new ServiceBusManagementClient(token)
-                {
-                    SubscriptionId = _identifier.SubscriptionId,
-                };
+                ArmClient armClient = new ArmClient(new AzureCliCredential());
+                SubscriptionResource subscription = 
+                    armClient.GetSubscriptionResource(new ResourceIdentifier(_identifier.SubscriptionId));
+                var resourceGroup = (await subscription.GetResourceGroupAsync(_identifier.ResourceGroupName)).Value;
+                ServiceBusNamespaceCollection namespaceCollection =
+                    resourceGroup.GetServiceBusNamespaces();
+                
+                namespaceCollection.CreateOrUpdateAsync(WaitUntil.Completed, _identifier.Name)
+                client.Value.exi
             }
         }
 

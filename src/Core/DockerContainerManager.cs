@@ -302,6 +302,7 @@ namespace Squadron
                 {
                     InternalPort = _settings.InternalPort,
                     ExternalPort = _settings.ExternalPort,
+                    AllowedHostIp = _settings.AllowedHostIp
                 }
             };
             allPorts.AddRange(_settings.AdditionalPortMappings);
@@ -316,7 +317,7 @@ namespace Squadron
                 portMapping.Value.Add(
                     new PortBinding()
                     {
-                        HostIP = "",
+                        HostIP = containerPortMapping.AllowedHostIp ?? "",
                         HostPort = containerPortMapping.ExternalPort != 0 ?
                             containerPortMapping.ExternalPort.ToString()
                             : ""
@@ -489,11 +490,12 @@ namespace Squadron
                         {
                             Instance.HostPort =
                                 ResolvePort(inspectResponse, $"{_settings.InternalPort}/tcp");
-                            foreach (ContainerPortMapping portMapping
-                                in _settings.AdditionalPortMappings)
+
+                            foreach (ContainerPortMapping portMapping in _settings.AdditionalPortMappings)
                             {
                                 Instance.AdditionalPorts.Add(new ContainerPortMapping()
                                 {
+                                    AllowedHostIp = portMapping.AllowedHostIp,
                                     InternalPort = portMapping.InternalPort,
                                     ExternalPort = ResolvePort(
                                         inspectResponse,

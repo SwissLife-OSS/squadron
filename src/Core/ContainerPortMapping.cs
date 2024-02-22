@@ -27,5 +27,12 @@ namespace Squadron
         /// External port that value will be resolved from variable
         /// </summary>
         public string ExternalPortVariableName { get; internal set; }
+
+        /// <summary>
+        /// Allowed host IP. Restriction
+        /// Example: HostIp = 127.0.0.1 
+        /// Default all IPs are allowed
+        /// </summary>
+        public string? HostIp { get; internal set; }
     }
 }

@@ -19,6 +19,13 @@ namespace Squadron
         public string Image { get; internal set; }
 
         /// <summary>
+        /// Allowed host IP. Restriction
+        /// Example: HostIp = 127.0.0.1 
+        /// Default all IPs are allowed
+        /// </summary>
+        public string? HostIp { get; internal set; }
+
+        /// <summary>
         /// Returns the main internal port of the container
         /// </summary>
         public int InternalPort { get; internal set; }

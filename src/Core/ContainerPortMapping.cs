@@ -33,6 +33,6 @@ namespace Squadron
         /// Example: HostIp = 127.0.0.1 
         /// Default all IPs are allowed
         /// </summary>
-        public string? HostIp { get; internal set; } = null;
+        public string? HostIp { get; internal set; }
     }
 }

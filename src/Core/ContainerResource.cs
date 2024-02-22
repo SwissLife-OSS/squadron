@@ -47,6 +47,13 @@ namespace Squadron
         /// </summary>
         public async virtual Task InitializeAsync()
         {
+            SetupContainerResource();
+
+            await Manager.CreateAndStartContainerAsync();
+        }
+
+        protected virtual void SetupContainerResource()
+        {
             ResourceOptions = new TOptions();
             var builder = ContainerResourceBuilder.New();
             ResourceOptions.Configure(builder);
@@ -61,7 +68,6 @@ namespace Squadron
 
             Manager = new DockerContainerManager(Settings, dockerConfig);
             Initializer = new ContainerInitializer(Manager, Settings);
-            await Manager.CreateAndStartContainerAsync();
         }
 
         private void AddNetworksToBuilder(ContainerResourceBuilder builder)
@@ -128,7 +134,6 @@ namespace Squadron
                 { "PORT", Manager.Instance.HostPort.ToString() },
             };
         }
-
 
         /// <summary>
         /// Cleans up the resource

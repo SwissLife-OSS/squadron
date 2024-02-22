@@ -20,10 +20,10 @@ namespace Squadron
 
         /// <summary>
         /// Allowed host IP. Restriction
-        /// Example: AllowedHostIp = 127.0.0.1 
+        /// Example: HostIp = 127.0.0.1 
         /// Default all IPs are allowed
         /// </summary>
-        public string? AllowedHostIp { get; internal set; } = null;
+        public string? HostIp { get; internal set; };
 
         /// <summary>
         /// Returns the main internal port of the container

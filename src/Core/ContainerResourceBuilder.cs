@@ -140,10 +140,10 @@ namespace Squadron
         /// Per default all IPs are allowed (0.0.0.0).
         /// Example usage: if only localhost shall be allowed, then use 127.0.0.1
         /// </summary>
-        /// <param name="allowedHostIp">The allowed host IP for which the external port is exposed.</param>
-        public ContainerResourceBuilder AllowedHostIp(string? allowedHostIp)
+        /// <param name="hostIp">The allowed host IP for which the external port is exposed.</param>
+        public ContainerResourceBuilder HostIp(string? hostIp)
         {
-            _options.AllowedHostIp = allowedHostIp;
+            _options.HostIp = hostIp;
             return this;
         }
 
@@ -194,21 +194,21 @@ namespace Squadron
         /// Only provide an external port if a static external port is required.
         /// When the given external port is already in use by a container, the creation will fail.
         /// </param>
-        /// <param name="allowedHostIp">
+        /// <param name="hostIp">
         /// Allowed host IP. Default all IPs are allowed
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
             int internalPort,
             int externalPort = 0,
-            string? allowedHostIp = null)
+            string? hostIp = null)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
                     ExternalPort = externalPort,
                     InternalPort = internalPort,
-                    AllowedHostIp = allowedHostIp
+                    HostIp = hostIp
                 });
             return this;
         }
@@ -227,21 +227,21 @@ namespace Squadron
         /// Only provide an external port if a static external port is required.
         /// When the given external port is already in use by a container, the creation will fail.
         /// </param>
-        /// <param name="allowedHostIp">
+        /// <param name="hostIp">
         /// Allowed host IP. Default all IPs are allowed
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
             int internalPort,
             string externalPortVariableName,
-            string? allowedHostIp = null)
+            string? hostIp = null)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
                     InternalPort = internalPort,
                     ExternalPortVariableName = externalPortVariableName,
-                    AllowedHostIp = allowedHostIp
+                    HostIp = hostIp
                 });
             return this;
         }
@@ -263,21 +263,21 @@ namespace Squadron
         /// Only provide an external port if a static external port is required.
         /// When the given external port is already in use by a container, the creation will fail.
         /// </param>
-        /// <param name="allowedHostIp">
+        /// <param name="hostIp">
         /// Allowed host IP. Default all IPs are allowed
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
             string internalPortVariableName,
             int externalPort = 0,
-            string? allowedHostIp = null)
+            string? hostIp = null)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
                     InternalPortVariableName = internalPortVariableName,
                     ExternalPort = externalPort,
-                    AllowedHostIp = allowedHostIp
+                    HostIp = hostIp
                 });
             return this;
         }
@@ -297,21 +297,21 @@ namespace Squadron
         /// Only provide an external port if a static external port is required.
         /// When the given external port is already in use by a container, the creation will fail.
         /// </param>
-        /// <param name="allowedHostIp">
+        /// <param name="hostIp">
         /// Allowed host IP. Default all IPs are allowed
         /// </param>
         /// <returns></returns>
         public ContainerResourceBuilder AddPortMapping(
             string internalPortVariableName,
             string externalPortVariableName,
-            string? allowedHostIp = null)
+            string? hostIp = null)
         {
             _options.AdditionalPortMappings.Add(
                 new ContainerPortMapping()
                 {
                     InternalPortVariableName = internalPortVariableName,
                     ExternalPortVariableName = externalPortVariableName,
-                    AllowedHostIp = allowedHostIp
+                    HostIp = hostIp
                 });
             return this;
         }

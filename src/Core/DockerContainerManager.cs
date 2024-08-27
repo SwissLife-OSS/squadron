@@ -714,7 +714,7 @@ namespace Squadron
         {
             return Policy
                 .Handle<Exception>()
-                .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2), RetryAction)
+                .WaitAndRetryAsync(10, _ => TimeSpan.FromSeconds(5), RetryAction)
                 .ExecuteAsync(async () => await execute());
         }
 

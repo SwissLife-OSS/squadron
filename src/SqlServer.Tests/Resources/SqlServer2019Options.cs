@@ -13,7 +13,6 @@ namespace Squadron.Resources
         /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
-            // var password = "Qtp!" + Guid.NewGuid().ToString("N").Substring(0,6);
             var password = "Qtp!" + Guid.NewGuid().ToString("N").Substring(0,6);
             builder
                 .Name("mssql")

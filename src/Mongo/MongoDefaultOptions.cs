@@ -17,7 +17,7 @@ namespace Squadron
         {
             builder
                 .Name("mongodb")
-                .Image("mongo:latest")
+                .Image("public.ecr.aws/docker/library/mongo:latest")
                 .InternalPort(27017);
         }
     }

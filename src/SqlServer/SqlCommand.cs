@@ -11,8 +11,8 @@ namespace Squadron
             string command,
             ContainerResourceSettings settings)
         {
-            _command.Append("/opt/mssql-tools/bin/sqlcmd ");
-            _command.Append($"-S localhost -U {settings.Username} -P {settings.Password} ");
+            _command.Append("/opt/mssql-tools18/bin/sqlcmd ");
+            _command.Append($"-S localhost -U {settings.Username} -P {settings.Password} -C ");
             _command.Append(command);
         }
 

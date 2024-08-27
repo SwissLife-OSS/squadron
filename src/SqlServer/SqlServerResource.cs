@@ -101,10 +101,10 @@ namespace Squadron
 
                 await Manager.CopyToContainerAsync(copyContext);
 
-                await Manager.InvokeCommandAsync(
+                var invoke1= await Manager.InvokeCommandAsync(
                     ChmodCommand.ReadWrite($"/tmp/{scriptFile.Name}"));
 
-                await Manager.InvokeCommandAsync(
+                var invoke2= await Manager.InvokeCommandAsync(
                     SqlCommand.ExecuteFile(copyContext.Destination, Settings));
 
                 _databases.Add(databaseName);
@@ -173,7 +173,7 @@ namespace Squadron
                 .Append($"User ID={Settings.Username};")
                 .Append($"Password={Settings.Password};")
                 .Append("MultipleActiveResultSets=True;")
-                .Append("TrustServerCertificate=True;")
+                .Append("Encrypt=no;")
                 .ToString();
 
         internal async Task DeployAndExecute(string sqlScript)

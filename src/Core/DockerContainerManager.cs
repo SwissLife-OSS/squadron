@@ -81,9 +81,7 @@ namespace Squadron
             {
                 Username = string.IsNullOrEmpty(registryConfig.Username)?null:registryConfig.Username,
                 Password = string.IsNullOrEmpty(registryConfig.Password)?null:registryConfig.Password,
-                ServerAddress = registryConfig.Address,
-                Email = string.IsNullOrEmpty(registryConfig.Email)?null:registryConfig.Email,
-                Auth = string.IsNullOrEmpty(registryConfig.Auth)?null:registryConfig.Auth
+                ServerAddress = registryConfig.Address
             };
         }
 

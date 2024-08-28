@@ -58,13 +58,22 @@ namespace Squadron
                     {
                         continue;
                     }
+                    
+                    var decryptedToken = Convert.FromBase64String(auth.Value.Auth);
+                    var token = System.Text.Encoding.UTF8.GetString(decryptedToken);
+                    var parts = token.Split(':');
+                    
+                    if (parts.Length != 2)
+                    {
+                        continue;
+                    }
 
                     containerConfig.Registries.Add(new DockerRegistryConfiguration
                     {
                         Name = address.Host,
                         Address = address.ToString(),
-                        Auth = auth.Value.Auth,
-                        Email = auth.Value.Email
+                        Username = parts[0],
+                        Password = parts[1]
                     });
                 }
             }

@@ -46,10 +46,15 @@ namespace Squadron
             {
                 foreach (var auth in dockerAuthRootObject.Auths)
                 {
-                    var address = new Uri(auth.Key);
+                    if(!Uri.TryCreate(auth.Key, UriKind.RelativeOrAbsolute, out Uri address))
+                    {
+                        continue;
+                    }
 
                     if (containerConfig.Registries.Any(p =>
-                            p.Address.Equals(address.ToString(), StringComparison.InvariantCultureIgnoreCase)))
+                            p.Address.Equals(address.ToString(), StringComparison.InvariantCultureIgnoreCase)) ||
+                        string.IsNullOrEmpty(auth.Value.Email) ||
+                        string.IsNullOrEmpty(auth.Value.Auth))
                     {
                         continue;
                     }

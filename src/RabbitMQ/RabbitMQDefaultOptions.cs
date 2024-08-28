@@ -17,7 +17,8 @@ namespace Squadron
                 .WaitTimeout(60)
                 .InternalPort(5672)
                 .Username("guest")
-                .Password("guest");
+                .Password("guest")
+                .PreferLocalImage();
         }
     }
 }

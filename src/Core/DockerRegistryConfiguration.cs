@@ -36,6 +36,22 @@
         /// The password.
         /// </value>
         public string Password { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the registry token
+        /// </summary>
+        /// <value>
+        /// The password.
+        /// </value>
+        public string Auth { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the email.
+        /// </summary>
+        /// <value>
+        /// The password.
+        /// </value>
+        public string Email { get; set; }
 
     }
 }

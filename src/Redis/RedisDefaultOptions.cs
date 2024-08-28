@@ -19,8 +19,9 @@ namespace Squadron
         {
             builder
                 .Name("redis")
-                .Image("public.ecr.aws/docker/library/redis:latest")
-                .InternalPort(6379);
+                .Image("redis:latest")
+                .InternalPort(6379)
+                .PreferLocalImage();
         }
     }
 }

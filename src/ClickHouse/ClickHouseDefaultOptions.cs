@@ -14,7 +14,8 @@ namespace Squadron
             builder
                 .Name("clickhouse-server")
                 .Image("clickhouse/clickhouse-server")
-                .InternalPort(8123);
+                .InternalPort(8123)
+                .PreferLocalImage();
         }
     }
 }

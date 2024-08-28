@@ -22,7 +22,8 @@ namespace Squadron
                 .Image("neo4j:latest")
                 .InternalPort(7687)
                 .AddEnvironmentVariable("NEO4J_AUTH=none")
-                .WaitTimeout(180);
+                .WaitTimeout(180)
+                .PreferLocalImage();
         }
     }
 }

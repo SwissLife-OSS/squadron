@@ -21,7 +21,8 @@ namespace Squadron
             builder
                 .Name(name)
                 .Image("mcr.microsoft.com/azure-storage/azurite")
-                .InternalPort(10000);
+                .InternalPort(10000)
+                .PreferLocalImage();
         }
     }
 }

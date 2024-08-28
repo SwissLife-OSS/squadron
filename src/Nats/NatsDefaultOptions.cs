@@ -26,7 +26,8 @@ namespace Squadron
                 .Image("nats:latest")
                 .AddVariable("nats-monitoring", VariableType.DynamicPort)
                 .InternalPort(4222) // automatically dynamic because no use of ExternalPort
-                .AddPortMapping(8222, "nats-monitoring");
+                .AddPortMapping(8222, "nats-monitoring")
+                .PreferLocalImage();
         }
     }
 }

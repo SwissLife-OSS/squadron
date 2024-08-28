@@ -24,7 +24,8 @@ namespace Squadron
                 .AddCmd("server", "/data")
                 .Username(AccessKey)
                 .Password(SecretKey)
-                .InternalPort(9000);
+                .InternalPort(9000)
+                .PreferLocalImage();
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Squadron
         /// <value>
         /// The registries.
         /// </value>
-        public IEnumerable<DockerRegistryConfiguration> Registries { get; set; }
+        public IList<DockerRegistryConfiguration> Registries { get; set; } =
+            new List<DockerRegistryConfiguration>();
 
         public ContainerAddressMode DefaultAddressMode { get; internal set; } = ContainerAddressMode.Port;
     }

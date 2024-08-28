@@ -78,7 +78,6 @@ namespace Squadron
                 return null;
             }
 
-            // Construct the full path to the config.json file
             var configFilePath = Path.Combine(dockerConfigPath, "config.json");
 
             if (!File.Exists(configFilePath))

@@ -13,7 +13,7 @@ namespace Squadron.Resources
         /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
-            var password = "_Qtp" + Guid.NewGuid().ToString("N");
+            var password = "Qtp!" + Guid.NewGuid().ToString("N").Substring(0,6);
             builder
                 .Name("mssql")
                 .Image("mcr.microsoft.com/mssql/server:2019-latest")
@@ -22,7 +22,7 @@ namespace Squadron.Resources
                 .Password(password)
                 .WaitTimeout(60 * 5)
                 .AddEnvironmentVariable("ACCEPT_EULA=Y")
-                .AddEnvironmentVariable($"SA_PASSWORD={password}");
+                .AddEnvironmentVariable($"MSSQL_SA_PASSWORD={password}");
         }
     }
 }

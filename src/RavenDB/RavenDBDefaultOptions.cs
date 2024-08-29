@@ -14,7 +14,8 @@ namespace Squadron
             builder
                 .Name("ravendb")
                 .Image("ravendb/ravendb:ubuntu-latest")
-                .InternalPort(8080);
+                .InternalPort(8080)
+                .PreferLocalImage();
         }
     }
 }

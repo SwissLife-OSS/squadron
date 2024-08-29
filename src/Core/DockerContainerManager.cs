@@ -34,29 +34,30 @@ namespace Squadron
         /// <param name="settings">The settings.</param>
         /// <param name="dockerConfiguration"></param>
         public DockerContainerManager(ContainerResourceSettings settings,
-                                      DockerConfiguration dockerConfiguration)
+            DockerConfiguration dockerConfiguration)
         {
             _settings = settings;
             _dockerConfiguration = dockerConfiguration;
             Client = new DockerClientConfiguration(
-                 LocalDockerUri(),
-                 null,
-                 TimeSpan.FromMinutes(5)
-                 )
-             .CreateClient(Version.Parse("1.25"));
+                    LocalDockerUri(),
+                    null,
+                    TimeSpan.FromMinutes(5)
+                )
+                .CreateClient(Version.Parse("1.25"));
             _authConfig = GetAuthConfig();
             _variableResolver = new VariableResolver(_settings.Variables);
         }
-        
+
         public ContainerInstance Instance { get; } = new ContainerInstance();
-        
+
         public DockerClient Client { get; }
 
         private AuthConfig GetAuthConfig()
         {
             if (_settings.RegistryName != null)
             {
-                DockerRegistryConfiguration registryConfig = _dockerConfiguration.Registries
+                DockerRegistryConfiguration? registryConfig = _dockerConfiguration
+                    .Registries
                     .FirstOrDefault(x => x.Name.Equals(
                         _settings.RegistryName,
                         StringComparison.InvariantCultureIgnoreCase));
@@ -65,17 +66,42 @@ namespace Squadron
                 {
                     throw new InvalidOperationException(
                         $"No container registry with name '{_settings.RegistryName}'" +
-                         "found in configuration");
+                        "found in configuration");
                 }
 
-                return new AuthConfig
-                {
-                    ServerAddress = registryConfig.Address,
-                    Username = registryConfig.Username,
-                    Password = registryConfig.Password
-                };
+                return GetAuthConfig(registryConfig);
             }
-            return new AuthConfig();
+            
+            return TrySetDefaultAuthConfig(_settings.Image);
+        }
+        
+        private AuthConfig GetAuthConfig(DockerRegistryConfiguration registryConfig)
+        {
+            return new AuthConfig
+            {
+                Username = string.IsNullOrEmpty(registryConfig.Username)?null:registryConfig.Username,
+                Password = string.IsNullOrEmpty(registryConfig.Password)?null:registryConfig.Password,
+                ServerAddress = registryConfig.Address
+            };
+        }
+
+        private AuthConfig TrySetDefaultAuthConfig(string imageName)
+        {
+            var registryName = "index.docker.io";
+            
+            try
+            {
+                registryName = new Uri(imageName).Host;
+            }
+            catch{}
+            
+            DockerRegistryConfiguration? registryConfig = _dockerConfiguration
+                .Registries
+                .FirstOrDefault(x => x.Name.Equals(
+                    registryName,
+                    StringComparison.InvariantCultureIgnoreCase));
+
+            return registryConfig != null ? GetAuthConfig(registryConfig) : new AuthConfig();
         }
 
         private static Uri LocalDockerUri()
@@ -91,9 +117,7 @@ namespace Squadron
             return new Uri("npipe://./pipe/docker_engine");
 #else
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            return isWindows ?
-                new Uri("npipe://./pipe/docker_engine") :
-                new Uri("unix:/var/run/docker.sock");
+            return isWindows ? new Uri("npipe://./pipe/docker_engine") : new Uri("unix:/var/run/docker.sock");
 #endif
         }
 
@@ -121,10 +145,7 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task<bool> StopContainerAsync()
         {
-            var stopOptions = new ContainerStopParameters
-            {
-                WaitBeforeKillSeconds = 5
-            };
+            var stopOptions = new ContainerStopParameters { WaitBeforeKillSeconds = 5 };
 
             bool stopped = await Client.Containers
                 .StopContainerAsync(Instance.Id, stopOptions, default);
@@ -153,11 +174,7 @@ namespace Squadron
         /// <inheritdoc/>
         public async Task RemoveContainerAsync()
         {
-            var removeOptions = new ContainerRemoveParameters
-            {
-                Force = true,
-                RemoveVolumes = true
-            };
+            var removeOptions = new ContainerRemoveParameters { Force = true, RemoveVolumes = true };
 
             try
             {
@@ -190,8 +207,7 @@ namespace Squadron
                     Instance.Id,
                     new ContainerPathStatParameters
                     {
-                        AllowOverwriteDirWithFile = true,
-                        Path = context.DestinationFolder.Replace("\\", "/")
+                        AllowOverwriteDirWithFile = true, Path = context.DestinationFolder.Replace("\\", "/")
                     }, archiver.Stream);
             });
         }
@@ -200,17 +216,16 @@ namespace Squadron
         public async Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters)
         {
             ContainerExecCreateResponse response = await Client.Exec
-                .ExecCreateContainerAsync( Instance.Id, parameters);
+                .ExecCreateContainerAsync(Instance.Id, parameters);
 
             if (string.IsNullOrEmpty(response.ID))
             {
                 return null;
-
             }
 
-            using MultiplexedStream stream = 
-                    await Client.Exec.StartAndAttachContainerExecAsync(response.ID, false);
-                
+            using MultiplexedStream stream =
+                await Client.Exec.StartAndAttachContainerExecAsync(response.ID, false);
+
             (var stdout, var stderr) = await stream
                 .ReadOutputToEndAsync(CancellationToken.None);
 
@@ -233,9 +248,7 @@ namespace Squadron
 
             var containerStatsParameters = new ContainerLogsParameters
             {
-                Follow = true,
-                ShowStderr = true,
-                ShowStdout = true
+                Follow = true, ShowStderr = true, ShowStdout = true
             };
 
             Instance.LogStream = await Client
@@ -273,7 +286,6 @@ namespace Squadron
                     {
                         _settings.Logger.Information("Container started");
                     }
-
                 });
             }
             catch (Exception ex)
@@ -318,8 +330,8 @@ namespace Squadron
                     new PortBinding()
                     {
                         HostIP = containerPortMapping.HostIp ?? "",
-                        HostPort = containerPortMapping.ExternalPort != 0 ?
-                            containerPortMapping.ExternalPort.ToString()
+                        HostPort = containerPortMapping.ExternalPort != 0
+                            ? containerPortMapping.ExternalPort.ToString()
                             : ""
                     });
 
@@ -435,7 +447,7 @@ namespace Squadron
             catch (Exception ex)
             {
                 throw new ContainerException(
-                    $"Error in ImageExists: {_settings.ImageFullname }", ex);
+                    $"Error in ImageExists: {_settings.ImageFullname}", ex);
             }
         }
 
@@ -464,7 +476,7 @@ namespace Squadron
             catch (Exception ex)
             {
                 throw new ContainerException(
-                    $"Error in PullImage: {_settings.ImageFullname }", ex);
+                    $"Error in PullImage: {_settings.ImageFullname}", ex);
             }
         }
 
@@ -508,6 +520,7 @@ namespace Squadron
                             Instance.Address = inspectResponse.NetworkSettings.IPAddress;
                             Instance.HostPort = _settings.InternalPort;
                         }
+
                         Instance.IsRunning = inspectResponse.State.Running;
 
                         bindingsResolved = true;
@@ -554,6 +567,7 @@ namespace Squadron
                 //Overide by user setting
                 addressMode = _settings.AddressMode;
             }
+
             if (addressMode == ContainerAddressMode.Auto)
             {
                 //Default to port when not defined
@@ -633,10 +647,7 @@ namespace Squadron
                 {
                     await Client.Networks.ConnectNetworkAsync(
                         networkId,
-                        new NetworkConnectParameters
-                        {
-                            Container = Instance.Id
-                        });
+                        new NetworkConnectParameters { Container = Instance.Id });
                 });
             }
         }
@@ -665,10 +676,7 @@ namespace Squadron
             string uniqueNetworkName = UniqueNameGenerator.CreateNetworkName(networkName);
 
             NetworksCreateResponse response = await Client.Networks.CreateNetworkAsync(
-                new NetworksCreateParameters
-                {
-                    Name = uniqueNetworkName
-                });
+                new NetworksCreateParameters { Name = uniqueNetworkName });
 
             Networks.Add(networkName, uniqueNetworkName);
             return response.ID;
@@ -678,28 +686,28 @@ namespace Squadron
         {
             string uniqueNetworkName = Networks[networkName];
             await Retry(async () =>
-                {
-                    NetworkResponse? inspectResponse = (await Client.Networks.ListNetworksAsync())
-                        .FirstOrDefault(n => n.Name == uniqueNetworkName);
+            {
+                NetworkResponse? inspectResponse = (await Client.Networks.ListNetworksAsync())
+                    .FirstOrDefault(n => n.Name == uniqueNetworkName);
 
-                    if (inspectResponse != null && !inspectResponse.Containers.Any())
+                if (inspectResponse != null && !inspectResponse.Containers.Any())
+                {
+                    try
                     {
-                        try
-                        {
-                            await Client.Networks.DeleteNetworkAsync(inspectResponse.ID);
-                        }
-                        catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
-                        {
-                            _settings.Logger.Warning(
-                                $"Cloud not remove network {inspectResponse.ID}. {ex.ResponseBody}");
-                        }
-                        catch (DockerNetworkNotFoundException)
-                        {
-                            _settings.Logger.Information(
-                                $"Network {inspectResponse.ID} has already been removed.");
-                        }
+                        await Client.Networks.DeleteNetworkAsync(inspectResponse.ID);
                     }
-                });
+                    catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+                    {
+                        _settings.Logger.Warning(
+                            $"Cloud not remove network {inspectResponse.ID}. {ex.ResponseBody}");
+                    }
+                    catch (DockerNetworkNotFoundException)
+                    {
+                        _settings.Logger.Information(
+                            $"Network {inspectResponse.ID} has already been removed.");
+                    }
+                }
+            });
         }
 
         private Task<TResult> Retry<TResult>(Func<Task<TResult>> execute)
@@ -714,7 +722,7 @@ namespace Squadron
         {
             return Policy
                 .Handle<Exception>()
-                .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2), RetryAction)
+                .WaitAndRetryAsync(10, _ => TimeSpan.FromSeconds(5), RetryAction)
                 .ExecuteAsync(async () => await execute());
         }
 

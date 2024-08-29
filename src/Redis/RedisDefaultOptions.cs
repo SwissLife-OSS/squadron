@@ -20,7 +20,8 @@ namespace Squadron
             builder
                 .Name("redis")
                 .Image("redis:latest")
-                .InternalPort(6379);
+                .InternalPort(6379)
+                .PreferLocalImage();
         }
     }
 }

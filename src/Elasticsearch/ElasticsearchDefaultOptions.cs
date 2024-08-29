@@ -18,7 +18,8 @@ namespace Squadron
                 .InternalPort(9200)
                 .WaitTimeout(60 * 5)
                 .AddEnvironmentVariable("discovery.type=single-node")
-                .AddEnvironmentVariable($"cluster.name={name}");
+                .AddEnvironmentVariable($"cluster.name={name}")
+                .PreferLocalImage();
         }
     }
 }

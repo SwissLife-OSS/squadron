@@ -101,10 +101,10 @@ namespace Squadron
 
                 await Manager.CopyToContainerAsync(copyContext);
 
-                var invoke1= await Manager.InvokeCommandAsync(
+                await Manager.InvokeCommandAsync(
                     ChmodCommand.ReadWrite($"/tmp/{scriptFile.Name}"));
 
-                var invoke2= await Manager.InvokeCommandAsync(
+                await Manager.InvokeCommandAsync(
                     SqlCommand.ExecuteFile(copyContext.Destination, Settings));
 
                 _databases.Add(databaseName);

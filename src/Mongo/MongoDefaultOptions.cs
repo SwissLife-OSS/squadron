@@ -18,7 +18,8 @@ namespace Squadron
             builder
                 .Name("mongodb")
                 .Image("mongo:latest")
-                .InternalPort(27017);
+                .InternalPort(27017)
+                .PreferLocalImage();
         }
     }
 }

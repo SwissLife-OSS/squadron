@@ -173,7 +173,7 @@ namespace Squadron
                 .Append($"User ID={Settings.Username};")
                 .Append($"Password={Settings.Password};")
                 .Append("MultipleActiveResultSets=True;")
-                .Append("TrustServerCertificate=True;")
+                .Append("Encrypt=no;")
                 .ToString();
 
         internal async Task DeployAndExecute(string sqlScript)

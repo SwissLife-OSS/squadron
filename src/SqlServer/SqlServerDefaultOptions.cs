@@ -22,7 +22,8 @@ namespace Squadron
                 .Username("sa")
                 .Password(password)
                 .AddEnvironmentVariable("ACCEPT_EULA=Y")
-                .AddEnvironmentVariable($"SA_PASSWORD={password}");
+                .AddEnvironmentVariable($"SA_PASSWORD={password}")
+                .PreferLocalImage();
         }
     }
 }

@@ -18,7 +18,8 @@ namespace Squadron
                 .Image("postgres:latest")
                 .Username("postgres")
                 .Password(Guid.NewGuid().ToString("N").Substring(12))
-                .InternalPort(5432);
+                .InternalPort(5432)
+                .PreferLocalImage();
         }
     }
 }

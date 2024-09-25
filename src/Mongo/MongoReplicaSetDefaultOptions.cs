@@ -1,7 +1,7 @@
 namespace Squadron
 {
     /// <summary>
-    /// Default Mongo ResplicaSet resource options
+    /// Default Mongo ReplicaSet resource options
     /// </summary>
     public class MongoReplicaSetDefaultOptions : MongoDefaultOptions
     {

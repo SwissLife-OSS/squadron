@@ -5,13 +5,18 @@ using MongoDB.Driver;
 
 namespace Squadron
 {
+    /// <inheritdoc/>
+    public class MongoReplicaSetResource : MongoReplicaSetResource<MongoReplicaSetDefaultOptions> { }
+
     /// <summary>
-    /// Represents a mongo database resplica set resource that can be used by unit tests.
+    /// Represents a mongo database replica set resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MongoReplicaSetResource : MongoResource<MongoReplicaSetDefaultOptions>
+    public class MongoReplicaSetResource<TOptions> :
+        MongoResource<TOptions>
+        where TOptions : MongoReplicaSetDefaultOptions, new()
     {
-        public async override Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
             var client = new MongoClient(ConnectionString + "/?connect=direct");

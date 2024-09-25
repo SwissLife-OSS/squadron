@@ -15,10 +15,10 @@ namespace Squadron
     /// Represents a mongo database resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MongoResource<TOptions>
-        : ContainerResource<TOptions>,
-          IAsyncLifetime,
-          IComposableResource
+    public class MongoResource<TOptions> :
+        ContainerResource<TOptions>,
+        IAsyncLifetime,
+        IComposableResource
         where TOptions : ContainerResourceOptions, new()
     {
         private MongoClient _client;

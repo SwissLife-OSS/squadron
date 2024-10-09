@@ -14,15 +14,15 @@ namespace Squadron
         /// <param name="builder"></param>
         public override void Configure(ContainerResourceBuilder builder)
         {
-            var password = Guid.NewGuid().ToString("N");
             var localdata = PrepareLocalDirectory();
+            var apiKey = "secretKey";
 
             builder
                 .Name("typesense")
                 .Image("typesense/typesense:27.1")
                 .InternalPort(8108)
-                .Password(password)
-                .AddCmd("--api-key", password)
+                .Password(apiKey)
+                .AddCmd("--api-key", apiKey)
                 .AddCmd("--data-dir", "/data")
                 .AddVolume($"{localdata}:/data")
                 .PreferLocalImage();

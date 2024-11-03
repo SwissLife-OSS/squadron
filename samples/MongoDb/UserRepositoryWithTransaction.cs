@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Squadron.Samples.Shared;
 
 namespace Squadron.Samples.Mongo
@@ -31,8 +32,5 @@ namespace Squadron.Samples.Mongo
             IMongoCollection<User> col = _mongoDatabase.GetCollection<User>("users");
             return await col.AsQueryable().ToListAsync();
         }
-
-
-
     }
 }

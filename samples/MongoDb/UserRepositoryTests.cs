@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Driver;
@@ -10,7 +11,7 @@ using Xunit;
 
 namespace Squadron.Samples.Mongo
 {
-    public class UserRepositoryTests : IClassFixture<MongoResource> 
+    public class UserRepositoryTests : IClassFixture<MongoResource>
     {
         private readonly MongoResource _mongoResource;
 
@@ -49,7 +50,7 @@ namespace Squadron.Samples.Mongo
                 File = new FileInfo("users.json")
             };
 
-            IMongoCollection<User> col = await _mongoResource  
+            IMongoCollection<User> col = await _mongoResource
                 .CreateCollectionFromFileAsync<User>(db, options);
 
             var repo = new UserRepository(db);

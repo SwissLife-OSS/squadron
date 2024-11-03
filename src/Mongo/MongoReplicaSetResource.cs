@@ -12,22 +12,23 @@ namespace Squadron
     /// Represents a mongo database replica set resource that can be used by unit tests.
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class MongoReplicaSetResource<TOptions> :
-        MongoResource<TOptions>
+    public class MongoReplicaSetResource<TOptions> : MongoResource<TOptions>
         where TOptions : MongoReplicaSetDefaultOptions, new()
     {
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
+            
             var client = new MongoClient(ConnectionString + "/?connect=direct");
             BsonDocument rsConfig = CreateReplicaSetConfiguration();
-            var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
-            {
-                {"replSetInitiate", rsConfig}
-            });
+           
+            var command = new BsonDocumentCommand<BsonDocument>(
+                new BsonDocument
+                {
+                    {"replSetInitiate", rsConfig}
+                });
 
-            await client.GetDatabase("admin")
-                .RunCommandAsync(command);
+            await client.GetDatabase("admin").RunCommandAsync(command);
 
             await Initializer.WaitAsync(new MongoReplicaSetStatus(ConnectionString));
         }

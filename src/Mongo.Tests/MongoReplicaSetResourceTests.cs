@@ -9,8 +9,7 @@ using Xunit;
 
 namespace Squadron
 {
-    public class MongoReplicaSetResourceTests
-        : IClassFixture<MongoReplicaSetResource>
+    public class MongoReplicaSetResourceTests : IClassFixture<MongoReplicaSetResource>
     {
         private readonly MongoReplicaSetResource _mongoRsResource;
 
@@ -25,13 +24,11 @@ namespace Squadron
             //Act
             Action action = () =>
             {
-                using (IClientSessionHandle session = _mongoRsResource.Client.StartSession())
-                {
-                    IMongoCollection<BsonDocument> collection = _mongoRsResource.CreateCollection<BsonDocument>("bar");
-                    session.StartTransaction();
-                    collection.InsertOne(session, new BsonDocument("name", "test"));
-                    session.CommitTransaction();
-                }
+                using IClientSessionHandle session = _mongoRsResource.Client.StartSession();
+                IMongoCollection<BsonDocument> collection = _mongoRsResource.CreateCollection<BsonDocument>("bar");
+                session.StartTransaction();
+                collection.InsertOne(session, new BsonDocument("name", "test"));
+                session.CommitTransaction();
             };
 
             //Assert

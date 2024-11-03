@@ -43,7 +43,7 @@ namespace Squadron
         {
             return new MongoClient(new MongoClientSettings
             {
-                ConnectionMode = ConnectionMode.Direct,
+                DirectConnection = true,
                 ReadConcern = ReadConcern.Majority,
                 WriteConcern = WriteConcern.Acknowledged,
                 Server = new MongoServerAddress(Manager.Instance.Address, Manager.Instance.HostPort),

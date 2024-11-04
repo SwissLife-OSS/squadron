@@ -19,7 +19,7 @@ namespace Squadron
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            var client = new MongoClient(ConnectionString + "/?connect=direct");
+            var client = new MongoClient(ConnectionString);
             BsonDocument rsConfig = CreateReplicaSetConfiguration();
             var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
             {

@@ -28,7 +28,8 @@ namespace Squadron
         {
             await base.InitializeAsync();
             ConnectionString =
-                $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
+                $"mongodb://{Manager.Instance.Address}:{Manager.Instance.HostPort}" +
+                "/?directConnection=true";
 
             _client = GetClient();
             await Initializer.WaitAsync(new MongoStatus(_client));
@@ -43,7 +44,7 @@ namespace Squadron
         {
             return new MongoClient(new MongoClientSettings
             {
-                ConnectionMode = ConnectionMode.Direct,
+                DirectConnection = true,
                 ReadConcern = ReadConcern.Majority,
                 WriteConcern = WriteConcern.Acknowledged,
                 Server = new MongoServerAddress(Manager.Instance.Address, Manager.Instance.HostPort),

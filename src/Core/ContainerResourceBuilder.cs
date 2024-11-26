@@ -414,6 +414,12 @@ namespace Squadron
         /// <returns></returns>
         public virtual ContainerResourceSettings Build()
         {
+            var logLevel = Environment.GetEnvironmentVariable("SQUADRON_LOG_LEVEL");
+            if (Enum.TryParse(logLevel, true, out SourceLevels overriddenLogLevel))
+            {
+                _logLevel = overriddenLogLevel;
+            }
+            
             _options.DockerConfigResolver ??= ContainerResourceOptions.DefaultDockerConfigResolver;
             _options.Logger = new Logger(_logLevel, _options);
             _options.Cmd = _cmd;

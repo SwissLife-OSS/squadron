@@ -55,6 +55,7 @@ namespace Squadron
         protected virtual void SetupContainerResource()
         {
             ResourceOptions = new TOptions();
+            OnOptionsInitialized(ResourceOptions);
             var builder = ContainerResourceBuilder.New();
             ResourceOptions.Configure(builder);
             AddNetworksToBuilder(builder);
@@ -121,6 +122,12 @@ namespace Squadron
         protected virtual void OnSettingsBuilded(ContainerResourceSettings settings)
         { }
 
+        /// <summary>
+        /// Called after the ResourceOptions were initialized
+        /// </summary>
+        /// <param name="options">The options.</param>
+        protected virtual void OnOptionsInitialized(TOptions options)
+        { }
 
         public async Task PauseContainer(TimeSpan pauseTime)
         {}

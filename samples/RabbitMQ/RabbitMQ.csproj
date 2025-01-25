@@ -3,13 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Squadron.Samples.RabbitMQ</AssemblyName>
     <RootNamespace>Squadron.Samples.RabbitMQ</RootNamespace>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="1.0.1" />
-    <PackageReference Include="FluentAssertions" Version="5.9.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyName>Squadron.Samples.Redis</AssemblyName>
     <RootNamespace>Squadron.Samples.Redis</RootNamespace>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

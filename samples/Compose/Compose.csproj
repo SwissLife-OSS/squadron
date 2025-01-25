@@ -1,19 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <AssemblyName>Squadron.Samples.Compose</AssemblyName>
-      <RootNamespace>Squadron.Samples.Compose</RootNamespace>
-      <IsPackable>false</IsPackable>
-    </PropertyGroup>
+    <AssemblyName>Squadron.Samples.Compose</AssemblyName>
+    <RootNamespace>Squadron.Samples.Compose</RootNamespace>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="coverlet.collector" Version="1.0.1" />
-      <PackageReference Include="FluentAssertions" Version="5.9.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\Compose\Compose.csproj" />
-      <ProjectReference Include="..\..\src\Mongo\Mongo.csproj" />
-      <ProjectReference Include="..\Shared\Shared.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Compose\Compose.csproj" />
+    <ProjectReference Include="..\..\src\Mongo\Mongo.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
 
 </Project>

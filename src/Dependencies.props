@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Label="Package Versions">
-    <xUnitVersion>2.4.1</xUnitVersion>
+    <xUnitVersion>2.9.2</xUnitVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Framework Versions">

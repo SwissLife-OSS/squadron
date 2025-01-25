@@ -86,7 +86,7 @@ namespace Squadron
             };
 
             //Assert
-            resultAction.Should().Throw<ContainerException>().WithMessage("*database exists*");
+            resultAction.Should().ThrowAsync<ContainerException>().WithMessage("*database exists*");
         }
 
         private async Task<IList<string>> ReadFeatures(string dbName)

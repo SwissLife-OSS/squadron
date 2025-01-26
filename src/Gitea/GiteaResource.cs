@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -55,9 +54,28 @@ public class GiteaResource<TOptions>
             var result = await response.Content.ReadAsStringAsync();
             throw new InvalidOperationException($"Failed to create repository: {result}");
         }
-        var repo = await response.Content.ReadFromJsonAsync<GiteaRepository>();
-
-        return repo;
+        GiteaRepository? repo = await response.Content.ReadFromJsonAsync<GiteaRepository>();
+        
+        if (repo == null)
+        {
+            throw new InvalidOperationException("Failed to create repository");
+        }
+        
+        return repo with
+        {
+            Url = ReplaceUrlPort(repo.Url), 
+            CloneUrl = ReplaceUrlPort(repo.CloneUrl)
+        };
+    }
+    
+    public GiteaCredentials GetCredentials()
+    {
+        return new GiteaCredentials(Settings.Username, Token);
+    }
+    
+    private string ReplaceUrlPort(string url)
+    {
+        return url.Replace(":" + Settings.InternalPort, ":" + Manager.Instance.Address);
     }
 
     /// <inheritdoc/>
@@ -66,7 +84,7 @@ public class GiteaResource<TOptions>
     }
     
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public async override Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         Url = $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
@@ -112,9 +130,3 @@ public class GiteaResource<TOptions>
         throw new InvalidOperationException($"Failed to create token: {result}");
     }
 }
-
-public record GiteaRepository(
-    [property: JsonPropertyName("id")] int Id,
-    [property: JsonPropertyName("name")] string Name,
-    [property: JsonPropertyName("clone_url")] string CloneUrl,
-    [property: JsonPropertyName("default_branch")] string DefaultBranch);

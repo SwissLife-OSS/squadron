@@ -4,7 +4,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Framework Versions">
-    <TestProjectTargetFrameworks>net8.0;net9.0</TestProjectTargetFrameworks>
-    <ResourceProjectTargetFrameworks>net8.0;net9.0</ResourceProjectTargetFrameworks>
+    <TestProjectTargetFrameworks>net8.0</TestProjectTargetFrameworks>
+    <ResourceProjectTargetFrameworks>net8.0</ResourceProjectTargetFrameworks>
   </PropertyGroup>
 </Project>

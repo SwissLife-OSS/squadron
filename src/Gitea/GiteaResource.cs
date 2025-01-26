@@ -75,7 +75,7 @@ public class GiteaResource<TOptions>
     
     private string ReplaceUrlPort(string url)
     {
-        return url.Replace(":" + Settings.InternalPort, ":" + Manager.Instance.Address);
+        return url.Replace(":" + Settings.InternalPort, ":" + Manager.Instance.HostPort);
     }
 
     /// <inheritdoc/>

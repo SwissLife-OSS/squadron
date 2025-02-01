@@ -11,11 +11,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            6
-            7
+            8
+            9
       - name: Docker Information
         run: |
           echo -e "\n\033[0;34mDocker System Info \033[0m"

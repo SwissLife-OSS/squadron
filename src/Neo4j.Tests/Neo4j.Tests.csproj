@@ -20,7 +20,7 @@
     <ProjectReference Include="..\Neo4j\Neo4j.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Snapshooter.Xunit" Version="0.5.6" />
+    <PackageReference Include="Snapshooter.Xunit" Version="1.0.0" />
     <PackageReference Include="Neo4jMapper" Version="1.0.12" />
     <PackageReference Include="ServiceStack.Text" Version="5.9.2" />
   </ItemGroup>

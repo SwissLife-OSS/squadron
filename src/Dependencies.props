@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup Label="Package Versions">
-    <xUnitVersion>2.4.1</xUnitVersion>
+    <xUnitVersion>2.9.2</xUnitVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Framework Versions">
-    <TestProjectTargetFrameworks>net6.0;net7.0;net8.0</TestProjectTargetFrameworks>
-    <ResourceProjectTargetFrameworks>netstandard2.0;net6.0;net7.0</ResourceProjectTargetFrameworks>
+    <TestProjectTargetFrameworks>net8.0</TestProjectTargetFrameworks>
+    <ResourceProjectTargetFrameworks>net8.0</ResourceProjectTargetFrameworks>
   </PropertyGroup>
 </Project>

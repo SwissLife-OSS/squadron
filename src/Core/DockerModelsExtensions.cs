@@ -18,5 +18,20 @@ namespace Squadron
                 Tty = false
             };
         }
+        
+        internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
+            this ICommand command, string user)
+        {
+            return new ContainerExecCreateParameters
+            {
+                User = user,
+                AttachStderr = true,
+                AttachStdin = false,
+                AttachStdout = true,
+                Cmd = command.Command.Split(' '),
+                Detach = false,
+                Tty = false
+            };
+        }
     }
 }

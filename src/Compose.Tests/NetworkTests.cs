@@ -32,14 +32,14 @@ namespace Squadron
             string connectionString = mongoResource.GetComposeExports()["CONNECTIONSTRING_INTERNAL"];
 
             string containerName = GetNameFromConnectionString(connectionString);
-            IList<ContainerListResponse> response = (await _dockerClient.Containers.ListContainersAsync(
-                new ContainersListParameters()));
+            IList<ContainerListResponse> response = await _dockerClient.Containers.ListContainersAsync(
+                new ContainersListParameters());
 
-            ContainerListResponse container = response.Where(c => c.Names.Contains($"/{containerName}")).Single();
+            ContainerListResponse container = response.FirstOrDefault(c => c.Names.Contains($"/{containerName}"));
 
-            string networkName = container.NetworkSettings.Networks.Keys.Where(n => n.Contains("squa_network")).Single();
+            string networkName = container?.NetworkSettings.Networks.Keys.FirstOrDefault(n => n.Contains("squa_network"));
 
-            NetworkResponse network = (await _dockerClient.Networks.ListNetworksAsync()).Where(n => n.Name == networkName).SingleOrDefault();
+            NetworkResponse network = (await _dockerClient.Networks.ListNetworksAsync()).FirstOrDefault(n => n.Name == networkName);
             network.Should().NotBeNull();
         }
 

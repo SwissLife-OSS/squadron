@@ -5,7 +5,7 @@ namespace Squadron;
 
 public class ComposeResourceSettings
 {
-    public string Identifier { get; } = Guid.NewGuid().ToString("N");
+    public string Identifier { get; } = $"compose_{Guid.NewGuid():N}";
     public IReadOnlyList<string> GlobalEnvionmentVariables { get; internal set; }
 
     public IReadOnlyList<ComposableResourceSettings> Resources { get; set; }

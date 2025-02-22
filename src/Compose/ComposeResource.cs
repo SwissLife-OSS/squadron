@@ -1,83 +1,78 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class ComposeResource<TOptions> : IAsyncLifetime
+    where TOptions : ComposeResourceOptions, new()
 {
-    public class ComposeResource<TOptions> : IAsyncLifetime
-        where TOptions : ComposeResourceOptions, new()
+    public ComposeResourceSettings Settings { get; set; }
+
+    protected Dictionary<string, ComposeResourceManager> Managers { get; set; }
+        = new Dictionary<string, ComposeResourceManager>();
+
+    public virtual async Task InitializeAsync()
     {
-        public ComposeResourceSettings Settings { get; set; }
+        var options = new TOptions();
+        var builder = ComposeResourceBuilder.New();
+        options.Configure(builder);
+        Settings = builder.Build();
 
-        protected Dictionary<string, ComposeResourceManager> Managers { get; set; }
-            = new Dictionary<string, ComposeResourceManager>();
-
-        public async Task InitializeAsync()
+        foreach (var name in BuildStartOrder())
         {
-            var options = new TOptions();
-            var builder = ComposeResourceBuilder.New();
-            options.Configure(builder);
-            Settings = builder.Build();
+            var mgr = new ComposeResourceManager(Settings, name);
+            Managers.Add(name, mgr);
 
-            foreach (var name in BuildStartOrder())
+            foreach (ComposeResourceLink link in mgr.ResourceSettings.Links)
             {
-                var mgr = new ComposeResourceManager();
-                mgr.ResourceSettings = Settings.Resources.First(x => x.Name == name);
-                Managers.Add(name, mgr);
-
-                var variables = new List<string>();
-                foreach (ComposeResourceLink link in mgr.ResourceSettings.Links)
+                foreach (EnvironmentVariableMapping map in link.EnvironmentVariables)
                 {
-                    foreach (EnvironmentVariableMapping map in link.EnvironmentVariables)
-                    {
-                        Dictionary<string, string> exports = Managers[link.Name].Exports;
-                        variables.Add($"{map.Name}={GetVariableValue(map.Value, exports)}");
-                    }
+                    Dictionary<string, string> exports = Managers[link.Name].Exports;
+                    mgr.AddEnvironmentVariable($"{map.Name}={GetVariableValue(map.Value, exports)}");
                 }
-                mgr.EnvironmentVariables = Settings.GlobalEnvionmentVariables.Concat(variables);
-                await mgr.StartAsync();
             }
+                
+            await mgr.StartAsync();
         }
+    }
 
-        public TResource GetResource<TResource>(string name)
+    public TResource GetResource<TResource>(string name)
+    {
+        ComposeResourceManager manager = Managers[name];
+        return (TResource)manager.Resource;
+    }
+
+    private string GetVariableValue(string template, Dictionary<string, string> exports)
+    {
+        var value = template;
+        foreach (KeyValuePair<string, string> export in exports)
         {
-            ComposeResourceManager manager = Managers[name];
-            return (TResource)manager.Resource;
+            value = value.Replace($"#{export.Key}#", export.Value);
         }
+        return value;
+    }
 
-        private string GetVariableValue(string template, Dictionary<string, string> exports)
+    public async Task DisposeAsync()
+    {
+        var stopTasks = new List<Task>();
+
+        foreach (KeyValuePair<string, ComposeResourceManager> mgr in Managers)
         {
-            var value = template;
-            foreach (KeyValuePair<string, string> export in exports)
-            {
-                value = value.Replace($"#{export.Key}#", export.Value);
-            }
-            return value;
+            stopTasks.Add(mgr.Value.StopAsync());
         }
+        await Task.WhenAll(stopTasks);
+    }
 
-        public async Task DisposeAsync()
-        {
-            var stopTasks = new List<Task>();
+    private IEnumerable<string> BuildStartOrder()
+    {
+        //TODO: Build dependency graph
+        return Settings.Resources.Select(x => x.Name);
+    }
 
-            foreach (KeyValuePair<string, ComposeResourceManager> mgr in Managers)
-            {
-                stopTasks.Add(mgr.Value.StopAsync());
-            }
-            await Task.WhenAll(stopTasks);
-        }
-
-        private IEnumerable<string> BuildStartOrder()
-        {
-            //TODO: Build dependency graph
-            return Settings.Resources.Select(x => x.Name);
-        }
-
-        private ComposableResourceSettings GetResourceSetting(string name)
-        {
-            return Settings.Resources.FirstOrDefault(x => x.Name == name);
-        }
+    private ComposableResourceSettings GetResourceSetting(string name)
+    {
+        return Settings.Resources.FirstOrDefault(x => x.Name == name);
     }
 }

@@ -67,7 +67,7 @@ public class ComposeResourceManager
 
     private bool IsResourceGenericType() =>
         ((IComposableResourceOption)ResourceSettings.ContainerOptions)
-        .ResourceType.IsGenericType;
+        .ResourceType.IsGenericTypeDefinition;
 
     internal async Task StopAsync()
     {

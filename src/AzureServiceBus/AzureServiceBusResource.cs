@@ -7,14 +7,15 @@ using Xunit;
 namespace Squadron;
 
 /// <inheritdoc/>
-public class AzureServiceBusEmulatorResource
-    : AzureServiceBusEmulatorResource<AzureServiceBusEmulatorDefaultOptions>;
+public class AzureServiceBusEmulatorResource<TConfig>
+    : AzureServiceBusEmulatorResource<AzureServiceBusEmulatorDefaultOptions<TConfig>, TConfig> 
+    where TConfig : AzureServiceBusConfig, new();
 
 /// <summary>
 /// Represents an AzureServiceBus resource that can be used by unit tests.
 /// </summary>
 /// <seealso cref="IDisposable"/>
-public class AzureServiceBusEmulatorResource<TOptions> : 
+public class AzureServiceBusEmulatorResource<TOptions, TConfig> : 
     ContainerResource<TOptions>,
     IAsyncLifetime,
     IComposableResource

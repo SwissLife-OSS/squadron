@@ -53,7 +53,6 @@ namespace Squadron
 
                     if (containerConfig.Registries.Any(p =>
                             p.Address.Equals(address.ToString(), StringComparison.InvariantCultureIgnoreCase)) ||
-                        string.IsNullOrEmpty(auth.Value.Email) ||
                         string.IsNullOrEmpty(auth.Value.Auth))
                     {
                         continue;

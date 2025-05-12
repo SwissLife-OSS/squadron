@@ -729,9 +729,18 @@ namespace Squadron
         private async Task RetryAction(Exception exception, TimeSpan t, int retryCount, Context c)
         {
             _settings.Logger.Warning($"Docker command failed {retryCount}. {exception.Message}");
+            
             SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
-            _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
-            _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
+            
+            if (systemInfo is { DriverStatus: { Count: > 0 } })
+            {
+                _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
+            }
+
+            if (systemInfo is { SystemStatus: { Count: > 0 } })
+            {
+                _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
+            }
         }
 
         public void Dispose()

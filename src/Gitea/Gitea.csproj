@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
   <PropertyGroup>
-    <AssemblyName>Squadron.PostgreSql</AssemblyName>
+    <AssemblyName>Squadron.Gitea</AssemblyName>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Npgsql" Version="8.0.3" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>

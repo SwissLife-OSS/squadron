@@ -94,6 +94,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gitea", "Gitea\Gitea.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gitea.Tests", "Gitea.Tests\Gitea.Tests.csproj", "{8FFFFA62-88DC-44BB-A451-E74455AFC8D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typesense", "Typesense\Typesense.csproj", "{20885D12-9998-40F1-8153-22B3C0ADAAD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typesense.Tests", "Typesense.Tests\Typesense.Tests.csproj", "{84CBA1BF-7C75-491E-813A-9F1987F32D63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -644,6 +648,10 @@ Global
 		{8FFFFA62-88DC-44BB-A451-E74455AFC8D0}.Release|x64.Build.0 = Release|Any CPU
 		{8FFFFA62-88DC-44BB-A451-E74455AFC8D0}.Release|x86.ActiveCfg = Release|Any CPU
 		{8FFFFA62-88DC-44BB-A451-E74455AFC8D0}.Release|x86.Build.0 = Release|Any CPU
+		{20885D12-9998-40F1-8153-22B3C0ADAAD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20885D12-9998-40F1-8153-22B3C0ADAAD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84CBA1BF-7C75-491E-813A-9F1987F32D63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84CBA1BF-7C75-491E-813A-9F1987F32D63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

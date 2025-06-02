@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,17 +24,17 @@ namespace Squadron
                 _ftpServerConfiguration.Port,
                 _ftpServerConfiguration.Username,
                 _ftpServerConfiguration.Password);
-
+            
             try
             {
                 await ftpClient.ConnectAsync(cancellationToken);
-                await ftpClient.GetListingAsync("/",cancellationToken);
+                await ftpClient.GetListingAsync("/", cancellationToken);
 
-                return new Status
-                {
-                    IsReady = true,
-                    Message = "Ready"
-                };
+                return new Status { IsReady = true, Message = "Ready" };
+            }
+            catch (Exception ex)
+            {
+                return new Status { IsReady = false, Message = ex.Message };
             }
             finally
             {

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Neo4j.Driver;
-using Neo4jMapper;
 using Snapshooter.Xunit;
 using Squadron.Neo4j.Models;
 using Xunit;
+using DriverValue = Neo4j.Driver.ValueExtensions;
 
 namespace Squadron
 {
@@ -30,7 +31,7 @@ namespace Squadron
         }
 
         [Fact]
-        public async void CreateActor()
+        public async Task CreateActor()
         {
             // arrange
             IAsyncSession session = _neo4JResource.GetAsyncSession();
@@ -40,14 +41,23 @@ namespace Squadron
                 // act
                 var actor = new Actor("Keanu Reaves", 56);
 
-                IDictionary<string, object> parameters =
-                    new Neo4jParameters().WithEntity("newActor", actor);
+                var parameters = new Dictionary<string, object>
+                {
+                    ["actorName"] = actor.Name,
+                    ["actorAge"] = actor.Age
+                };
 
                 IResultCursor cursor = await session.RunAsync(
-                    @"CREATE (actor:Actor $newActor) RETURN actor",
+                    @"CREATE (actor:Actor {Name: $actorName, Age: $actorAge}) RETURN actor",
                     parameters);
 
-                Actor createdActor = await cursor.MapSingleAsync<Actor>();
+                IRecord record = await cursor.SingleAsync();
+                INode node = DriverValue.As<INode>(record["actor"]);
+                
+                Actor createdActor = new Actor(
+                    DriverValue.As<string>(node.Properties["Name"]),
+                    DriverValue.As<int>(node.Properties["Age"])
+                );
 
                 await cursor.ConsumeAsync();
 

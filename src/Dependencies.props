@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Label="Framework Versions">
     <TestProjectTargetFrameworks>net9.0</TestProjectTargetFrameworks>
-    <ResourceProjectTargetFrameworks>net9.0</ResourceProjectTargetFrameworks>
+    <ResourceProjectTargetFrameworks>net8.0;net9.0</ResourceProjectTargetFrameworks>
   </PropertyGroup>
 </Project>

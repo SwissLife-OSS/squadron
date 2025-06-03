@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - id: set-matrix
         run: |
-          PROJECTS=$(find . -name '*.Tests.csproj' | jq -R -s -c 'split("\n")[:-1]')
+          PROJECTS=$(find . -name '*.Tests.csproj' | sed 's|.*/\([^/]*\)\.csproj|\1|' | jq -R -s -c 'split("\n")[:-1]')
           FRAMEWORKS='["net8.0", "net9.0"]'
           MATRIX=$(jq -n \
             --argjson projects "$PROJECTS" \
@@ -28,6 +28,7 @@ jobs:
   tests:
     needs: prepare
     runs-on: ubuntu-latest
+    name: ${{ matrix.test_project }} ${{ matrix.framework }}
     strategy:
       matrix: 
         test_project: ${{fromJson(needs.prepare.outputs.matrix).test_project}}
@@ -58,11 +59,13 @@ jobs:
 
       - name: Build project
         run: |
-          dotnet build "${{ matrix.test_project }}" -c Debug /p:WarningLevel=0 -f "${{ matrix.framework }}"
+          PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
+          dotnet build "$PROJECT_PATH" -c Debug /p:WarningLevel=0 -f "${{ matrix.framework }}"
         shell: bash
 
       - name: Run tests
         run: |
+          PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
           echo -e "\n\033[0;34mTesting ${{ matrix.test_project }} (${{ matrix.framework }})\033[0m\n"
-          dotnet test "${{ matrix.test_project }}" -c Debug --no-build -f "${{ matrix.framework }}" -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover"
+          dotnet test "$PROJECT_PATH" -c Debug --no-build -f "${{ matrix.framework }}" -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover"
         shell: bash

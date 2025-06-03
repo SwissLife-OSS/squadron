@@ -5,17 +5,36 @@ on:
     branches: ['master']
 
 jobs:
-  tests:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      test_projects: ${{ steps.set-matrix.outputs.test_projects }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        run: |
+          PROJECTS=$(find . -name '*.Tests.csproj' | jq -R -s -c 'split("\n")[:-1]')
+          echo "test_projects=${PROJECTS}" >> $GITHUB_OUTPUT
+        shell: bash
+
+  tests:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_project: ${{fromJson(needs.prepare.outputs.test_projects)}}
+      fail-fast: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8
             9
+      
       - name: Docker Information
         run: |
           echo -e "\n\033[0;34mDocker System Info \033[0m"
@@ -23,14 +42,18 @@ jobs:
           echo -e "\n\033[0;34mDocker Containers \033[0m"
           docker ps -a
         shell: bash
-      - name: Build, Test and Sonar
-        uses: swisslife-oss/actions/pull-request@main
-        with:
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
-          sonar_project_key: 'SwissLife-OSS_Squadron'
-          sonar_project_name: "squadron"
-          pr_number: ${{ github.event.pull_request.number }}
-          pr_source_branch: ${{ github.head_ref }}
-          pr_target_branch: ${{ github.base_ref }}
-          github_repository: ${{ github.repository }}
-          sonar_exclusions: ${{ vars.SONAR_EXCLUSIONS }}
+
+      - name: Restore tools
+        run: dotnet tool restore
+        shell: bash
+
+      - name: Build project
+        run: |
+          dotnet build "${{ matrix.test_project }}" -c Debug /p:WarningLevel=0
+        shell: bash
+
+      - name: Run tests
+        run: |
+          echo -e "\n\033[0;34mTesting ${{ matrix.test_project }}\033[0m\n"
+          dotnet test "${{ matrix.test_project }}" -c Debug --no-build -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover"
+        shell: bash

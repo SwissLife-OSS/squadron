@@ -44,6 +44,7 @@ jobs:
           dotnet-version: |
             8
             9
+            10
       
       - name: Docker Information
         run: |

@@ -6,31 +6,6 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8
-            9
-      - name: Docker Information
-        run: |
-          echo -e "\n\033[0;34mDocker System Info \033[0m"
-          docker system info
-          echo -e "\n\033[0;34mDocker Containers \033[0m"
-          docker ps -a
-        shell: bash
-      - name: Build, Test and Sonar
-        uses: swisslife-oss/actions/pull-request@main
-        with:
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
-          sonar_project_key: 'SwissLife-OSS_Squadron'
-          sonar_project_name: "squadron"
-          pr_number: ${{ github.event.pull_request.number }}
-          pr_source_branch: ${{ github.head_ref }}
-          pr_target_branch: ${{ github.base_ref }}
-          github_repository: ${{ github.repository }}
-          sonar_exclusions: ${{ vars.SONAR_EXCLUSIONS }}
+    uses: ./.github/workflows/test-matrix.yml
+    with:
+      include_docker_info: true

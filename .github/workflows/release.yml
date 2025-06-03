@@ -6,9 +6,13 @@ on:
       - "*"
 
 jobs:
+  tests:
+    uses: ./.github/workflows/test-matrix.yml
+    with:
+      include_docker_info: false
   release:
+    needs: tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -20,25 +24,3 @@ jobs:
           tag: ${{ github.ref_name }}
           nuget_api_key: ${{ secrets.NUGET_API_KEY }}
           enable_push: 'yes'
-
-  sonar:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8
-            9
-      - name: Restore tools
-        run: dotnet tool restore
-      - name: Build, Test and Sonar
-        uses: swisslife-oss/actions/release-sonar@main
-        with:
-          tag: ${{ github.ref_name }}
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
-          sonar_project_key: 'SwissLife-OSS_Squadron'
-          sonar_project_name: "squadron"
-          sonar_exclusions: ${{ vars.SONAR_EXCLUSIONS }}

@@ -34,7 +34,7 @@ namespace Squadron
         {
             await base.InitializeAsync();
             ConnectionString = BuildConnectionString(Settings.Username);
-            await Initializer.WaitAsync(new ClickHouseStatus(Url));
+            await Initializer.WaitAsync(new ClickHouseStatus(Url, Settings.Username, Settings.Password));
         }
 
         private string BuildConnectionString(string database)
@@ -72,7 +72,7 @@ namespace Squadron
         /// <returns></returns>
         public async Task RunSqlScriptAsync(string sqlScript, string? dbName = null)
         {
-            var result = await SendCommand(sqlScript, dbName);
+            HttpResponseMessage result = await SendCommand(sqlScript, dbName);
             if (!result.IsSuccessStatusCode)
             {
                 var content = await result.Content.ReadAsStringAsync();
@@ -94,6 +94,16 @@ namespace Squadron
             if (dbName != null)
             {
                 content.Headers.Add("X-ClickHouse-Database", dbName);
+            }
+
+            // Add authentication headers
+            if (!string.IsNullOrEmpty(Settings.Username))
+            {
+                content.Headers.Add("X-ClickHouse-User", Settings.Username);
+                if (!string.IsNullOrEmpty(Settings.Password))
+                {
+                    content.Headers.Add("X-ClickHouse-Key", Settings.Password);
+                }
             }
 
             return await httpClient.PostAsync(Url, content, cancellationToken);

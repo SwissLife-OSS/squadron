@@ -13,7 +13,7 @@ namespace Squadron
 {
     internal sealed class EventHubManager
     {
-        private IEventHubManagementClient _client;
+        private IEventHubManagementClient? _client;
         private readonly AzureCredentials _azureCredentials;
         private readonly AzureResourceIdentifier _azureResourceIdentifier;
 
@@ -47,7 +47,7 @@ namespace Squadron
                 Location = location
             };
 
-            EHNamespace res = await _client.Namespaces
+            EHNamespace res = await _client!.Namespaces
                 .CreateOrUpdateAsync(_azureResourceIdentifier.ResourceGroupName, ns, pars);
             res.KafkaEnabled = true;
 
@@ -57,7 +57,7 @@ namespace Squadron
 
         internal async Task DeleteNamespaceAsync()
         {
-            await _client.Namespaces
+            await _client!.Namespaces
                 .DeleteAsync(_azureResourceIdentifier.ResourceGroupName, _azureResourceIdentifier.Name);
         }
 
@@ -67,12 +67,15 @@ namespace Squadron
             Trace.WriteLine($"Create event hub: {eventHub.CreatedName}");
 
             var newEventHub = new Eventhub{MessageRetentionInDays = 1, PartitionCount = 1};
-            await _client.EventHubs.CreateOrUpdateAsync(_azureResourceIdentifier.ResourceGroupName,
+            await _client!.EventHubs.CreateOrUpdateAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub.CreatedName, newEventHub);
 
-            var autRuleParams = new AuthorizationRule {Rights = new List<string> {"send", "listen"}};
-            await _client.EventHubs.CreateOrUpdateAuthorizationRuleAsync(_azureResourceIdentifier.ResourceGroupName,
-                _azureResourceIdentifier.Name, eventHub.CreatedName, "sender", autRuleParams);
+            await _client!.EventHubs.CreateOrUpdateAuthorizationRuleAsync(
+                _azureResourceIdentifier.ResourceGroupName,
+                _azureResourceIdentifier.Name, 
+                eventHub.CreatedName,
+                "sender",
+                new List<string> { "Send", "Listen" });
         }
 
         public async Task DeleteEventHubAsync(EventHubModel eventHub)
@@ -80,14 +83,14 @@ namespace Squadron
             await EnsureAuthenticatedAsync();
             Trace.WriteLine($"Deletes event hub: {eventHub.CreatedName}");
 
-            await _client.EventHubs.DeleteAsync(_azureResourceIdentifier.ResourceGroupName,
+            await _client!.EventHubs.DeleteAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub.CreatedName);
         }
 
         public async Task<string> GetConnectionStringAsync()
         {
             await EnsureAuthenticatedAsync();
-            AccessKeys keys = await _client.Namespaces
+            AccessKeys keys = await _client!.Namespaces
                 .ListKeysAsync(_azureResourceIdentifier.ResourceGroupName,
                     _azureResourceIdentifier.Name,
                     "RootManageSharedAccessKey");
@@ -98,7 +101,7 @@ namespace Squadron
         {
             await EnsureAuthenticatedAsync();
 
-            AzureOperationResponse<AccessKeys> responseKeys = await _client.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
+            AzureOperationResponse<AccessKeys> responseKeys = await _client!.EventHubs.ListKeysWithHttpMessagesAsync(_azureResourceIdentifier.ResourceGroupName,
                 _azureResourceIdentifier.Name, eventHub, "sender");
 
             AccessKeys keys = responseKeys.Body;

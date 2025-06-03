@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Typesense" Version="7.21.0" />
+    <PackageReference Include="Typesense" />
   </ItemGroup>
 
 </Project>

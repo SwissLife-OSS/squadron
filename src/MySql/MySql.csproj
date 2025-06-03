@@ -4,9 +4,8 @@
   <PropertyGroup>
     <AssemblyName>Squadron.MySql</AssemblyName>
   </PropertyGroup>
- 
-  <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="1.0.1" />
+   <ItemGroup>
+    <PackageReference Include="MySqlConnector" />
   </ItemGroup>
 
   <ItemGroup>

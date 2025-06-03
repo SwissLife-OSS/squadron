@@ -14,23 +14,24 @@ jobs:
       - id: set-matrix
         run: |
           PROJECTS=$(find . -name '*.Tests.csproj' | jq -R -s -c 'split("\n")[:-1]')
+          FRAMEWORKS='["net8.0", "net9.0"]'
           MATRIX=$(jq -n \
-            --arg projects "$PROJECTS" \
+            --argjson projects "$PROJECTS" \
+            --argjson frameworks "$FRAMEWORKS" \
             '{
-              "include": [
-                $projects | fromjson[] as $p | 
-                ["net8.0", "net9.0"][] | 
-                {"test_project": $p, "framework": .}
-              ]
+              "test_project": $projects,
+              "framework": $frameworks
             }')
-          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo $MATRIX | jq -c .)" >> $GITHUB_OUTPUT
         shell: bash
 
   tests:
     needs: prepare
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{fromJson(needs.prepare.outputs.matrix)}}
+      matrix: 
+        test_project: ${{fromJson(needs.prepare.outputs.matrix).test_project}}
+        framework: ${{fromJson(needs.prepare.outputs.matrix).framework}}
       fail-fast: false
     steps:
       - name: Checkout code

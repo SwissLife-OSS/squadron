@@ -6,9 +6,28 @@ on:
       - "*"
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        run: |
+          PROJECTS=$(find . -name '*.Tests.csproj' | sed 's|.*/\([^/]*\)\.csproj|\1|' | jq -R -s -c 'split("\n")[:-1]')
+          FRAMEWORKS='["net8.0", "net9.0"]'
+          MATRIX=$(jq -n \
+            --argjson projects "$PROJECTS" \
+            --argjson frameworks "$FRAMEWORKS" \
+            '{
+              "test_project": $projects,
+              "framework": $frameworks
+            }')
+          echo "matrix=$(echo $MATRIX | jq -c .)" >> $GITHUB_OUTPUT
+        shell: bash
+
   release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -21,24 +40,32 @@ jobs:
           nuget_api_key: ${{ secrets.NUGET_API_KEY }}
           enable_push: 'yes'
 
-  sonar:
+  tests:
+    needs: prepare
     runs-on: ubuntu-latest
+    name: ${{ matrix.test_project }} ${{ matrix.framework }}
+    strategy:
+      matrix: 
+        test_project: ${{fromJson(needs.prepare.outputs.matrix).test_project}}
+        framework: ${{fromJson(needs.prepare.outputs.matrix).framework}}
+      fail-fast: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8
             9
+      
       - name: Restore tools
         run: dotnet tool restore
-      - name: Build, Test and Sonar
-        uses: swisslife-oss/actions/release-sonar@main
-        with:
-          tag: ${{ github.ref_name }}
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
-          sonar_project_key: 'SwissLife-OSS_Squadron'
-          sonar_project_name: "squadron"
-          sonar_exclusions: ${{ vars.SONAR_EXCLUSIONS }}
+        shell: bash
+
+      - name: Build and Test
+        run: |
+          PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
+          dotnet test "$PROJECT_PATH" -c Release -f "${{ matrix.framework }}"
+        shell: bash

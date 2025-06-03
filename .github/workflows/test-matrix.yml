@@ -1,0 +1,78 @@
+name: Run Tests
+
+on:
+  workflow_call:
+    inputs:
+      include_docker_info:
+        description: 'Whether to include Docker information step'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        run: |
+          PROJECTS=$(find . -name '*.Tests.csproj' | sed 's|.*/\([^/]*\)\.csproj|\1|' | jq -R -s -c 'split("\n")[:-1]')
+          FRAMEWORKS='["net8.0", "net9.0","net10.0"]'
+          MATRIX=$(jq -n \
+            --argjson projects "$PROJECTS" \
+            --argjson frameworks "$FRAMEWORKS" \
+            '{
+              "test_project": $projects,
+              "framework": $frameworks
+            }')
+          echo "matrix=$(echo $MATRIX | jq -c .)" >> $GITHUB_OUTPUT
+        shell: bash
+
+  tests:
+    needs: prepare
+    runs-on: ubuntu-latest
+    name: ${{ matrix.test_project }} ${{ matrix.framework }}
+    strategy:
+      matrix: 
+        test_project: ${{fromJson(needs.prepare.outputs.matrix).test_project}}
+        framework: ${{fromJson(needs.prepare.outputs.matrix).framework}}
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8
+            9
+            10
+      
+      - name: Docker Information
+        if: ${{ inputs.include_docker_info }}
+        run: |
+          echo -e "\n\033[0;34mDocker System Info \033[0m"
+          docker system info
+          echo -e "\n\033[0;34mDocker Containers \033[0m"
+          docker ps -a
+        shell: bash
+
+      - name: Restore tools
+        run: dotnet tool restore
+        shell: bash
+
+      - name: Build project
+        run: |
+          PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
+          dotnet build "$PROJECT_PATH" -c Debug /p:WarningLevel=0 -f "${{ matrix.framework }}"
+        shell: bash
+
+      - name: Run tests
+        run: |
+          PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
+          echo -e "\n\033[0;34mTesting ${{ matrix.test_project }} (${{ matrix.framework }})\033[0m\n"
+          dotnet test "$PROJECT_PATH" -c Debug --no-build -f "${{ matrix.framework }}" -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover"
+        shell: bash

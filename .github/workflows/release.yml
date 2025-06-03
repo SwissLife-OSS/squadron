@@ -26,20 +26,6 @@ jobs:
           echo "matrix=$(echo $MATRIX | jq -c .)" >> $GITHUB_OUTPUT
         shell: bash
 
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Use .NET SDK from global.json
-        uses: actions/setup-dotnet@v4
-      - name: Build, Test and Push
-        uses: swisslife-oss/actions/release-packages@main
-        with:
-          tag: ${{ github.ref_name }}
-          nuget_api_key: ${{ secrets.NUGET_API_KEY }}
-          enable_push: 'yes'
-
   tests:
     needs: prepare
     runs-on: ubuntu-latest
@@ -69,3 +55,18 @@ jobs:
           PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
           dotnet test "$PROJECT_PATH" -c Release -f "${{ matrix.framework }}"
         shell: bash
+
+  release:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Use .NET SDK from global.json
+        uses: actions/setup-dotnet@v4
+      - name: Build, Test and Push
+        uses: swisslife-oss/actions/release-packages@main
+        with:
+          tag: ${{ github.ref_name }}
+          nuget_api_key: ${{ secrets.NUGET_API_KEY }}
+          enable_push: 'yes'

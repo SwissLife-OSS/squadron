@@ -8,21 +8,29 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
-      test_projects: ${{ steps.set-matrix.outputs.test_projects }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
       - id: set-matrix
         run: |
           PROJECTS=$(find . -name '*.Tests.csproj' | jq -R -s -c 'split("\n")[:-1]')
-          echo "test_projects=${PROJECTS}" >> $GITHUB_OUTPUT
+          MATRIX=$(jq -n \
+            --arg projects "$PROJECTS" \
+            '{
+              "include": [
+                $projects | fromjson[] as $p | 
+                ["net8.0", "net9.0"][] | 
+                {"test_project": $p, "framework": .}
+              ]
+            }')
+          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
         shell: bash
 
   tests:
     needs: prepare
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        test_project: ${{fromJson(needs.prepare.outputs.test_projects)}}
+      matrix: ${{fromJson(needs.prepare.outputs.matrix)}}
       fail-fast: false
     steps:
       - name: Checkout code
@@ -49,11 +57,11 @@ jobs:
 
       - name: Build project
         run: |
-          dotnet build "${{ matrix.test_project }}" -c Debug /p:WarningLevel=0
+          dotnet build "${{ matrix.test_project }}" -c Debug /p:WarningLevel=0 -f "${{ matrix.framework }}"
         shell: bash
 
       - name: Run tests
         run: |
-          echo -e "\n\033[0;34mTesting ${{ matrix.test_project }}\033[0m\n"
-          dotnet test "${{ matrix.test_project }}" -c Debug --no-build -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover"
+          echo -e "\n\033[0;34mTesting ${{ matrix.test_project }} (${{ matrix.framework }})\033[0m\n"
+          dotnet test "${{ matrix.test_project }}" -c Debug --no-build -f "${{ matrix.framework }}" -p:"CollectCoverage=true" -p:"Exclude=[xunit.*]*" -p:"CoverletOutputFormat=opencover"
         shell: bash

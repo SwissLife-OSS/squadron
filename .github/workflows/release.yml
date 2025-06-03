@@ -45,6 +45,7 @@ jobs:
           dotnet-version: |
             8
             9
+            10
       
       - name: Restore tools
         run: dotnet tool restore
@@ -53,7 +54,7 @@ jobs:
       - name: Build and Test
         run: |
           PROJECT_PATH=$(find . -name "${{ matrix.test_project }}.csproj")
-          dotnet test "$PROJECT_PATH" -c Release -f "${{ matrix.framework }}"
+          dotnet test "$PROJECT_PATH" -c Debug -f "${{ matrix.framework }}"
         shell: bash
 
   release:

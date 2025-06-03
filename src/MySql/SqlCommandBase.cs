@@ -3,39 +3,38 @@ using System.Collections.Generic;
 using System.Text;
 using Docker.DotNet.Models;
 
-namespace Squadron
+namespace Squadron;
+
+internal class SqlCommandBase
 {
-    internal class SqlCommandBase
+    protected ContainerExecCreateParameters GetContainerExecParameters(
+        string query,
+        ContainerResourceSettings settings)
     {
-        protected ContainerExecCreateParameters GetContainerExecParameters(
-            string query,
-            ContainerResourceSettings settings)
+        return new ContainerExecCreateParameters
         {
-            return new ContainerExecCreateParameters
-            {
-                AttachStderr = true,
-                AttachStdin = false,
-                AttachStdout = true,
-                Cmd = GetCommand(query, settings),
-                Detach = false,
-                Tty = false
-            };
-        }
-
-        private IList<string> GetCommand(
-            string query,
-            ContainerResourceSettings settings)
-        {
-            return new List<string>
-            {
-                "mysql",
-                "-u",
-                "root",
-                $"-p{settings.Password}",
-                "-e",
-                query
-            };
-        }
-
+            AttachStderr = true,
+            AttachStdin = false,
+            AttachStdout = true,
+            Cmd = GetCommand(query, settings),
+            Detach = false,
+            Tty = false
+        };
     }
+
+    private IList<string> GetCommand(
+        string query,
+        ContainerResourceSettings settings)
+    {
+        return new List<string>
+        {
+            "mysql",
+            "-u",
+            "root",
+            $"-p{settings.Password}",
+            "-e",
+            query
+        };
+    }
+
 }

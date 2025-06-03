@@ -3,43 +3,33 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace Squadron
+namespace Squadron;
+
+public sealed class MongoReplicaSetStatus(string connectionString) : IResourceStatusProvider
 {
-    public sealed class MongoReplicaSetStatus : IResourceStatusProvider
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
     {
-        private readonly string _connectionString;
-
-        public MongoReplicaSetStatus(string connectionString)
+        var client = new MongoClient(connectionString);
+        IMongoDatabase adminDb = client.GetDatabase("admin");
+        var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
         {
-            _connectionString = connectionString;
+            {"isMaster", 1}
+        });
+
+        BsonDocument res = await adminDb.RunCommandAsync(command);
+        bool isMaster = res.GetValue("ismaster").AsBoolean;
+
+        if (isMaster)
+        {
+            IClientSessionHandle session = await client.StartSessionAsync();
+            session.StartTransaction();
+            await session.CommitTransactionAsync();
         }
 
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+        return new Status
         {
-            var client = new MongoClient(_connectionString);
-            IMongoDatabase adminDb = client.GetDatabase("admin");
-            var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
-            {
-                {"isMaster", 1}
-            });
-
-            BsonDocument res = await adminDb.RunCommandAsync(command);
-            bool isMaster = res.GetValue("ismaster").AsBoolean;
-
-            if (isMaster)
-            {
-                IClientSessionHandle session = await client.StartSessionAsync();
-                session.StartTransaction();
-                await session.CommitTransactionAsync();
-            }
-
-            return new Status
-            {
-                IsReady = isMaster,
-                Message = res.ToString()
-            };
-        }
+            IsReady = isMaster,
+            Message = res.ToString()
+        };
     }
 }
-
-

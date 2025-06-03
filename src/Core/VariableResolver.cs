@@ -3,51 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Squadron
+namespace Squadron;
+
+internal class VariableResolver(IList<Variable> variables)
 {
-    internal class VariableResolver
+    private readonly IList<IVariableResolver> _resolvers = new List<IVariableResolver>
     {
-        private readonly IList<IVariableResolver> _resolvers;
-        private readonly IList<Variable> _variables;
+        new DynamicPortVariableResolver()
+    };
 
-        public VariableResolver(IList<Variable> variables)
+    internal T Resolve<T>(string variableName)
+    {
+        Variable variable = GetVariable(variableName);
+
+        foreach (IVariableResolver resolver in _resolvers)
         {
-            _resolvers = new List<IVariableResolver>
+            if (resolver.CanHandle(variable.Type))
             {
-                new DynamicPortVariableResolver()
-            };
-            _variables = variables;
-        }
-
-        internal T Resolve<T>(string variableName)
-        {
-            Variable variable = GetVariable(variableName);
-
-            foreach (IVariableResolver resolver in _resolvers)
-            {
-                if (resolver.CanHandle(variable.Type))
-                {
-                    return resolver.Resolve<T>(variableName);
-                }
+                return resolver.Resolve<T>(variableName);
             }
-
-            throw new NotSupportedException(
-                $"Variable type '{variable.Type}' is not supported.");
         }
 
-        private Variable GetVariable(string name)
-        {
-            Variable variable =
-                _variables
+        throw new NotSupportedException(
+            $"Variable type '{variable.Type}' is not supported.");
+    }
+
+    private Variable GetVariable(string name)
+    {
+        Variable variable =
+            variables
                 .FirstOrDefault(
                     p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
-            if (variable == null)
-            {
-                throw new ContainerException($"Variable name '{name}' not set.");
-            }
-
-            return variable;
+        if (variable == null)
+        {
+            throw new ContainerException($"Variable name '{name}' not set.");
         }
+
+        return variable;
     }
 }

@@ -1,28 +1,21 @@
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Default Mongo ReplicaSet resource options
+/// </summary>
+public class MongoReplicaSetDefaultOptions(string replicaSetName) : MongoDefaultOptions
 {
-    /// <summary>
-    /// Default Mongo ReplicaSet resource options
-    /// </summary>
-    public class MongoReplicaSetDefaultOptions : MongoDefaultOptions
+    internal string ReplicaSetName { get; } = replicaSetName;
+
+    public MongoReplicaSetDefaultOptions()
+        : this("rs0")
     {
-        internal string ReplicaSetName { get; }
 
-        public MongoReplicaSetDefaultOptions(string replicaSetName)
-        {
-            ReplicaSetName = replicaSetName;
-        }
+    }
 
-        public MongoReplicaSetDefaultOptions()
-            : this("rs0")
-        {
-
-        }
-
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            builder.AddCmd("--replSet", ReplicaSetName);
-            base.Configure(builder);
-        }
+    public override void Configure(ContainerResourceBuilder builder)
+    {
+        builder.AddCmd("--replSet", ReplicaSetName);
+        base.Configure(builder);
     }
 }
-

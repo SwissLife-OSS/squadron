@@ -7,52 +7,44 @@ using Docker.DotNet.Models;
 using FluentAssertions;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class GenericContainerResourceWithMultiplePortsTests(
+    GenericContainerResource<MultiplePortsContainerOptions> resource)
+    : IClassFixture<GenericContainerResource<MultiplePortsContainerOptions>>
 {
-    public class GenericContainerResourceWithMultiplePortsTests
-        : IClassFixture<GenericContainerResource<MultiplePortsContainerOptions>>
+    [Fact]
+    public async Task PrepareResource_NoError()
     {
-        private readonly GenericContainerResource<MultiplePortsContainerOptions> _resource;
+        //Assert
+        resource.Instance.AdditionalPorts.Count.Should().Be(2);
+        resource.Instance.AdditionalPorts
+            .Should()
+            .ContainSingle(port => port.InternalPort == 29170);
+        resource.Instance.AdditionalPorts
+            .Should()
+            .ContainSingle(port => port.InternalPort == 29171);
 
-        public GenericContainerResourceWithMultiplePortsTests(
-            GenericContainerResource<MultiplePortsContainerOptions> resource)
+        var client = new HttpClient();
+        foreach (ContainerPortMapping port in resource.Instance.AdditionalPorts)
         {
-            _resource = resource;
-        }
-
-        [Fact]
-        public async Task PrepareResource_NoError()
-        {
-            //Assert
-            _resource.Instance.AdditionalPorts.Count.Should().Be(2);
-            _resource.Instance.AdditionalPorts
-                .Should()
-                .ContainSingle(port => port.InternalPort == 29170);
-            _resource.Instance.AdditionalPorts
-                .Should()
-                .ContainSingle(port => port.InternalPort == 29171);
-
-            var client = new HttpClient();
-            foreach (ContainerPortMapping port in _resource.Instance.AdditionalPorts)
-            {
-                HttpResponseMessage response = await client
-                    .GetAsync($"http://{_resource.Address.Address}:{port.ExternalPort}");
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            HttpResponseMessage response = await client
+                .GetAsync($"http://{resource.Address.Address}:{port.ExternalPort}");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
+}
 
-    public class MultiplePortsContainerOptions : GenericContainerOptions
+public class MultiplePortsContainerOptions : GenericContainerOptions
+{
+    public override void Configure(ContainerResourceBuilder builder)
     {
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            base.Configure(builder);
-            builder
-                .Name("multi-port-test")
-                .InternalPort(22)
-                .AddPortMapping(29170)
-                .AddPortMapping(29171)
-                .Image("fredericbirke/test-image:latest");
-        }
+        base.Configure(builder);
+        builder
+            .Name("multi-port-test")
+            .InternalPort(22)
+            .AddPortMapping(29170)
+            .AddPortMapping(29171)
+            .Image("fredericbirke/test-image:latest");
     }
 }

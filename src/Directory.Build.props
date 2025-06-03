@@ -9,10 +9,14 @@
     <CCDependenciesProps>$([System.IO.Path]::Combine($(CCSourceDirectory), 'Dependencies.props'))</CCDependenciesProps>
     <CCDirectoryPackagesProps>$([System.IO.Path]::Combine($(CCSourceDirectory), 'Directory.Packages.props'))</CCDirectoryPackagesProps>
   </PropertyGroup>
-
+  
   <Import Project="$(CCDependenciesProps)" Condition="Exists('$(CCDependenciesProps)')"/>
   <Import Project="$(CCSettingsProps)" Condition="Exists('$(CCSettingsProps)')"/>
   <Import Project="$(CCVersionProps)" Condition="Exists('$(CCVersionProps)')"/>
   <Import Project="$(CCPackageProps)" Condition="Exists('$(CCPackageProps)')"/>
 
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CS8618;CS8625;CS8600</NoWarn>
+  </PropertyGroup>
+  
 </Project>

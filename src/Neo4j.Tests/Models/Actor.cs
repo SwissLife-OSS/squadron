@@ -1,14 +1,7 @@
-namespace Squadron.Neo4j.Models
-{
-    public class Actor
-    {
-        public string Name { get; set; }
-        public int Age { get; set; }
+namespace Squadron.Neo4j.Models;
 
-        public Actor(string name, int age)
-        {
-            Name = name;
-            Age = age;
-        }
-    }
+public class Actor(string name, int age)
+{
+    public string Name { get; set; } = name;
+    public int Age { get; set; } = age;
 }

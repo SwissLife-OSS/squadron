@@ -3,45 +3,44 @@ using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Tar;
 
-namespace Squadron
+namespace Squadron;
+
+internal class TarArchiver : IDisposable
 {
-    internal class TarArchiver : IDisposable
+    private readonly string _archiveFileName;
+
+    public TarArchiver(CopyContext CopyContext, bool overrideTargetName)
     {
-        private readonly string _archiveFileName;
+        _archiveFileName = Path.GetTempFileName();
 
-        public TarArchiver(CopyContext CopyContext, bool overrideTargetName)
+        using (Stream fileStream = File.Create(_archiveFileName))
+        using (Stream tarStream = new TarOutputStream(fileStream))
+        using (var tarArchive = TarArchive.CreateOutputTarArchive(tarStream))
         {
-            _archiveFileName = Path.GetTempFileName();
+            var tarEntry = TarEntry.CreateEntryFromFile(CopyContext.Source);
 
-            using (Stream fileStream = File.Create(_archiveFileName))
-            using (Stream tarStream = new TarOutputStream(fileStream))
-            using (TarArchive tarArchive = TarArchive.CreateOutputTarArchive(tarStream))
-            {
-                TarEntry tarEntry = TarEntry.CreateEntryFromFile(CopyContext.Source);
+            tarEntry.Name = overrideTargetName
+                ? CopyContext.Destination.Split('\\', '/').Last()
+                : CopyContext.Source.Split('\\', '/').Last();
 
-                tarEntry.Name = overrideTargetName
-                    ? CopyContext.Destination.Split('\\', '/').Last()
-                    : CopyContext.Source.Split('\\', '/').Last();
-
-                tarArchive.WriteEntry(tarEntry, true);
-            }
-
-            Stream = File.OpenRead(_archiveFileName);
+            tarArchive.WriteEntry(tarEntry, true);
         }
 
-        public Stream Stream { get; }
+        Stream = File.OpenRead(_archiveFileName);
+    }
 
-        public void Dispose()
+    public Stream Stream { get; }
+
+    public void Dispose()
+    {
+        try
         {
-            try
-            {
-                Stream?.Dispose();
-                File.Delete(_archiveFileName);
-            }
-            catch
-            {
-                // ignored
-            }
+            Stream?.Dispose();
+            File.Delete(_archiveFileName);
+        }
+        catch
+        {
+            // ignored
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Squadron.AzureCloud;
 
-namespace Squadron
+namespace Squadron;
+
+public abstract class AzureKeyVaultOptions : AzureResourceOptions
 {
-    public abstract class AzureKeyVaultOptions : AzureResourceOptions
-    {
-        public abstract void Configure(KeyVaultOptionsBuilder builder);
-    }
+    public abstract void Configure(KeyVaultOptionsBuilder builder);
 }

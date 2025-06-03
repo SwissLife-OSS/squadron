@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Squadron
+namespace Squadron;
+
+public class ComposeResourceLink
 {
-    public class ComposeResourceLink
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public List<EnvironmentVariableMapping> EnvironmentVariables { get; set; }
-    }
-
+    public List<EnvironmentVariableMapping> EnvironmentVariables { get; set; }
 }

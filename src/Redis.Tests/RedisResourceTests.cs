@@ -5,30 +5,21 @@ using FluentAssertions;
 using StackExchange.Redis;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class RedisResourceTests(RedisResource redisResource) : IClassFixture<RedisResource>
 {
-    public class RedisResourceTests : IClassFixture<RedisResource>
+    [Fact]
+    public void GetConnection_NoError()
     {
-        private readonly RedisResource _redisResource;
-
-        public RedisResourceTests(RedisResource redisResource)
+        //Act
+        Action action = () =>
         {
-            _redisResource = redisResource;
-        }
+            ConnectionMultiplexer redis = redisResource.GetConnection();
+            IDatabase db = redis.GetDatabase();
+        };
 
-
-        [Fact]
-        public void GetConnection_NoError()
-        {
-            //Act
-            Action action = () =>
-            {
-                ConnectionMultiplexer redis = _redisResource.GetConnection();
-                IDatabase db = redis.GetDatabase();
-            };
-
-            //Assert
-            action.Should().NotThrow();
-        }
+        //Assert
+        action.Should().NotThrow();
     }
 }

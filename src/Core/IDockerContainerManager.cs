@@ -3,61 +3,60 @@ using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// DockerContainerManager interface
+/// </summary>
+public interface IDockerContainerManager : IDisposable
 {
     /// <summary>
-    /// DockerContainerManager interface
+    /// Gets the container instance.
     /// </summary>
-    public interface IDockerContainerManager : IDisposable
-    {
-        /// <summary>
-        /// Gets the container instance.
-        /// </summary>
-        /// <value>
-        /// The instance.
-        /// </value>
-        ContainerInstance Instance { get; }
+    /// <value>
+    /// The instance.
+    /// </value>
+    ContainerInstance Instance { get; }
         
-        /// <summary>
-        /// The client to interact with docker
-        /// </summary>
-        DockerClient Client { get; }
+    /// <summary>
+    /// The client to interact with docker
+    /// </summary>
+    DockerClient Client { get; }
 
-        /// <summary>
-        /// Consumes container logs
-        /// </summary>
-        /// <param name="timeout">timeout to ready logs</param>
-        /// <returns></returns>
-        Task<string> ConsumeLogsAsync(TimeSpan timeout);
+    /// <summary>
+    /// Consumes container logs
+    /// </summary>
+    /// <param name="timeout">timeout to ready logs</param>
+    /// <returns></returns>
+    Task<string> ConsumeLogsAsync(TimeSpan timeout);
 
-        /// <summary>
-        /// Copies files to the container
-        /// </summary>
-        /// <param name="context">The context.</param>
-        Task CopyToContainerAsync(CopyContext context, bool overrideTargetName = false);
+    /// <summary>
+    /// Copies files to the container
+    /// </summary>
+    /// <param name="context">The context.</param>
+    Task CopyToContainerAsync(CopyContext context, bool overrideTargetName = false);
 
-        /// <summary>
-        /// Creates the and starts the container.
-        /// </summary>
-        /// <exception cref="ContainerException">Container exited with following logs...</exception>
-        Task CreateAndStartContainerAsync();
+    /// <summary>
+    /// Creates the and starts the container.
+    /// </summary>
+    /// <exception cref="ContainerException">Container exited with following logs...</exception>
+    Task CreateAndStartContainerAsync();
 
-        /// <summary>
-        /// Invokes a command on the container
-        /// </summary>
-        /// <param name="parameters">Command parameter</param>
-        /// <exception cref="ContainerException"></exception>
-        Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters);
+    /// <summary>
+    /// Invokes a command on the container
+    /// </summary>
+    /// <param name="parameters">Command parameter</param>
+    /// <exception cref="ContainerException"></exception>
+    Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters);
 
-        /// <summary>
-        /// Removes the container.
-        /// </summary>
-        Task RemoveContainerAsync();
+    /// <summary>
+    /// Removes the container.
+    /// </summary>
+    Task RemoveContainerAsync();
 
-        /// <summary>
-        /// Stops the container.
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> StopContainerAsync();
-    }
+    /// <summary>
+    /// Stops the container.
+    /// </summary>
+    /// <returns></returns>
+    Task<bool> StopContainerAsync();
 }

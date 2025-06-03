@@ -1,28 +1,27 @@
 using System.Text;
 
-namespace Squadron
+namespace Squadron;
+
+internal class MongoImportCommand : ICommand
 {
-    internal class MongoImportCommand : ICommand
+    private readonly StringBuilder _command = new StringBuilder();
+
+    internal MongoImportCommand(
+        string inputFile,
+        string databaseName,
+        string collectionName,
+        string[] customArgs)
     {
-        private readonly StringBuilder _command = new StringBuilder();
+        _command.Append("mongoimport ");
+        _command.Append($"--db={databaseName} ");
+        _command.Append($"--collection={collectionName} ");
+        _command.Append($"--file={inputFile.Replace("\\", "/")}");
 
-        internal MongoImportCommand(
-            string inputFile,
-            string databaseName,
-            string collectionName,
-            string[] customArgs)
+        if (customArgs.Length > 0)
         {
-            _command.Append("mongoimport ");
-            _command.Append($"--db={databaseName} ");
-            _command.Append($"--collection={collectionName} ");
-            _command.Append($"--file={inputFile.Replace("\\", "/")}");
-
-            if (customArgs.Length > 0)
-            {
-                _command.Append($" {string.Join(" ", customArgs)}");
-            }
+            _command.Append($" {string.Join(" ", customArgs)}");
         }
-
-        public string Command => _command.ToString();
     }
+
+    public string Command => _command.ToString();
 }

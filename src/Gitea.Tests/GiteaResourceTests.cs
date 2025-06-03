@@ -5,43 +5,35 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class GiteaResourceTests(GiteaResource resource) : IClassFixture<GiteaResource>
 {
-    public class GiteaResourceTests : IClassFixture<GiteaResource>
+    [Fact]
+    public void PrepareResource_NoError()
     {
-        private readonly GiteaResource _resource;
-
-        public GiteaResourceTests(GiteaResource resource)
+        //Act
+        Action action = () =>
         {
-            _resource = resource;
-        }
+            resource.CreateApiClient();
+        };
 
-        [Fact]
-        public void PrepareResource_NoError()
-        {
-            //Act
-            Action action = () =>
-            {
-                _resource.CreateApiClient();
-            };
-
-            //Assert
-            action.Should().NotThrow();
-        }
+        //Assert
+        action.Should().NotThrow();
+    }
         
-        [Fact]
-        public async Task CreateRepository_Created()
-        {
-            // Arrange
+    [Fact]
+    public async Task CreateRepository_Created()
+    {
+        // Arrange
             
-            //Act
-            var repo = await _resource.CreateRepositoryAsync("foo");
+        //Act
+        var repo = await resource.CreateRepositoryAsync("foo");
             
-            //Assert
-            repo.Should().NotBeNull();
-            repo.Name.Should().Be("foo");
-            repo.CloneUrl.Should().NotContain("3000");
-            repo.Url.Should().NotContain("3000");
-        }
+        //Assert
+        repo.Should().NotBeNull();
+        repo.Name.Should().Be("foo");
+        repo.CloneUrl.Should().NotContain("3000");
+        repo.Url.Should().NotContain("3000");
     }
 }

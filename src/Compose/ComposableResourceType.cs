@@ -1,8 +1,7 @@
-namespace Squadron
+namespace Squadron;
+
+public enum ComposableResourceType
 {
-    public enum ComposableResourceType
-    {
-        Container = 0,
-        AzureCloud = 1
-    }
+    Container = 0,
+    AzureCloud = 1
 }

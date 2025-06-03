@@ -8,66 +8,59 @@ using Squadron.Neo4j.Models;
 using Xunit;
 using DriverValue = Neo4j.Driver.ValueExtensions;
 
-namespace Squadron
+namespace Squadron;
+
+public class Neo4jResourceTests(Neo4jResource neo4JResource) : IClassFixture<Neo4jResource>
 {
-    public class Neo4jResourceTests
-        : IClassFixture<Neo4jResource>
+    private Neo4jResource _neo4JResource { get; } = neo4JResource;
+
+    [Fact]
+    public void GetSession_NoError()
     {
-        private Neo4jResource _neo4JResource { get; }
+        //Act
+        Action action = () => _neo4JResource.GetAsyncSession();
 
-        public Neo4jResourceTests(Neo4jResource neo4jResource)
+        //Assert
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public async Task CreateActor()
+    {
+        // arrange
+        IAsyncSession session = _neo4JResource.GetAsyncSession();
+
+        try
         {
-            _neo4JResource = neo4jResource;
-        }
+            // act
+            var actor = new Actor("Keanu Reaves", 56);
 
-        [Fact]
-        public void GetSession_NoError()
-        {
-            //Act
-            Action action = () => _neo4JResource.GetAsyncSession();
-
-            //Assert
-            action.Should().NotThrow();
-        }
-
-        [Fact]
-        public async Task CreateActor()
-        {
-            // arrange
-            IAsyncSession session = _neo4JResource.GetAsyncSession();
-
-            try
+            var parameters = new Dictionary<string, object>
             {
-                // act
-                var actor = new Actor("Keanu Reaves", 56);
+                ["actorName"] = actor.Name,
+                ["actorAge"] = actor.Age
+            };
 
-                var parameters = new Dictionary<string, object>
-                {
-                    ["actorName"] = actor.Name,
-                    ["actorAge"] = actor.Age
-                };
+            IResultCursor cursor = await session.RunAsync(
+                @"CREATE (actor:Actor {Name: $actorName, Age: $actorAge}) RETURN actor",
+                parameters);
 
-                IResultCursor cursor = await session.RunAsync(
-                    @"CREATE (actor:Actor {Name: $actorName, Age: $actorAge}) RETURN actor",
-                    parameters);
-
-                IRecord record = await cursor.SingleAsync();
-                INode node = DriverValue.As<INode>(record["actor"]);
+            IRecord record = await cursor.SingleAsync();
+            INode node = DriverValue.As<INode>(record["actor"]);
                 
-                Actor createdActor = new Actor(
-                    DriverValue.As<string>(node.Properties["Name"]),
-                    DriverValue.As<int>(node.Properties["Age"])
-                );
+            Actor createdActor = new Actor(
+                DriverValue.As<string>(node.Properties["Name"]),
+                DriverValue.As<int>(node.Properties["Age"])
+            );
 
-                await cursor.ConsumeAsync();
+            await cursor.ConsumeAsync();
 
-                // assert
-                createdActor.MatchSnapshot();
-            }
-            finally
-            {
-                await session.CloseAsync();
-            }
+            // assert
+            createdActor.MatchSnapshot();
+        }
+        finally
+        {
+            await session.CloseAsync();
         }
     }
 }

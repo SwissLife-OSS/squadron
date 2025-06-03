@@ -3,12 +3,11 @@ using System.Threading.Tasks;
 using MySqlConnector;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Represents a MariaDB resource that can be used by unit tests.
+/// </summary>
+public class MariaDBResource: MySqlResource<MariaDBDefaultOptions>
 {
-    /// <summary>
-    /// Represents a MariaDB resource that can be used by unit tests.
-    /// </summary>
-    public class MariaDBResource: MySqlResource<MariaDBDefaultOptions>
-    {
-    }
 }

@@ -8,22 +8,12 @@ using Microsoft.Data.SqlClient;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Squadron
+namespace Squadron;
+
+public class SqlServerResourceTests(
+    SqlServerResource resource,
+    ITestOutputHelper logger) : IClassFixture<SqlServerResource>
 {
-    public class SqlServerResourceTests
-        : IClassFixture<SqlServerResource>
-    {
-        private readonly SqlServerResource _resource;
-        private readonly ITestOutputHelper _logger;
-
-        public SqlServerResourceTests(
-            SqlServerResource resource,
-            ITestOutputHelper logger)
-        {
-            _logger = logger;
-            _resource = resource;
-        }
-
 #if NET46
         [Fact(Skip = "How container will be handled in Test Agent? TODO: Pull image from Azure Registry")]
         public void SqlServerResource_FromDatabase_HasContent()
@@ -45,62 +35,61 @@ namespace Squadron
             Assert.Equal(databaseName, retrievedDatabaseName);
         }
 #else
-        [Fact]
-        public async Task SqlServerResource_FromSqlScript_HasContent()
-        {
-            // arrange
-            string sqlFile = Path.Combine("Resources", "SampleModel.sql");
-            const string databaseName = "Sales_DEABB979";
+    [Fact]
+    public async Task SqlServerResource_FromSqlScript_HasContent()
+    {
+        // arrange
+        string sqlFile = Path.Combine("Resources", "SampleModel.sql");
+        const string databaseName = "Sales_DEABB979";
 
-            // act
-            var connectionString = await _resource.CreateDatabaseAsync(
-                File.ReadAllText(sqlFile), databaseName);
+        // act
+        var connectionString = await resource.CreateDatabaseAsync(
+            File.ReadAllText(sqlFile), databaseName);
 
-            // assert
-            string retrievedDatabaseName = FindDatabase(connectionString, databaseName);
-            Assert.Equal(databaseName, retrievedDatabaseName);
-        }
+        // assert
+        string retrievedDatabaseName = FindDatabase(connectionString, databaseName);
+        Assert.Equal(databaseName, retrievedDatabaseName);
+    }
 
-        [Fact]
-        public async Task SqlServerResource_Empty_Created()
-        {
-            // arrange
-            const string databaseName = "Sales_DEABB980";
+    [Fact]
+    public async Task SqlServerResource_Empty_Created()
+    {
+        // arrange
+        const string databaseName = "Sales_DEABB980";
 
-            // act
-            var connectionString = await _resource.CreateDatabaseAsync(databaseName);
+        // act
+        var connectionString = await resource.CreateDatabaseAsync(databaseName);
 
-            // assert
-            string retrievedDatabaseName = FindDatabase(connectionString, databaseName);
-            Assert.Equal(databaseName, retrievedDatabaseName);
-        }
+        // assert
+        string retrievedDatabaseName = FindDatabase(connectionString, databaseName);
+        Assert.Equal(databaseName, retrievedDatabaseName);
+    }
 #endif
 
-        private string FindDatabase(string databaseConnection, string databaseName)
+    private string FindDatabase(string databaseConnection, string databaseName)
+    {
+        string value = null;
+        try
         {
-            string value = null;
-            try
+            using (var connection = new SqlConnection(databaseConnection))
             {
-                using (var connection = new SqlConnection(databaseConnection))
-                {
-                    connection.Open();
-                    _logger.WriteLine("Connection is open.");
+                connection.Open();
+                logger.WriteLine("Connection is open.");
 
-                    using (var command = new SqlCommand($"SELECT * FROM sys.databases WHERE name = '{databaseName}'",
-                        connection))
-                    {
-                        value = (string) command.ExecuteScalar();
-                        _logger.WriteLine("Database name retrieved.");
-                    }
+                using (var command = new SqlCommand($"SELECT * FROM sys.databases WHERE name = '{databaseName}'",
+                           connection))
+                {
+                    value = (string) command.ExecuteScalar();
+                    logger.WriteLine("Database name retrieved.");
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.WriteLine("FindDatabase failed.");
-                _logger.WriteLine(ex.Message);
-            }
-
-            return value;
         }
+        catch (Exception ex)
+        {
+            logger.WriteLine("FindDatabase failed.");
+            logger.WriteLine(ex.Message);
+        }
+
+        return value;
     }
 }

@@ -1,21 +1,20 @@
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Default RavenDB resource options
+/// </summary>
+public class RavenDBDefaultOptions : ContainerResourceOptions
 {
     /// <summary>
-    /// Default RavenDB resource options
+    /// Configure resource options
     /// </summary>
-    public class RavenDBDefaultOptions : ContainerResourceOptions
+    /// <param name="builder"></param>
+    public override void Configure(ContainerResourceBuilder builder)
     {
-        /// <summary>
-        /// Configure resource options
-        /// </summary>
-        /// <param name="builder"></param>
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            builder
-                .Name("ravendb")
-                .Image("ravendb/ravendb:ubuntu-latest")
-                .InternalPort(8080)
-                .PreferLocalImage();
-        }
+        builder
+            .Name("ravendb")
+            .Image("ravendb/ravendb:ubuntu-latest")
+            .InternalPort(8080)
+            .PreferLocalImage();
     }
 }

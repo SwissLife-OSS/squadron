@@ -1,25 +1,24 @@
 using System;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Default PostgreSQL resource options
+/// </summary>
+public class PostgreSqlDefaultOptions : ContainerResourceOptions
 {
     /// <summary>
-    /// Default PostgreSQL resource options
+    /// Configure resource options
     /// </summary>
-    public class PostgreSqlDefaultOptions : ContainerResourceOptions
+    /// <param name="builder"></param>
+    public override void Configure(ContainerResourceBuilder builder)
     {
-        /// <summary>
-        /// Configure resource options
-        /// </summary>
-        /// <param name="builder"></param>
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            builder
-                .Name("postgres")
-                .Image("postgres:latest")
-                .Username("postgres")
-                .Password(Guid.NewGuid().ToString("N").Substring(12))
-                .InternalPort(5432)
-                .PreferLocalImage();
-        }
+        builder
+            .Name("postgres")
+            .Image("postgres:latest")
+            .Username("postgres")
+            .Password(Guid.NewGuid().ToString("N").Substring(12))
+            .InternalPort(5432)
+            .PreferLocalImage();
     }
 }

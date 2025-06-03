@@ -7,89 +7,88 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class InitializerTests
 {
-    public class InitializerTests
+
+    [Fact]
+    public async Task WaitAsync_NotReady_Throws()
     {
+        //act
+        Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
 
-        [Fact]
-        public async Task WaitAsync_NotReady_Throws()
-        {
-            //act
-            Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
-
-            var initilizer = new ContainerInitializer(
-                managerMock.Object,
-                ContainerResourceBuilder.New()
+        var initilizer = new ContainerInitializer(
+            managerMock.Object,
+            ContainerResourceBuilder.New()
                 .WaitTimeout(3)
                 .Build());
 
-            // act
-            Func<Task> action = async ()
-                => await initilizer.WaitAsync(new NotReadyStatusProvider());
+        // act
+        Func<Task> action = async ()
+            => await initilizer.WaitAsync(new NotReadyStatusProvider());
 
-            // assert
-            await action.Should().ThrowAsync<InvalidOperationException>();
-        }
+        // assert
+        await action.Should().ThrowAsync<InvalidOperationException>();
+    }
 
-        [Fact]
-        public async Task WaitAsync_Ready_IsReady()
-        {
-            //act
-            Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
+    [Fact]
+    public async Task WaitAsync_Ready_IsReady()
+    {
+        //act
+        Mock<IDockerContainerManager> managerMock = ArrangeContainerManagerMock();
 
-            var initilizer = new ContainerInitializer(
-                managerMock.Object,
-                ContainerResourceBuilder.New()
+        var initilizer = new ContainerInitializer(
+            managerMock.Object,
+            ContainerResourceBuilder.New()
                 .WaitTimeout(7)
                 .Build());
 
-            // act
-            Status result = await initilizer.WaitAsync(new OneThrowStatusProvider());
+        // act
+        Status result = await initilizer.WaitAsync(new OneThrowStatusProvider());
 
 
-            // assert
-            result.IsReady.Should().BeTrue();
-        }
+        // assert
+        result.IsReady.Should().BeTrue();
+    }
 
-        private static Mock<IDockerContainerManager> ArrangeContainerManagerMock()
+    private static Mock<IDockerContainerManager> ArrangeContainerManagerMock()
+    {
+        var mock = new Mock<IDockerContainerManager>(MockBehavior.Strict);
+        mock.Setup(m => m.ConsumeLogsAsync(It.IsAny<TimeSpan>()))
+            .ReturnsAsync("Some Logs...");
+        mock.SetupGet(p => p.Instance)
+            .Returns(new ContainerInstance { Logs = new List<string> { "Bang!" } });
+
+        return mock;
+    }
+
+    private class NotReadyStatusProvider
+        : IResourceStatusProvider
+    {
+        public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-            var mock = new Mock<IDockerContainerManager>(MockBehavior.Strict);
-            mock.Setup(m => m.ConsumeLogsAsync(It.IsAny<TimeSpan>()))
-                    .ReturnsAsync("Some Logs...");
-            mock.SetupGet(p => p.Instance)
-                    .Returns(new ContainerInstance { Logs = new List<string> { "Bang!" } });
-
-            return mock;
+            return Task.FromResult(Status.NotReady);
         }
+    }
 
-        private class NotReadyStatusProvider
-            : IResourceStatusProvider
+    private class OneThrowStatusProvider
+        : IResourceStatusProvider
+    {
+        private int _runs;
+
+        public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
         {
-            public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+            if (_runs <= 0)
             {
-                return Task.FromResult(Status.NotReady);
+                _runs++;
+                throw new TimeoutException();
             }
-        }
 
-        private class OneThrowStatusProvider
-            : IResourceStatusProvider
-        {
-            private int _runs;
-
-            public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+            return Task.FromResult(new Status()
             {
-                if (_runs <= 0)
-                {
-                    _runs++;
-                    throw new TimeoutException();
-                }
-
-                return Task.FromResult(new Status()
-                {
-                    IsReady = true
-                });
-            }
+                IsReady = true
+            });
         }
     }
 }

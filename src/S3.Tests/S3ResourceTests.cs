@@ -8,94 +8,86 @@ using FluentAssertions;
 using Squadron;
 using Xunit;
 
-namespace S3.Tests
+namespace S3.Tests;
+
+public class S3ResourceTests(S3Resource s3Resource) : IClassFixture<S3Resource>
 {
-    public class S3ResourceTests : IClassFixture<S3Resource>
+    [Fact]
+    public async Task CreateBucket_Success()
     {
-        private readonly S3Resource _s3Resource;
+        // Arrange
+        const string bucketName = "new-bucket";
 
-        public S3ResourceTests(S3Resource s3Resource)
+        Amazon.S3.IAmazonS3 client = s3Resource.GetCLient();
+        var putBucketRequest = new PutBucketRequest
         {
-            _s3Resource = s3Resource;
-        }
+            BucketName = bucketName,
+        };
 
-        [Fact]
-        public async Task CreateBucket_Success()
-        {
-            // Arrange
-            const string bucketName = "new-bucket";
+        // Act
+        await client.PutBucketAsync(putBucketRequest, default);
+        ListBucketsResponse result = await client.ListBucketsAsync(default);
 
-            Amazon.S3.IAmazonS3 client = _s3Resource.GetCLient();
-            var putBucketRequest = new PutBucketRequest
+        // Assert
+        result.Buckets.Should().ContainSingle(p => p.BucketName == bucketName);
+    }
+
+    [Fact]
+    public async Task DownloadFile_ShouldMatchLocalFile()
+    {
+        // Arrange
+        const string bucketName = "uploadtest";
+        const string fileName = "SampleFile.txt";
+
+        Amazon.S3.IAmazonS3 client = s3Resource.GetCLient();
+
+        await client.PutBucketAsync(
+            new PutBucketRequest { BucketName = bucketName },
+            default);
+
+        using Stream fileStream = OpenEmbeddedResourceStream(fileName);
+
+        byte[] localFile = await StreamToByteArrayAsync(fileStream);
+
+        fileStream.Position = 0;
+
+        await client.PutObjectAsync(
+            new PutObjectRequest
             {
+                InputStream = fileStream,
                 BucketName = bucketName,
-            };
+                Key = fileName
+            },
+            default);
 
-            // Act
-            await client.PutBucketAsync(putBucketRequest, default);
-            ListBucketsResponse result = await client.ListBucketsAsync(default);
+        // Act
+        GetObjectResponse fileResponse = await client.GetObjectAsync(
+            new GetObjectRequest
+            {
+                Key = fileName,
+                BucketName = bucketName
+            },
+            default);
 
-            // Assert
-            result.Buckets.Should().ContainSingle(p => p.BucketName == bucketName);
-        }
+        byte[] result = await StreamToByteArrayAsync(fileResponse.ResponseStream);
 
-        [Fact]
-        public async Task DownloadFile_ShouldMatchLocalFile()
-        {
-            // Arrange
-            const string bucketName = "uploadtest";
-            const string fileName = "SampleFile.txt";
+        // Assert
+        result.Should().BeEquivalentTo(localFile);
+    }
 
-            Amazon.S3.IAmazonS3 client = _s3Resource.GetCLient();
+    private async Task<byte[]> StreamToByteArrayAsync(Stream stream)
+    {
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
 
-            await client.PutBucketAsync(
-                new PutBucketRequest { BucketName = bucketName },
-                default);
+        return memoryStream.ToArray();
+    }
 
-            using Stream fileStream = OpenEmbeddedResourceStream(fileName);
+    private Stream OpenEmbeddedResourceStream(string fileName)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"Squadron.{fileName}";
 
-            byte[] localFile = await StreamToByteArrayAsync(fileStream);
-
-            fileStream.Position = 0;
-
-            await client.PutObjectAsync(
-                new PutObjectRequest
-                {
-                    InputStream = fileStream,
-                    BucketName = bucketName,
-                    Key = fileName
-                },
-                default);
-
-            // Act
-            GetObjectResponse fileResponse = await client.GetObjectAsync(
-                new GetObjectRequest
-                {
-                    Key = fileName,
-                    BucketName = bucketName
-                },
-                default);
-
-            byte[] result = await StreamToByteArrayAsync(fileResponse.ResponseStream);
-
-            // Assert
-            result.Should().BeEquivalentTo(localFile);
-        }
-
-        private async Task<byte[]> StreamToByteArrayAsync(Stream stream)
-        {
-            using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-
-            return memoryStream.ToArray();
-        }
-
-        private Stream OpenEmbeddedResourceStream(string fileName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = $"Squadron.{fileName}";
-
-            return assembly.GetManifestResourceStream(resourceName);
-        }
+        return assembly.GetManifestResourceStream(resourceName);
     }
 }

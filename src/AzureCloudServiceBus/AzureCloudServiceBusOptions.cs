@@ -4,19 +4,18 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Squadron.AzureCloud;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// ServiceBus resources options
+/// </summary>
+/// <seealso cref="Squadron.AzureCloud.AzureResourceOptions" />
+public abstract class AzureCloudServiceBusOptions : AzureResourceOptions
 {
     /// <summary>
-    /// ServiceBus resources options
+    /// Configures the ServiceBus
     /// </summary>
-    /// <seealso cref="Squadron.AzureCloud.AzureResourceOptions" />
-    public abstract class AzureCloudServiceBusOptions : AzureResourceOptions
-    {
-        /// <summary>
-        /// Configures the ServiceBus
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        public abstract void Configure(ServiceBusOptionsBuilder builder);
+    /// <param name="builder">The builder.</param>
+    public abstract void Configure(ServiceBusOptionsBuilder builder);
 
-    }
 }

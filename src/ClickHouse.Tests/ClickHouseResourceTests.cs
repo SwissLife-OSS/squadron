@@ -3,47 +3,39 @@ using System.Net;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class ClickHouseResourceTests(ClickHouseResource resource) : IClassFixture<ClickHouseResource>
 {
-    public class ClickHouseResourceTests : IClassFixture<ClickHouseResource>
+    [Fact]
+    public async Task CreateDatabaseAndRunSqlScript()
     {
-        private readonly ClickHouseResource _resource;
+        //Arrange
 
-        public ClickHouseResourceTests(ClickHouseResource resource)
-        {
-            _resource = resource;
-        }
+        //Act
+        await resource.RunSqlScriptAsync("CREATE DATABASE test;");
 
-        [Fact]
-        public async Task CreateDatabaseAndRunSqlScript()
-        {
-            //Arrange
+        //Assert
+        var res = await resource.SendCommand("SELECT name FROM system.databases;");
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.Contains("test", await res.Content.ReadAsStringAsync());
+    }
 
-            //Act
-            await _resource.RunSqlScriptAsync("CREATE DATABASE test;");
+    [Fact]
+    public async Task ShouldCreateTableInDatabase()
+    {
+        //Arrange
+        await resource.RunSqlScriptAsync("CREATE DATABASE test2;");
 
-            //Assert
-            var res = await _resource.SendCommand("SELECT name FROM system.databases;");
-            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
-            Assert.Contains("test", await res.Content.ReadAsStringAsync());
-        }
+        //Act
+        await resource.RunSqlScriptAsync(
+            "CREATE TABLE test_table (id Int32) ENGINE = MergeTree ORDER BY (id);",
+            "test2");
 
-        [Fact]
-        public async Task ShouldCreateTableInDatabase()
-        {
-            //Arrange
-            await _resource.RunSqlScriptAsync("CREATE DATABASE test2;");
-
-            //Act
-            await _resource.RunSqlScriptAsync(
-                "CREATE TABLE test_table (id Int32) ENGINE = MergeTree ORDER BY (id);",
-                "test2");
-
-            //Assert
-            var res = await _resource.SendCommand(
-                "SELECT name FROM system.tables WHERE database = 'test2';");
-            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
-            Assert.Contains("test_table", await res.Content.ReadAsStringAsync());
-        }
+        //Assert
+        var res = await resource.SendCommand(
+            "SELECT name FROM system.tables WHERE database = 'test2';");
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.Contains("test_table", await res.Content.ReadAsStringAsync());
     }
 }

@@ -5,54 +5,47 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class SFtpServerResourceTests(SFtpServerResource sftpServerResource) : IClassFixture<SFtpServerResource>
 {
-    public class SFtpServerResourceTests : IClassFixture<SFtpServerResource>
+    private const string SampleFileName = "SampleFile.txt";
+
+    [Fact]
+    public async Task UploadFile_DownloadedFileMatchLocal()
     {
-        private const string SampleFileName = "SampleFile.txt";
-        private readonly SFtpServerResource _sftpServerResource;
+        // Arrange
+        using Stream sampleFileStream = GetEmbeddedResource(SampleFileName);
 
-        public SFtpServerResourceTests(SFtpServerResource sftpServerResource)
+        var localFileContent = ToByteArray(sampleFileStream);
+        sampleFileStream.Position = 0;
+        SFtpServerConfiguration configuration = sftpServerResource.FtpServerConfiguration;
+
+        // Act
+        sftpServerResource.Upload(sampleFileStream, SampleFileName, configuration.Directory);
+
+        //Assert
+        byte[] downloadedFile =
+            sftpServerResource.Download(SampleFileName, configuration.Directory);
+
+        downloadedFile.Should().BeEquivalentTo(localFileContent);
+    }
+
+    private Stream GetEmbeddedResource(string fileName)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"Squadron.{fileName}";
+
+        return assembly.GetManifestResourceStream(resourceName);
+    }
+
+    private byte[] ToByteArray(Stream stream)
+    {
+        using (MemoryStream memoryStream = new MemoryStream())
         {
-            _sftpServerResource = sftpServerResource;
-        }
+            stream.CopyToAsync(memoryStream);
 
-        [Fact]
-        public async Task UploadFile_DownloadedFileMatchLocal()
-        {
-            // Arrange
-            using Stream sampleFileStream = GetEmbeddedResource(SampleFileName);
-
-            var localFileContent = ToByteArray(sampleFileStream);
-            sampleFileStream.Position = 0;
-            SFtpServerConfiguration configuration = _sftpServerResource.FtpServerConfiguration;
-
-            // Act
-            _sftpServerResource.Upload(sampleFileStream, SampleFileName, configuration.Directory);
-
-            //Assert
-            byte[] downloadedFile =
-                _sftpServerResource.Download(SampleFileName, configuration.Directory);
-
-            downloadedFile.Should().BeEquivalentTo(localFileContent);
-        }
-
-        private Stream GetEmbeddedResource(string fileName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = $"Squadron.{fileName}";
-
-            return assembly.GetManifestResourceStream(resourceName);
-        }
-
-        private byte[] ToByteArray(Stream stream)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                stream.CopyToAsync(memoryStream);
-
-                return memoryStream.ToArray();
-            }
+            return memoryStream.ToArray();
         }
     }
 }

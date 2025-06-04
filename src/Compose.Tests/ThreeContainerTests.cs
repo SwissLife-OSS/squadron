@@ -5,67 +5,59 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class SampleAppOptions : GenericContainerOptions
 {
-    public class SampleAppOptions : GenericContainerOptions
+    public override void Configure(ContainerResourceBuilder builder)
     {
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            base.Configure(builder);
-            builder
-                .Name("nginx-sample")
-                .InternalPort(80)
-                .Image("nginx")
-                .AddNetwork("demo-network");
-        }
+        base.Configure(builder);
+        builder
+            .Name("nginx-sample")
+            .InternalPort(80)
+            .Image("nginx")
+            .AddNetwork("demo-network");
     }
+}
 
-    public class ThreeContainerOptions : ComposeResourceOptions
+public class ThreeContainerOptions : ComposeResourceOptions
+{
+    public override void Configure(ComposeResourceBuilder builder)
     {
-        public override void Configure(ComposeResourceBuilder builder)
-        {
-            builder.AddGlobalEnvironmentVariable("FOO", "BAR");
-            builder.AddContainer<MongoDefaultOptions>("mongo");
-            builder.AddContainer<SampleAppOptions>("api")
-                    .AddLink("mongo", new EnvironmentVariableMapping(
-                                "Sample:Database:ConnectionString",
-                                "#CONNECTIONSTRING#"
-                                ));
+        builder.AddGlobalEnvironmentVariable("FOO", "BAR");
+        builder.AddContainer<MongoDefaultOptions>("mongo");
+        builder.AddContainer<SampleAppOptions>("api")
+            .AddLink("mongo", new EnvironmentVariableMapping(
+                "Sample:Database:ConnectionString",
+                "#CONNECTIONSTRING#"
+            ));
 
-            builder.AddContainer<SampleAppOptions>("ui")
-                    .AddLink("api", new EnvironmentVariableMapping(
-                                "Sample:Api:Url", "#HTTPURL#"
-                                ));
-        }
+        builder.AddContainer<SampleAppOptions>("ui")
+            .AddLink("api", new EnvironmentVariableMapping(
+                "Sample:Api:Url", "#HTTPURL#"
+            ));
     }
+}
 
-    public class TwoContainerComposedResource : ComposeResource<ThreeContainerOptions>
+public class TwoContainerComposedResource : ComposeResource<ThreeContainerOptions>
+{
+
+
+}
+
+
+public class ThreeContainerTests(TwoContainerComposedResource resource) : IClassFixture<TwoContainerComposedResource>
+{
+    [Fact]
+    public void ThreeContainer_NoError()
     {
-
-
-    }
-
-
-    public class ThreeContainerTests : IClassFixture<TwoContainerComposedResource>
-    {
-        private readonly TwoContainerComposedResource _resource;
-
-        public ThreeContainerTests(TwoContainerComposedResource resource)
+        //Act
+        Action action = () =>
         {
-            _resource = resource;
-        }
+            MongoResource mongo = resource.GetResource<MongoResource>("mongo");
+        };
 
-        [Fact]
-        public void ThreeContainer_NoError()
-        {
-            //Act
-            Action action = () =>
-            {
-                MongoResource mongo = _resource.GetResource<MongoResource>("mongo");
-            };
-
-            //Assert
-            action.Should().NotThrow();
-        }
+        //Assert
+        action.Should().NotThrow();
     }
 }

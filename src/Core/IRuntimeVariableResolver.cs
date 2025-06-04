@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Squadron
+namespace Squadron;
+
+internal interface IVariableResolver
 {
-    internal interface IVariableResolver
-    {
-        T Resolve<T>(string dynamicVariableName);
-        bool CanHandle(VariableType type);
-    }
+    T Resolve<T>(string dynamicVariableName);
+    bool CanHandle(VariableType type);
 }

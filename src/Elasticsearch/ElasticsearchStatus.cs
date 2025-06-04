@@ -3,41 +3,40 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Status checker for Elasticsearch
+/// </summary>
+/// <seealso cref="IResourceStatusProvider" />
+public class ElasticsearchStatus : IResourceStatusProvider
 {
+    private readonly IElasticClient _client;
+
     /// <summary>
-    /// Status checker for Elasticsearch
+    /// Initializes a new instance of the <see cref="ElasticsearchStatus"/> class.
     /// </summary>
-    /// <seealso cref="IResourceStatusProvider" />
-    public class ElasticsearchStatus : IResourceStatusProvider
+    public ElasticsearchStatus(IElasticClient client)
     {
-        private readonly IElasticClient _client;
+        _client = client;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElasticsearchStatus"/> class.
-        /// </summary>
-        public ElasticsearchStatus(IElasticClient client)
+    /// <summary>
+    /// Determines whether Elasticsearch cluster is ready.
+    /// </summary>
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    {
+        var healthRequest = new ClusterHealthRequest
         {
-            _client = client;
-        }
+            WaitForStatus = WaitForStatus.Green
+        };
+        ClusterHealthResponse healthResponse = await _client
+            .Cluster.HealthAsync(healthRequest, cancellationToken);
 
-        /// <summary>
-        /// Determines whether Elasticsearch cluster is ready.
-        /// </summary>
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+        return new Status
         {
-            var healthRequest = new ClusterHealthRequest
-            {
-                WaitForStatus = WaitForStatus.Green
-            };
-            ClusterHealthResponse healthResponse = await _client
-                .Cluster.HealthAsync(healthRequest, cancellationToken);
-
-            return new Status
-            {
-                IsReady = healthResponse.IsValid,
-                Message = healthResponse.DebugInformation
-            };
-        }
+            IsReady = healthResponse.IsValid,
+            Message = healthResponse.DebugInformation
+        };
     }
 }

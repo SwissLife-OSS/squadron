@@ -6,83 +6,82 @@ using System.Threading.Tasks;
 using Renci.SshNet;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class SFtpServerResource : SFtpServerResource<SFtpServerDefaultOptions>
 {
-    public class SFtpServerResource : SFtpServerResource<SFtpServerDefaultOptions>
+}
+
+/// <summary>
+/// Represents a FtpServer resource that can be used by unit tests.
+/// </summary>
+/// <seealso cref="IDisposable"/>
+public class SFtpServerResource<TOptions>
+    : ContainerResource<TOptions>,
+        IAsyncLifetime
+    where TOptions : ContainerResourceOptions, new()
+{
+    public SFtpServerConfiguration FtpServerConfiguration { get; private set; }
+
+    /// <inheritdoc cref="IAsyncLifetime"/>
+    public override async Task InitializeAsync()
     {
+        await base.InitializeAsync().ConfigureAwait(false);
+        FtpServerConfiguration = BuildConfiguration(Settings.Username, Settings.Password);
+
+        await Initializer.WaitAsync(
+            new SFtpServerStatus(FtpServerConfiguration));
     }
 
-    /// <summary>
-    /// Represents a FtpServer resource that can be used by unit tests.
-    /// </summary>
-    /// <seealso cref="IDisposable"/>
-    public class SFtpServerResource<TOptions>
-        : ContainerResource<TOptions>,
-          IAsyncLifetime
-        where TOptions : ContainerResourceOptions, new()
+    private SFtpServerConfiguration BuildConfiguration(string username, string password)
     {
-        public SFtpServerConfiguration FtpServerConfiguration { get; private set; }
+        Settings.KeyValueStore
+            .TryGetValue(WellKnown.DirectoryName, out object directoryNameObj);
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public override async Task InitializeAsync()
+        if (directoryNameObj is null || directoryNameObj is not string directoryName)
         {
-            await base.InitializeAsync().ConfigureAwait(false);
-            FtpServerConfiguration = BuildConfiguration(Settings.Username, Settings.Password);
-
-            await Initializer.WaitAsync(
-                new SFtpServerStatus(FtpServerConfiguration));
+            throw new ContainerException(
+                $"Key {WellKnown.DirectoryName} not set int {nameof(Settings.KeyValueStore)}.");
         }
 
-        private SFtpServerConfiguration BuildConfiguration(string username, string password)
+        return new SFtpServerConfiguration(
+            Manager.Instance.Address,
+            Manager.Instance.HostPort,
+            username,
+            password,
+            directoryName);
+    }
+
+    public void Upload(Stream stream, string fileName, string path)
+    {
+        using (var client = new SftpClient(ConnectionInfo))
         {
-            Settings.KeyValueStore
-                .TryGetValue(WellKnown.DirectoryName, out object directoryNameObj);
-
-            if (directoryNameObj is null || directoryNameObj is not string directoryName)
-            {
-                throw new ContainerException(
-                    $"Key {WellKnown.DirectoryName} not set int {nameof(Settings.KeyValueStore)}.");
-            }
-
-            return new SFtpServerConfiguration(
-                Manager.Instance.Address,
-                Manager.Instance.HostPort,
-                username,
-                password,
-                directoryName);
+            client.Connect();
+            client.UploadFile(stream, $"{path}/{fileName}");
+            client.Disconnect();
         }
+    }
 
-        public void Upload(Stream stream, string fileName, string path)
+    public byte[] Download(string fileName, string path)
+    {
+        using (var client = new SftpClient(ConnectionInfo))
         {
-            using (var client = new SftpClient(ConnectionInfo))
-            {
-                client.Connect();
-                client.UploadFile(stream, $"{path}/{fileName}");
-                client.Disconnect();
-            }
+            using var downloadedFileStream = new MemoryStream();
+            client.Connect();
+            client.DownloadFile($"{path}/{fileName}", downloadedFileStream);
+            client.Disconnect();
+
+            return downloadedFileStream.ToArray();
         }
+    }
 
-        public byte[] Download(string fileName, string path)
-        {
-            using (var client = new SftpClient(ConnectionInfo))
-            {
-                using var downloadedFileStream = new MemoryStream();
-                client.Connect();
-                client.DownloadFile($"{path}/{fileName}", downloadedFileStream);
-                client.Disconnect();
-
-                return downloadedFileStream.ToArray();
-            }
-        }
-
-        private ConnectionInfo ConnectionInfo =>
-            new ConnectionInfo(
-                FtpServerConfiguration.Host,
-                FtpServerConfiguration.Port,
+    private ConnectionInfo ConnectionInfo =>
+        new ConnectionInfo(
+            FtpServerConfiguration.Host,
+            FtpServerConfiguration.Port,
+            FtpServerConfiguration.Username,
+            new PasswordAuthenticationMethod(
                 FtpServerConfiguration.Username,
-                new PasswordAuthenticationMethod(
-                    FtpServerConfiguration.Username,
-                    FtpServerConfiguration.Password));
+                FtpServerConfiguration.Password));
 
-    }
 }

@@ -1,10 +1,9 @@
-namespace Squadron.AzureCloudEventHub.Tests
+namespace Squadron.AzureCloudEventHub.Tests;
+
+public class TestNewNamespaceAzureEventHubOptions : AzureCloudEventHubOptions
 {
-    public class TestNewNamespaceAzureEventHubOptions : AzureCloudEventHubOptions
+    public override void Configure(EventHubOptionsBuilder builder)
     {
-        public override void Configure(EventHubOptionsBuilder builder)
-        {
-            builder.AddEventHub("testEventHub");
-        }
+        builder.AddEventHub("testEventHub");
     }
 }

@@ -2,41 +2,40 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Status checker for SQLServer
+/// </summary>
+/// <seealso cref="Squadron.IResourceStatusProvider" />
+public class SqlServerStatus : IResourceStatusProvider
 {
+    private readonly string _serverConnectionString;
+
     /// <summary>
-    /// Status checker for SQLServer
+    /// Initializes a new instance of the <see cref="SqlServerStatus"/> class.
     /// </summary>
-    /// <seealso cref="Squadron.IResourceStatusProvider" />
-    public class SqlServerStatus : IResourceStatusProvider
+    public SqlServerStatus(string serverConnectionString)
     {
-        private readonly string _serverConnectionString;
+        _serverConnectionString = serverConnectionString;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SqlServerStatus"/> class.
-        /// </summary>
-        public SqlServerStatus(string serverConnectionString)
+    /// <summary>
+    /// Determines whether SQLServer is ready.
+    /// </summary>
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_serverConnectionString))
         {
-            _serverConnectionString = serverConnectionString;
-        }
+            await connection.OpenAsync(cancellationToken);
 
-        /// <summary>
-        /// Determines whether SQLServer is ready.
-        /// </summary>
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
-        {
-            using (var connection = new SqlConnection(_serverConnectionString))
+            using (Microsoft.Data.SqlClient.SqlCommand command = connection.CreateCommand())
             {
-                await connection.OpenAsync(cancellationToken);
-
-                using (Microsoft.Data.SqlClient.SqlCommand command = connection.CreateCommand())
+                command.CommandText = "SELECT Count(name) FROM sys.databases";
+                return new Status
                 {
-                    command.CommandText = "SELECT Count(name) FROM sys.databases";
-                    return new Status
-                    {
-                        IsReady = (int)await command.ExecuteScalarAsync(cancellationToken) >= 4
-                    };
-                }
+                    IsReady = (int)await command.ExecuteScalarAsync(cancellationToken) >= 4
+                };
             }
         }
     }

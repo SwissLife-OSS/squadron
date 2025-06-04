@@ -6,53 +6,46 @@ using FluentAssertions;
 using FluentFTP;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class FtpServerResourceTests(FtpServerResource ftpServerResource) : IClassFixture<FtpServerResource>
 {
-    public class FtpServerResourceTests : IClassFixture<FtpServerResource>
+    private const string SampleFileName = "SampleFile.txt";
+
+    [Fact]
+    public async Task UploadFile_DownloadedFileMatchLocal()
     {
-        private const string SampleFileName = "SampleFile.txt";
-        private readonly FtpServerResource _ftpServerResource;
+        // Arrange
+        using Stream sampleFileStream = GetEmbeddedResource(SampleFileName);
 
-        public FtpServerResourceTests(FtpServerResource ftpServerResource)
+        var localFileContent = ToByteArray(sampleFileStream);
+        sampleFileStream.Position = 0;
+
+        // Act
+        await ftpServerResource.UploadAsync(sampleFileStream, SampleFileName, "/", default);
+
+        //Assert
+        byte[] downloadedFile =
+            await ftpServerResource.DownloadAsync(SampleFileName, "/", default);
+
+        downloadedFile.Should().BeEquivalentTo(localFileContent);
+    }
+
+    private Stream GetEmbeddedResource(string fileName)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"Squadron.{fileName}";
+
+        return assembly.GetManifestResourceStream(resourceName);
+    }
+
+    private byte[] ToByteArray(Stream stream)
+    {
+        using (MemoryStream memoryStream = new MemoryStream())
         {
-            _ftpServerResource = ftpServerResource;
-        }
+            stream.CopyToAsync(memoryStream);
 
-        [Fact]
-        public async Task UploadFile_DownloadedFileMatchLocal()
-        {
-            // Arrange
-            using Stream sampleFileStream = GetEmbeddedResource(SampleFileName);
-
-            var localFileContent = ToByteArray(sampleFileStream);
-            sampleFileStream.Position = 0;
-
-            // Act
-            await _ftpServerResource.UploadAsync(sampleFileStream, SampleFileName, "/", default);
-
-            //Assert
-            byte[] downloadedFile =
-                await _ftpServerResource.DownloadAsync(SampleFileName, "/", default);
-
-            downloadedFile.Should().BeEquivalentTo(localFileContent);
-        }
-
-        private Stream GetEmbeddedResource(string fileName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = $"Squadron.{fileName}";
-
-            return assembly.GetManifestResourceStream(resourceName);
-        }
-
-        private byte[] ToByteArray(Stream stream)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                stream.CopyToAsync(memoryStream);
-
-                return memoryStream.ToArray();
-            }
+            return memoryStream.ToArray();
         }
     }
 }

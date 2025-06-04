@@ -5,56 +5,55 @@ using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Status checker for RabbitMQ
+/// </summary>
+/// <seealso cref="IResourceStatusProvider" />
+public class RabbitMQStatus : IResourceStatusProvider
 {
+    private readonly string _connectionString;
+
     /// <summary>
-    /// Status checker for RabbitMQ
+    /// Initializes a new instance of the <see cref="RabbitMQStatus"/> class.
     /// </summary>
-    /// <seealso cref="IResourceStatusProvider" />
-    public class RabbitMQStatus : IResourceStatusProvider
+    /// <param name="connectionString">The ConnectionString</param>
+    public RabbitMQStatus(string connectionString)
     {
-        private readonly string _connectionString;
+        _connectionString = connectionString;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RabbitMQStatus"/> class.
-        /// </summary>
-        /// <param name="connectionString">The ConnectionString</param>
-        public RabbitMQStatus(string connectionString)
+    /// <inheritdoc/>
+    public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    {
+        var factory = new ConnectionFactory()
         {
-            _connectionString = connectionString;
-        }
-
-        /// <inheritdoc/>
-        public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+            Uri = new Uri(_connectionString)
+        };
+        using (IConnection connection = CreateConnection(factory))
+        using (IModel channel = connection.CreateModel())
         {
-            var factory = new ConnectionFactory()
+            return Task.FromResult(new Status
             {
-                Uri = new Uri(_connectionString)
-            };
-            using (IConnection connection = CreateConnection(factory))
-            using (IModel channel = connection.CreateModel())
-            {
-                return Task.FromResult(new Status
-                {
-                    IsReady = channel.IsOpen,
-                    Message = connection.ToString()
-                });
-            }
+                IsReady = channel.IsOpen,
+                Message = connection.ToString()
+            });
         }
+    }
 
-        private static IConnection CreateConnection(
-            IConnectionFactory connectionFactory)
-        {
-            string hostname = ((ConnectionFactory)connectionFactory).HostName;
-            return connectionFactory
-                .CreateConnection(new List<AmqpTcpEndpoint>
-                {
-                    new AmqpTcpEndpoint(
+    private static IConnection CreateConnection(
+        IConnectionFactory connectionFactory)
+    {
+        string hostname = ((ConnectionFactory)connectionFactory).HostName;
+        return connectionFactory
+            .CreateConnection(new List<AmqpTcpEndpoint>
+            {
+                new AmqpTcpEndpoint(
                     connectionFactory.Uri,
                     new SslOption(
                         serverName:hostname,
                         enabled: false))
-                });
-        }
+            });
     }
 }

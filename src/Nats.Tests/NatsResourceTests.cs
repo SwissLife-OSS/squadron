@@ -8,28 +8,19 @@ using Xunit.Abstractions;
 
 namespace Nats.Tests;
 
-public class NatsResourceTests : IClassFixture<NatsResource>
+public class NatsResourceTests(NatsResource nats, ITestOutputHelper helper) : IClassFixture<NatsResource>
 {
-    private readonly NatsResource _nats;
-    private readonly ITestOutputHelper _helper;
-
-    public NatsResourceTests(NatsResource nats, ITestOutputHelper helper)
-    {
-        _nats = nats;
-        _helper = helper;
-    }
-
     [Fact]
     public async Task Client_Will_Connect()
     {
-        var options = NatsOptions.Default with { Url = _nats.NatsConnectionString };
+        var options = NatsOptions.Default with { Url = nats.NatsConnectionString };
         var client = new NatsConnection(options);
 
         await client.ConnectAsync();
-        _helper.WriteLine("NATS Client is connected to: " + _nats.NatsConnectionString);
+        helper.WriteLine("NATS Client is connected to: " + nats.NatsConnectionString);
 
         await client.DisposeAsync();
-        _helper.WriteLine("NATS Client disconnected.");
+        helper.WriteLine("NATS Client disconnected.");
 
         Assert.True(true);
     }
@@ -37,23 +28,23 @@ public class NatsResourceTests : IClassFixture<NatsResource>
     [Fact]
     public async Task Publish_Subscribe_Topic()
     {
-        var options = NatsOptions.Default with { Url = _nats.NatsConnectionString };
+        var options = NatsOptions.Default with { Url = nats.NatsConnectionString };
         var client = new NatsConnection(options);
 
         await client.ConnectAsync();
-        _helper.WriteLine("NATS Client is connected to: " + _nats.NatsConnectionString);
+        helper.WriteLine("NATS Client is connected to: " + nats.NatsConnectionString);
 
         var semaphore = new SemaphoreSlim(0);
         await client.SubscribeAsync("test", () =>
         {
-             _helper.WriteLine("Received message on test topic");
+             helper.WriteLine("Received message on test topic");
              semaphore.Release();
         });
 
         var timeout = Task.Delay(TimeSpan.FromSeconds(2));
 
         await client.PublishAsync("test", "Hello World!");
-        _helper.WriteLine("Published message on test topic");
+        helper.WriteLine("Published message on test topic");
 
         Task winner = await Task.WhenAny(new[]
         {
@@ -69,7 +60,7 @@ public class NatsResourceTests : IClassFixture<NatsResource>
         await client.DisposeAsync();
         semaphore.Dispose();
 
-        _helper.WriteLine("NATS Client disconnected.");
+        helper.WriteLine("NATS Client disconnected.");
 
         Assert.True(true);
     }

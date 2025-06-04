@@ -4,37 +4,29 @@ using RabbitMQ.Client.Events;
 using Squadron;
 using Xunit;
 
-namespace RabbitMQ.Tests
+namespace RabbitMQ.Tests;
+
+public class RabbitMQResourceTests(RabbitMQResource rabbitMqResource) : IClassFixture<RabbitMQResource>
 {
-    public class RabbitMQResourceTests : IClassFixture<RabbitMQResource>
+    [Fact]
+    public void CreateConnectionFactory_SendMessage_NoError()
     {
-        private readonly RabbitMQResource _rabbitMQResource;
+        //Act
+        ConnectionFactory factory = rabbitMqResource.CreateConnectionFactory();
 
-        public RabbitMQResourceTests(RabbitMQResource rabbitMQResource)
+        using (IConnection connection = factory.CreateConnection())
+        using (IModel channel = connection.CreateModel())
         {
-            _rabbitMQResource = rabbitMQResource;
-        }
+            channel.QueueDeclare(queue: "foo",
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
 
-        [Fact]
-        public void CreateConnectionFactory_SendMessage_NoError()
-        {
-            //Act
-            ConnectionFactory factory = _rabbitMQResource.CreateConnectionFactory();
-
-            using (IConnection connection = factory.CreateConnection())
-            using (IModel channel = connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: "foo",
-                             durable: false,
-                             exclusive: false,
-                             autoDelete: false,
-                             arguments: null);
-
-                channel.BasicPublish(exchange: "",
-                             routingKey: "bar",
-                             basicProperties: null,
-                             body: Encoding.UTF8.GetBytes("Hello RabbitMQ"));
-            }
+            channel.BasicPublish(exchange: "",
+                routingKey: "bar",
+                basicProperties: null,
+                body: Encoding.UTF8.GetBytes("Hello RabbitMQ"));
         }
     }
 }

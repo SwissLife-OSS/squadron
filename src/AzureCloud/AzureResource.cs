@@ -1,35 +1,34 @@
 using System.Threading.Tasks;
 
-namespace Squadron.AzureCloud
+namespace Squadron.AzureCloud;
+
+/// <summary>
+/// Base class to use with Azure Cloud resources
+/// </summary>
+/// <typeparam name="TOptions"></typeparam>
+public class AzureResource<TOptions>
+    where TOptions : AzureResourceOptions, new()
 {
     /// <summary>
-    /// Base class to use with Azure Cloud resources
+    /// Azure configuration to work with Azure management api
     /// </summary>
-    /// <typeparam name="TOptions"></typeparam>
-    public class AzureResource<TOptions>
-        where TOptions : AzureResourceOptions, new()
+    protected AzureResourceConfiguration AzureConfig { get; private set; }
+
+    /// <summary>
+    /// Initialize the resource
+    /// </summary>
+    /// <returns></returns>
+    public virtual Task InitializeAsync()
     {
-        /// <summary>
-        /// Azure configuration to work with Azure management api
-        /// </summary>
-        protected AzureResourceConfiguration AzureConfig { get; private set; }
+        return Task.CompletedTask;
+    }
 
-        /// <summary>
-        /// Initialize the resource
-        /// </summary>
-        /// <returns></returns>
-        public virtual Task InitializeAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Loads the azure resource configuration.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        protected void LoadResourceConfiguration(AzureResourceOptionsBuilder builder)
-        {
-           AzureConfig = builder.ConfigResolver();
-        }
+    /// <summary>
+    /// Loads the azure resource configuration.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    protected void LoadResourceConfiguration(AzureResourceOptionsBuilder builder)
+    {
+        AzureConfig = builder.ConfigResolver();
     }
 }

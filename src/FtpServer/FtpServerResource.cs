@@ -5,92 +5,91 @@ using System.Threading.Tasks;
 using FluentFTP;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class FtpServerResource : FtpServerResource<FtpServerDefaultOptions>
 {
-    public class FtpServerResource : FtpServerResource<FtpServerDefaultOptions>
+}
+
+/// <summary>
+/// Represents a FtpServer resource that can be used by unit tests.
+/// </summary>
+/// <seealso cref="IDisposable"/>
+public class FtpServerResource<TOptions>
+    : ContainerResource<TOptions>,
+        IAsyncLifetime
+    where TOptions : ContainerResourceOptions, new()
+{
+    public FtpServerConfiguration FtpServerConfiguration { get; private set; }
+
+    /// <inheritdoc cref="IAsyncLifetime"/>
+    public override async Task InitializeAsync()
     {
+        await base.InitializeAsync().ConfigureAwait(false);
+        FtpServerConfiguration = BuildConfiguration(Settings.Username, Settings.Password);
+
+        await Initializer.WaitAsync(
+            new FtpServerStatus(FtpServerConfiguration));
     }
 
-    /// <summary>
-    /// Represents a FtpServer resource that can be used by unit tests.
-    /// </summary>
-    /// <seealso cref="IDisposable"/>
-    public class FtpServerResource<TOptions>
-        : ContainerResource<TOptions>,
-          IAsyncLifetime
-        where TOptions : ContainerResourceOptions, new()
+    private FtpServerConfiguration BuildConfiguration(string username, string password)
     {
-        public FtpServerConfiguration FtpServerConfiguration { get; private set; }
+        return new FtpServerConfiguration(
+            Manager.Instance.Address,
+            Manager.Instance.HostPort,
+            username,
+            password);
+    }
 
-        /// <inheritdoc cref="IAsyncLifetime"/>
-        public override async Task InitializeAsync()
+    public async Task UploadAsync(
+        Stream stream,
+        string fileName,
+        string directory,
+        CancellationToken cancellationToken)
+    {
+        using IFtpClient ftpClient = new FtpClient(
+            FtpServerConfiguration.Host,
+            FtpServerConfiguration.Port,
+            FtpServerConfiguration.Username,
+            FtpServerConfiguration.Password);
+
+        try
         {
-            await base.InitializeAsync().ConfigureAwait(false);
-            FtpServerConfiguration = BuildConfiguration(Settings.Username, Settings.Password);
+            await ftpClient.ConnectAsync(token: cancellationToken);
 
-            await Initializer.WaitAsync(
-                new FtpServerStatus(FtpServerConfiguration));
+            await ftpClient.UploadAsync(
+                stream,
+                Path.Combine(directory, fileName),
+                token: cancellationToken);
         }
-
-        private FtpServerConfiguration BuildConfiguration(string username, string password)
+        finally
         {
-            return new FtpServerConfiguration(
-                Manager.Instance.Address,
-                Manager.Instance.HostPort,
-                username,
-                password);
+            await ftpClient.DisconnectAsync(token: cancellationToken);
         }
+    }
 
-        public async Task UploadAsync(
-            Stream stream,
-            string fileName,
-            string directory,
-            CancellationToken cancellationToken)
+    public async Task<byte[]> DownloadAsync(
+        string fileName,
+        string directory,
+        CancellationToken cancellationToken)
+    {
+        using IFtpClient ftpClient = new FtpClient(
+            FtpServerConfiguration.Host,
+            FtpServerConfiguration.Port,
+            FtpServerConfiguration.Username,
+            FtpServerConfiguration.Password);
+
+        try
         {
-            using IFtpClient ftpClient = new FtpClient(
-                FtpServerConfiguration.Host,
-                FtpServerConfiguration.Port,
-                FtpServerConfiguration.Username,
-                FtpServerConfiguration.Password);
+            await ftpClient.ConnectAsync(token: cancellationToken);
 
-            try
-            {
-                await ftpClient.ConnectAsync(token: cancellationToken);
-
-                await ftpClient.UploadAsync(
-                    stream,
-                    Path.Combine(directory, fileName),
-                    token: cancellationToken);
-            }
-            finally
-            {
-                await ftpClient.DisconnectAsync(token: cancellationToken);
-            }
+            return await ftpClient.DownloadAsync(
+                Path.Combine(directory, fileName),
+                token: cancellationToken);
         }
-
-        public async Task<byte[]> DownloadAsync(
-            string fileName,
-            string directory,
-            CancellationToken cancellationToken)
+        finally
         {
-            using IFtpClient ftpClient = new FtpClient(
-                FtpServerConfiguration.Host,
-                FtpServerConfiguration.Port,
-                FtpServerConfiguration.Username,
-                FtpServerConfiguration.Password);
-
-            try
-            {
-                await ftpClient.ConnectAsync(token: cancellationToken);
-
-                return await ftpClient.DownloadAsync(
-                    Path.Combine(directory, fileName),
-                    token: cancellationToken);
-            }
-            finally
-            {
-                await ftpClient.DisconnectAsync(token: cancellationToken);
-            }
+            await ftpClient.DisconnectAsync(token: cancellationToken);
         }
     }
 }

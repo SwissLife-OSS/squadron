@@ -6,121 +6,114 @@ using MongoDB.Driver;
 using Snapshooter.Xunit;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class MongoResourceTests(MongoResource mongoResource) : IClassFixture<MongoResource>
 {
-    public class MongoResourceTests
-        : IClassFixture<MongoResource>
+    private MongoResource MongoResource { get; } = mongoResource;
+
+    [Fact]
+    public void CreateAndUseCollection()
     {
-        public MongoResourceTests(MongoResource mongoResource)
-        {
-            MongoResource = mongoResource;
-        }
+        // arrange
+        IMongoCollection<BsonDocument> collection = MongoResource.CreateCollection<BsonDocument>();
 
-        private MongoResource MongoResource { get; }
+        BsonDocument document = new BsonDocument {{"a", "b"}};
 
-        [Fact]
-        public void CreateAndUseCollection()
-        {
-            // arrange
-            IMongoCollection<BsonDocument> collection = MongoResource.CreateCollection<BsonDocument>();
+        // act
+        collection.InsertOne(document);
 
-            BsonDocument document = new BsonDocument {{"a", "b"}};
+        // assert
+        BsonDocument retrieved = collection.Find(new BsonDocument()).First();
+        Assert.True(retrieved.Contains("a"));
+        Assert.Equal(document["a"], retrieved["a"]);
+    }
 
-            // act
-            collection.InsertOne(document);
+    [Fact]
+    public void ReUseDatabase()
+    {
+        // arrange
+        BsonDocument document = new BsonDocument {{"a", "b"}};
 
-            // assert
-            BsonDocument retrieved = collection.Find(new BsonDocument()).First();
-            Assert.True(retrieved.Contains("a"));
-            Assert.Equal(document["a"], retrieved["a"]);
-        }
+        // act
+        IMongoDatabase database = MongoResource.CreateDatabase();
+        IMongoCollection<BsonDocument> collectiona = MongoResource.CreateCollection<BsonDocument>(database);
+        IMongoCollection<BsonDocument> collectionb = MongoResource.CreateCollection<BsonDocument>(database);
 
-        [Fact]
-        public void ReUseDatabase()
-        {
-            // arrange
-            BsonDocument document = new BsonDocument {{"a", "b"}};
+        collectiona.InsertOne(document);
+        collectionb.InsertOne(document);
 
-            // act
-            IMongoDatabase database = MongoResource.CreateDatabase();
-            IMongoCollection<BsonDocument> collectiona = MongoResource.CreateCollection<BsonDocument>(database);
-            IMongoCollection<BsonDocument> collectionb = MongoResource.CreateCollection<BsonDocument>(database);
+        // assert
+        Assert.NotEqual(collectiona, collectionb);
+        Assert.Equal(database, collectiona.Database);
+        Assert.Equal(database, collectionb.Database);
 
-            collectiona.InsertOne(document);
-            collectionb.InsertOne(document);
+        BsonDocument retrieveda = collectiona.Find(new BsonDocument()).First();
+        BsonDocument retrievedb = collectionb.Find(new BsonDocument()).First();
 
-            // assert
-            Assert.NotEqual(collectiona, collectionb);
-            Assert.Equal(database, collectiona.Database);
-            Assert.Equal(database, collectionb.Database);
+        Assert.True(retrieveda.Contains("a"));
+        Assert.Equal(document["a"], retrieveda["a"]);
+        Assert.True(retrievedb.Contains("a"));
+        Assert.Equal(document["a"], retrievedb["a"]);
+    }
 
-            BsonDocument retrieveda = collectiona.Find(new BsonDocument()).First();
-            BsonDocument retrievedb = collectionb.Find(new BsonDocument()).First();
+    [Fact]
+    public async Task CreateCollectionFromFile_DefaultOptions()
+    {
+        // act
+        IMongoCollection<BsonDocument> collection = await MongoResource.CreateCollectionFromFileAsync<BsonDocument>(
+            null,
+            new CreateCollectionFromFileOptions
+            {
+                File = new FileInfo(Path.Combine("Resources", "news.json")),
+            });
 
-            Assert.True(retrieveda.Contains("a"));
-            Assert.Equal(document["a"], retrieveda["a"]);
-            Assert.True(retrievedb.Contains("a"));
-            Assert.Equal(document["a"], retrievedb["a"]);
-        }
+        // assert
+        BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
+        imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
+    }
 
-        [Fact]
-        public async Task CreateCollectionFromFile_DefaultOptions()
-        {
-            // act
-            IMongoCollection<BsonDocument> collection = await MongoResource.CreateCollectionFromFileAsync<BsonDocument>(
-                null,
-                new CreateCollectionFromFileOptions
+    [Fact]
+    public async Task CreateDatabaseFromFiles()
+    {
+        // act
+        IMongoDatabase db = await MongoResource.CreateDatabase(
+            new FileInfo(Path.Combine("Resources", "news.json")));
+
+        // assert
+        IMongoCollection<BsonDocument> imported = db.GetCollection<BsonDocument>("news");
+        List<BsonDocument> items = await imported
+            .Find(Builders<BsonDocument>.Filter.Empty)
+            .ToListAsync();
+        items.MatchSnapshot(o => o.IgnoreField("[0].[0].Value"));
+    }
+
+    [Fact]
+    public async Task CreateCollectionFromFile_CustomOptions()
+    {
+        // act
+        IMongoCollection<BsonDocument> collection = await MongoResource.CreateCollectionFromFileAsync<BsonDocument>(
+            null,
+            new CreateCollectionFromFileOptions
+            {
+                File = new FileInfo(Path.Combine("Resources", "news.tsv")),
+                CollectionOptions = new CreateCollectionOptions
                 {
-                    File = new FileInfo(Path.Combine("Resources", "news.json")),
-                });
-
-            // assert
-            BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
-            imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
-        }
-
-        [Fact]
-        public async Task CreateDatabaseFromFiles()
-        {
-            // act
-            IMongoDatabase db = await MongoResource.CreateDatabase(
-                new FileInfo(Path.Combine("Resources", "news.json")));
-
-            // assert
-            IMongoCollection<BsonDocument> imported = db.GetCollection<BsonDocument>("news");
-            List<BsonDocument> items = await imported
-                .Find(Builders<BsonDocument>.Filter.Empty)
-                .ToListAsync();
-            items.MatchSnapshot(o => o.IgnoreField("[0].[0].Value"));
-        }
-
-        [Fact]
-        public async Task CreateCollectionFromFile_CustomOptions()
-        {
-            // act
-            IMongoCollection<BsonDocument> collection = await MongoResource.CreateCollectionFromFileAsync<BsonDocument>(
-                null,
-                new CreateCollectionFromFileOptions
-                {
-                    File = new FileInfo(Path.Combine("Resources", "news.tsv")),
-                    CollectionOptions = new CreateCollectionOptions
+                    CollectionName = "myCollection",
+                    DatabaseOptions = new CreateDatabaseOptions
                     {
-                        CollectionName = "myCollection",
-                        DatabaseOptions = new CreateDatabaseOptions
-                        {
-                            DatabaseName = "myDatabase"
-                        }
-                    },
-                    CustomImportArgs = new []
-                    {
-                        "--type=tsv",
-                        "--headerline"
+                        DatabaseName = "myDatabase"
                     }
-                });
+                },
+                CustomImportArgs = new []
+                {
+                    "--type=tsv",
+                    "--headerline"
+                }
+            });
 
-            // assert
-            BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
-            imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
-        }
+        // assert
+        BsonDocument imported = collection.Find(new BsonDocument()).FirstOrDefault();
+        imported.MatchSnapshot(o => o.IgnoreField("[0].Value"));
     }
 }

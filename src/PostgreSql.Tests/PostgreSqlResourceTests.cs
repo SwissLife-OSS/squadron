@@ -6,58 +6,50 @@ using FluentAssertions;
 using Npgsql;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class PostgreSqlResourceTests(PostgreSqlResource resource) : IClassFixture<PostgreSqlResource>
 {
-    public class PostgreSqlResourceTests : IClassFixture<PostgreSqlResource>
+    [Fact]
+    public void PrepareResource_NoError()
     {
-        private readonly PostgreSqlResource _resource;
-
-        public PostgreSqlResourceTests(PostgreSqlResource resource)
+        //Act
+        Action action = () =>
         {
-            _resource = resource;
-        }
+            resource.GetConnection();
+        };
 
-        [Fact]
-        public void PrepareResource_NoError()
+        //Assert
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public async Task CreateDatabaseAndRunSqlScript()
+    {
+        //Arrange
+        var script = File.ReadAllText(Path.Combine("Resources", "Init1.sql"));
+        var newDb = "squadron";
+
+        //Act
+        await resource.CreateDatabaseAsync(newDb);
+        await resource.RunSqlScriptAsync(script, newDb);
+
+        //Assert
+        var features = new List<string>();
+
+        using (NpgsqlConnection con = resource.GetConnection(newDb))
         {
-            //Act
-            Action action = () =>
+            NpgsqlCommand cmd = con.CreateCommand();
+            cmd.CommandText = "select * from features";
+            await con.OpenAsync();
+            using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync())
             {
-                _resource.GetConnection();
-            };
-
-            //Assert
-            action.Should().NotThrow();
-        }
-
-        [Fact]
-        public async Task CreateDatabaseAndRunSqlScript()
-        {
-            //Arrange
-            var script = File.ReadAllText(Path.Combine("Resources", "Init1.sql"));
-            var newDb = "squadron";
-
-            //Act
-            await _resource.CreateDatabaseAsync(newDb);
-            await _resource.RunSqlScriptAsync(script, newDb);
-
-            //Assert
-            var features = new List<string>();
-
-            using (NpgsqlConnection con = _resource.GetConnection(newDb))
-            {
-                NpgsqlCommand cmd = con.CreateCommand();
-                cmd.CommandText = "select * from features";
-                await con.OpenAsync();
-                using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync())
+                while ( await reader.ReadAsync())
                 {
-                    while ( await reader.ReadAsync())
-                    {
-                        features.Add((string) reader["name"]);
-                    }
+                    features.Add((string) reader["name"]);
                 }
             }
-            features.Should().HaveCount(6);
         }
+        features.Should().HaveCount(6);
     }
 }

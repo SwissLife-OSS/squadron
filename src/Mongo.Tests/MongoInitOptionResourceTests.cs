@@ -6,48 +6,40 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class MongoInitOptionResourceTests(MongoResource<FileInitOptions> mongoResource)
+    : IClassFixture<MongoResource<FileInitOptions>>
 {
-    public class MongoInitOptionResourceTests
-        : IClassFixture<MongoResource<FileInitOptions>>
+    [Fact]
+    public async Task Database_IsInitialized()
     {
-        private readonly MongoResource<FileInitOptions> _mongoResource;
+        IMongoCollection<BsonDocument> collection = mongoResource.Client
+            .GetDatabase("fileImport")
+            .GetCollection<BsonDocument>("news");
 
-        public MongoInitOptionResourceTests(MongoResource<FileInitOptions> mongoResource)
-        {
-            _mongoResource = mongoResource;
-        }
+        List<BsonDocument> items = await collection
+            .Find(Builders<BsonDocument>.Filter.Empty)
+            .ToListAsync();
 
-        [Fact]
-        public async Task Database_IsInitialized()
-        {
-            IMongoCollection<BsonDocument> collection = _mongoResource.Client
-                .GetDatabase("fileImport")
-                .GetCollection<BsonDocument>("news");
-
-            List<BsonDocument> items = await collection
-                .Find(Builders<BsonDocument>.Filter.Empty)
-                .ToListAsync();
-
-            items.Should().HaveCount(1);
-        }
+        items.Should().HaveCount(1);
     }
+}
 
-    public class FileInitOptions : MongoInitOptions
+public class FileInitOptions : MongoInitOptions
+{
+    public override CreateDatabaseFromFilesOptions GetOptions()
     {
-        public override CreateDatabaseFromFilesOptions GetOptions()
+        return new CreateDatabaseFromFilesOptions
         {
-            return new CreateDatabaseFromFilesOptions
+            DatabaseOptions = new CreateDatabaseOptions
             {
-                DatabaseOptions = new CreateDatabaseOptions
-                {
-                    DatabaseName = "fileImport"
-                },
-                Files = new []
-                {
-                    new FileInfo(Path.Combine("Resources", "news.json"))
-                }
-            };
-        }
-    }   
+                DatabaseName = "fileImport"
+            },
+            Files = new []
+            {
+                new FileInfo(Path.Combine("Resources", "news.json"))
+            }
+        };
+    }
 }

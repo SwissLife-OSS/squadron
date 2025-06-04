@@ -4,42 +4,41 @@ using System.Threading;
 using System.Threading.Tasks;
 using MySqlConnector;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Status checker for MySql
+/// </summary>
+/// <seealso cref="IResourceStatusProvider" />
+public class MySqlStatus : IResourceStatusProvider
 {
+    private readonly string _connectionString;
+
     /// <summary>
-    /// Status checker for MySql
+    /// Initializes a new instance of the <see cref="MySqlStatus" /> class.
     /// </summary>
-    /// <seealso cref="IResourceStatusProvider" />
-    public class MySqlStatus : IResourceStatusProvider
+    /// <param name="connectionString">The connection string.</param>
+    public MySqlStatus(string connectionString)
     {
-        private readonly string _connectionString;
+        _connectionString = connectionString;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlStatus" /> class.
-        /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        public MySqlStatus(string connectionString)
+    /// <inheritdoc/>
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    {
+        using (var connection = new MySqlConnection(_connectionString))
         {
-            _connectionString = connectionString;
-        }
+            await connection.OpenAsync(cancellationToken);
 
-        /// <inheritdoc/>
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
-        {
-            using (var connection = new MySqlConnection(_connectionString))
+            using (var cmd = new MySqlCommand("select version()", connection))
             {
-                await connection.OpenAsync(cancellationToken);
+                object version = await cmd.ExecuteScalarAsync(cancellationToken);
 
-                using (var cmd = new MySqlCommand("select version()", connection))
+                return new Status
                 {
-                    object version = await cmd.ExecuteScalarAsync(cancellationToken);
-
-                    return new Status
-                    {
-                        IsReady = true,
-                        Message = version.ToString()
-                    };
-                }
+                    IsReady = true,
+                    Message = version.ToString()
+                };
             }
         }
     }

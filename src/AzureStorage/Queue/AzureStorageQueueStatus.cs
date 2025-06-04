@@ -4,40 +4,39 @@ using Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Status checker for AzureStorage Queues
+/// </summary>
+/// <seealso cref="IResourceStatusProvider" />
+public class AzureStorageQueueStatus : IResourceStatusProvider
 {
+    private readonly string _connectionString;
+
     /// <summary>
-    /// Status checker for AzureStorage Queues
+    /// Initializes a new instance of the <see cref="AzureStorageQueueStatus"/> class.
     /// </summary>
-    /// <seealso cref="IResourceStatusProvider" />
-    public class AzureStorageQueueStatus : IResourceStatusProvider
+    public AzureStorageQueueStatus(string connectionString)
     {
-        private readonly string _connectionString;
+        _connectionString = connectionString;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AzureStorageQueueStatus"/> class.
-        /// </summary>
-        public AzureStorageQueueStatus(string connectionString)
+    /// <summary>
+    /// Determines whether Azure Queue is ready
+    /// </summary>
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    {
+        QueueServiceClient queueServiceClient = new QueueServiceClient(_connectionString);
+        Response<QueueServiceProperties> serviceProperties =
+            await queueServiceClient.GetPropertiesAsync(cancellationToken);
+        return new Status
         {
-            _connectionString = connectionString;
-        }
-
-        /// <summary>
-        /// Determines whether Azure Queue is ready
-        /// </summary>
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
-        {
-            QueueServiceClient queueServiceClient = new QueueServiceClient(_connectionString);
-            Response<QueueServiceProperties> serviceProperties =
-                            await queueServiceClient.GetPropertiesAsync(cancellationToken);
-            return new Status
-            {
-                IsReady = serviceProperties != null,
-                Message =
-                    $"MinuteMetrics: {serviceProperties.Value.MinuteMetrics}, " +
-                    $"HourMetrics: {serviceProperties.Value.HourMetrics}, " +
-                    $"Cors: {serviceProperties.Value.Cors}"
-            };
-        }
+            IsReady = serviceProperties != null,
+            Message =
+                $"MinuteMetrics: {serviceProperties.Value.MinuteMetrics}, " +
+                $"HourMetrics: {serviceProperties.Value.HourMetrics}, " +
+                $"Cors: {serviceProperties.Value.Cors}"
+        };
     }
 }

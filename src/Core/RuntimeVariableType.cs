@@ -1,7 +1,6 @@
-namespace Squadron
+namespace Squadron;
+
+public enum VariableType
 {
-    public enum VariableType
-    {
-        DynamicPort
-    }
+    DynamicPort
 }

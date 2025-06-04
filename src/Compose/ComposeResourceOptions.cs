@@ -1,7 +1,6 @@
-﻿namespace Squadron
+﻿namespace Squadron;
+
+public abstract class ComposeResourceOptions
 {
-    public abstract class ComposeResourceOptions
-    {
-        public abstract void Configure(ComposeResourceBuilder builder);
-    }
+    public abstract void Configure(ComposeResourceBuilder builder);
 }

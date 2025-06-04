@@ -4,67 +4,66 @@ using Squadron.AzureCloud;
 using Squadron.Model;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class AzureKeyVaultResource<TOptions>
+    : AzureResource<TOptions>, IAsyncLifetime
+    where TOptions : AzureKeyVaultOptions, new()
 {
-    public class AzureKeyVaultResource<TOptions>
-            : AzureResource<TOptions>, IAsyncLifetime
-        where TOptions : AzureKeyVaultOptions, new()
+    private KeyVaultModel _keyVaultModel;
+    private KeyVaultManager _keyVaultManager;
+
+    public Uri VaultUri { get; private set; }
+
+    /// <summary>
+    /// Initialize the resource
+    /// </summary>
+    public override async Task InitializeAsync()
     {
-        private KeyVaultModel _keyVaultModel;
-        private KeyVaultManager _keyVaultManager;
+        await base.InitializeAsync();
+        BuildOptions();
+        InitializeKeyVaultManager();
+        await PrepareKeyVaultAsync();
+    }
 
-        public Uri VaultUri { get; private set; }
-
-        /// <summary>
-        /// Initialize the resource
-        /// </summary>
-        public override async Task InitializeAsync()
-        {
-            await base.InitializeAsync();
-            BuildOptions();
-            InitializeKeyVaultManager();
-            await PrepareKeyVaultAsync();
-        }
-
-        private void InitializeKeyVaultManager()
-        {
-            _keyVaultManager = new KeyVaultManager(
-                    AzureConfig.Credentials,
-                    new AzureResourceIdentifier
-                    {
-                        SubscriptionId = AzureConfig.SubscriptionId,
-                        ResourceGroupName = AzureConfig.ResourceGroup,
-                        Name = _keyVaultModel.Name
-                    });
-        }
-
-        private async Task PrepareKeyVaultAsync()
-        {
-            if (_keyVaultModel.Name == null)
+    private void InitializeKeyVaultManager()
+    {
+        _keyVaultManager = new KeyVaultManager(
+            AzureConfig.Credentials,
+            new AzureResourceIdentifier
             {
-                _keyVaultModel.ProvisioningMode = KeyVaultProvisioningMode.CreateAndDelete;
-                _keyVaultModel.Name = await
-                    _keyVaultManager.CreateAsync(AzureConfig.DefaultLocation);
-            }
+                SubscriptionId = AzureConfig.SubscriptionId,
+                ResourceGroupName = AzureConfig.ResourceGroup,
+                Name = _keyVaultModel.Name
+            });
+    }
 
-            VaultUri = await _keyVaultManager.GetUriAsync();
-        }
-
-        public async Task DisposeAsync()
+    private async Task PrepareKeyVaultAsync()
+    {
+        if (_keyVaultModel.Name == null)
         {
-            if (_keyVaultModel.ProvisioningMode == KeyVaultProvisioningMode.CreateAndDelete)
-            {
-                await _keyVaultManager.DeleteAsync(_keyVaultModel.Name);
-            }
+            _keyVaultModel.ProvisioningMode = KeyVaultProvisioningMode.CreateAndDelete;
+            _keyVaultModel.Name = await
+                _keyVaultManager.CreateAsync(AzureConfig.DefaultLocation);
         }
 
-        private void BuildOptions()
+        VaultUri = await _keyVaultManager.GetUriAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        if (_keyVaultModel.ProvisioningMode == KeyVaultProvisioningMode.CreateAndDelete)
         {
-            var builder = KeyVaultOptionsBuilder.New();
-            var options = new TOptions();
-            options.Configure(builder);
-            LoadResourceConfiguration(builder);
-            _keyVaultModel = builder.Build();
+            await _keyVaultManager.DeleteAsync(_keyVaultModel.Name);
         }
+    }
+
+    private void BuildOptions()
+    {
+        var builder = KeyVaultOptionsBuilder.New();
+        var options = new TOptions();
+        options.Configure(builder);
+        LoadResourceConfiguration(builder);
+        _keyVaultModel = builder.Build();
     }
 }

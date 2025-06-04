@@ -3,50 +3,44 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace Squadron.AzureCloud
+namespace Squadron.AzureCloud;
+
+public class AzureResourceOptionsBuilder
 {
-    public class AzureResourceOptionsBuilder
+    internal Func<AzureResourceConfiguration> ConfigResolver { get;  set; } = AzureResourceOptions.DefaultAzureConfigurationResolver;
+
+    public AzureResourceOptionsBuilder SetConfigResolver(
+        Func<AzureResourceConfiguration> resolver)
     {
-        internal Func<AzureResourceConfiguration> ConfigResolver { get;  set; }
-
-        public AzureResourceOptionsBuilder()
-        {
-            ConfigResolver = AzureResourceOptions.DefaultAzureConfigurationResolver;
-        }
-
-        public AzureResourceOptionsBuilder SetConfigResolver(
-            Func<AzureResourceConfiguration> resolver)
-        {
-            ConfigResolver = resolver;
-            return this;
-        }
+        ConfigResolver = resolver;
+        return this;
     }
+}
 
+
+/// <summary>
+/// Base options to use with Azure resources
+/// </summary>
+public class AzureResourceOptions 
+{
+    public Func<AzureResourceConfiguration> ConfigResolver { get; set; }
 
     /// <summary>
-    /// Base options to use with Azure resources
+    /// Gets the azure configuration using the .NET configuration system
     /// </summary>
-    public class AzureResourceOptions 
+    /// <returns></returns>
+    internal static AzureResourceConfiguration DefaultAzureConfigurationResolver()
     {
-        public Func<AzureResourceConfiguration> ConfigResolver { get; set; }
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.user.json", true)
 
-        /// <summary>
-        /// Gets the azure configuration using the .NET configuration system
-        /// </summary>
-        /// <returns></returns>
-        internal static AzureResourceConfiguration DefaultAzureConfigurationResolver()
-        {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.user.json", true)
-
-                .AddEnvironmentVariables()
-                .Build();
+            .AddEnvironmentVariables()
+            .Build();
 
 
-            IConfigurationSection section = configuration.GetSection("Squadron:Azure");
-            AzureResourceConfiguration azureConfig = section.Get<AzureResourceConfiguration>();
-            return azureConfig;
-        }
+        IConfigurationSection section = configuration.GetSection("Squadron:Azure");
+        AzureResourceConfiguration azureConfig = section.Get<AzureResourceConfiguration>();
+        return azureConfig;
     }
 }

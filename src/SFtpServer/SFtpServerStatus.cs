@@ -5,39 +5,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using Renci.SshNet;
 
-namespace Squadron
+namespace Squadron;
+
+public class SFtpServerStatus(SFtpServerConfiguration ftpServerConfiguration) : IResourceStatusProvider
 {
-    public class SFtpServerStatus : IResourceStatusProvider
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
     {
-        private readonly SFtpServerConfiguration _ftpServerConfiguration;
+        var connectionInfo = new ConnectionInfo(
+            ftpServerConfiguration.Host,
+            ftpServerConfiguration.Port,
+            ftpServerConfiguration.Username,
+            new PasswordAuthenticationMethod(
+                ftpServerConfiguration.Username,
+                ftpServerConfiguration.Password));
 
-        public SFtpServerStatus(SFtpServerConfiguration ftpServerConfiguration)
+        using (var client = new SftpClient(connectionInfo))
         {
-            _ftpServerConfiguration = ftpServerConfiguration;
-        }
+            client.Connect();
+            client.ListDirectory(ftpServerConfiguration.Directory);
+            ConnectionInfo info = client.ConnectionInfo;
 
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
-        {
-            var connectionInfo = new ConnectionInfo(
-                _ftpServerConfiguration.Host,
-                _ftpServerConfiguration.Port,
-                _ftpServerConfiguration.Username,
-                new PasswordAuthenticationMethod(
-                    _ftpServerConfiguration.Username,
-                    _ftpServerConfiguration.Password));
-
-            using (var client = new SftpClient(connectionInfo))
+            return new Status
             {
-                client.Connect();
-                client.ListDirectory(_ftpServerConfiguration.Directory);
-                ConnectionInfo info = client.ConnectionInfo;
-
-                return new Status
-                {
-                    IsReady = true,
-                    Message = $"Ready. Client version: '{info.ClientVersion}'."
-                };
-            }
+                IsReady = true,
+                Message = $"Ready. Client version: '{info.ClientVersion}'."
+            };
         }
     }
 }

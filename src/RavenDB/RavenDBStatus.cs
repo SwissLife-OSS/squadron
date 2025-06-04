@@ -8,40 +8,39 @@ using Raven.Client.Documents.Operations;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Status checker for RavenDB
+/// </summary>
+/// <seealso cref="IResourceStatusProvider" />
+public class RavenDBStatus : IResourceStatusProvider
 {
+    private readonly string _connectionString;
+
     /// <summary>
-    /// Status checker for RavenDB
+    /// Initializes a new instance of the <see cref="RavenDBStatus"/> class.
     /// </summary>
-    /// <seealso cref="IResourceStatusProvider" />
-    public class RavenDBStatus : IResourceStatusProvider
+    /// <param name="connectionString">The ConnectionString</param>
+    public RavenDBStatus(string connectionString)
     {
-        private readonly string _connectionString;
+        _connectionString = connectionString;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RavenDBStatus"/> class.
-        /// </summary>
-        /// <param name="connectionString">The ConnectionString</param>
-        public RavenDBStatus(string connectionString)
+    /// <inheritdoc/>
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    {
+        var store = new DocumentStore()
         {
-            _connectionString = connectionString;
-        }
+            Urls = new[] { _connectionString },
+        };
+        store.Initialize();
+        await store.Maintenance.Server.SendAsync(
+            new CreateDatabaseOperation(new DatabaseRecord("health")));
 
-        /// <inheritdoc/>
-        public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+        return new Status
         {
-            var store = new DocumentStore()
-            {
-                Urls = new[] { _connectionString },
-            };
-            store.Initialize();
-            await store.Maintenance.Server.SendAsync(
-                new CreateDatabaseOperation(new DatabaseRecord("health")));
-
-            return new Status
-            {
-                IsReady = true
-            };
-        }
+            IsReady = true
+        };
     }
 }

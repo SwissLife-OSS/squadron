@@ -2,25 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squadron
+namespace Squadron;
+
+public interface IComposableResource
 {
-    public interface IComposableResource
-    {
-        Dictionary<string, string> GetComposeExports();
+    Dictionary<string, string> GetComposeExports();
 
-        Task InitializeAsync();
+    Task InitializeAsync();
 
-        Task DisposeAsync();
+    Task DisposeAsync();
 
-        void SetEnvironmentVariables(IEnumerable<string> variables);
+    void SetEnvironmentVariables(IEnumerable<string> variables);
 
-        void SetNetworks(IEnumerable<string> networkName);
-    }
+    void SetNetworks(IEnumerable<string> networkName);
+}
 
-    public interface IComposableResourceOption
-    {
-        Type ResourceType { get; }
-    }
-
-
+public interface IComposableResourceOption
+{
+    Type ResourceType { get; }
 }

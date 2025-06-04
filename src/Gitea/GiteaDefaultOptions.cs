@@ -1,26 +1,25 @@
 using System;
 
-namespace Squadron
+namespace Squadron;
+
+/// <summary>
+/// Default Gitea resource options
+/// </summary>
+public class GiteaDefaultOptions : ContainerResourceOptions
 {
     /// <summary>
-    /// Default Gitea resource options
+    /// Configure resource options
     /// </summary>
-    public class GiteaDefaultOptions : ContainerResourceOptions
+    /// <param name="builder"></param>
+    public override void Configure(ContainerResourceBuilder builder)
     {
-        /// <summary>
-        /// Configure resource options
-        /// </summary>
-        /// <param name="builder"></param>
-        public override void Configure(ContainerResourceBuilder builder)
-        {
-            builder
-                .Name("gitea")
-                .Image("gitea/gitea:latest")
-                .AddEnvironmentVariable("GITEA__security__INSTALL_LOCK=true")
-                .Username("root")
-                .Password("admin1234")
-                .InternalPort(3000)
-                .PreferLocalImage();
-        }
+        builder
+            .Name("gitea")
+            .Image("gitea/gitea:latest")
+            .AddEnvironmentVariable("GITEA__security__INSTALL_LOCK=true")
+            .Username("root")
+            .Password("admin1234")
+            .InternalPort(3000)
+            .PreferLocalImage();
     }
 }

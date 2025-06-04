@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Squadron
+namespace Squadron;
+
+internal static class WellKnown
 {
-    internal static class WellKnown
-    {
-        internal static readonly string DirectoryName = nameof(DirectoryName);
-    }
+    internal static readonly string DirectoryName = nameof(DirectoryName);
 }

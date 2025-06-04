@@ -4,35 +4,27 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
-namespace Squadron
+namespace Squadron;
+
+public class MongoReplicaSetResourceTests(MongoReplicaSetResource mongoRsResource)
+    : IClassFixture<MongoReplicaSetResource>
 {
-    public class MongoReplicaSetResourceTests
-        : IClassFixture<MongoReplicaSetResource>
+    [Fact]
+    public void CommitTransaction_NoError()
     {
-        private readonly MongoReplicaSetResource _mongoRsResource;
-
-        public MongoReplicaSetResourceTests(MongoReplicaSetResource mongoRsResource)
+        //Act
+        Action action = () =>
         {
-            _mongoRsResource = mongoRsResource;
-        }
-
-        [Fact]
-        public void CommitTransaction_NoError()
-        {
-            //Act
-            Action action = () =>
+            using (IClientSessionHandle session = mongoRsResource.Client.StartSession())
             {
-                using (IClientSessionHandle session = _mongoRsResource.Client.StartSession())
-                {
-                    IMongoCollection<BsonDocument> collection = _mongoRsResource.CreateCollection<BsonDocument>("bar");
-                    session.StartTransaction();
-                    collection.InsertOne(session, new BsonDocument("name", "test"));
-                    session.CommitTransaction();
-                }
-            };
+                IMongoCollection<BsonDocument> collection = mongoRsResource.CreateCollection<BsonDocument>("bar");
+                session.StartTransaction();
+                collection.InsertOne(session, new BsonDocument("name", "test"));
+                session.CommitTransaction();
+            }
+        };
 
-            //Assert
-            action.Should().NotThrow();
-        }
+        //Assert
+        action.Should().NotThrow();
     }
 }

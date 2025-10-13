@@ -25,35 +25,33 @@ public class RabbitMQStatus : IResourceStatusProvider
     }
 
     /// <inheritdoc/>
-    public Task<Status> IsReadyAsync(CancellationToken cancellationToken)
+    public async Task<Status> IsReadyAsync(CancellationToken cancellationToken)
     {
         var factory = new ConnectionFactory()
         {
             Uri = new Uri(_connectionString)
         };
-        using (IConnection connection = CreateConnection(factory))
-        using (IModel channel = connection.CreateModel())
-        {
-            return Task.FromResult(new Status
-            {
-                IsReady = channel.IsOpen,
-                Message = connection.ToString()
-            });
-        }
+        await using IConnection connection = await CreateConnectionAsync(factory, cancellationToken);
+        await using IChannel channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+
+        return new Status { IsReady = channel.IsOpen, Message = connection.ToString()! };
     }
 
-    private static IConnection CreateConnection(
-        IConnectionFactory connectionFactory)
+    private static async Task<IConnection> CreateConnectionAsync(
+        IConnectionFactory connectionFactory,
+        CancellationToken cancellationToken)
     {
-        string hostname = ((ConnectionFactory)connectionFactory).HostName;
-        return connectionFactory
-            .CreateConnection(new List<AmqpTcpEndpoint>
+        var hostname = ((ConnectionFactory)connectionFactory).HostName;
+
+        return await connectionFactory.CreateConnectionAsync(
+            new List<AmqpTcpEndpoint>
             {
                 new AmqpTcpEndpoint(
                     connectionFactory.Uri,
                     new SslOption(
-                        serverName:hostname,
+                        serverName: hostname,
                         enabled: false))
-            });
+            },
+            cancellationToken);
     }
 }

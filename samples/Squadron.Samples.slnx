@@ -1,10 +1,10 @@
 <Solution>
-  <Project Path="AzureCloudServiceBus/AzureCloudServiceBus.csproj" />
-  <Project Path="Compose/Compose.csproj" />
-  <Project Path="GenericResource/GenericResource.csproj" />
-  <Project Path="MongoDb/MongoDb.csproj" />
-  <Project Path="PostgreSql/PostgreSql.csproj" />
-  <Project Path="RabbitMQ/RabbitMQ.csproj" />
-  <Project Path="Redis/Redis.csproj" />
+  <Project Path="AzureCloudServiceBus/AzureCloudServiceBus.Sample.csproj" />
+  <Project Path="Compose/Compose.Sample.csproj" />
+  <Project Path="GenericResource/GenericResource.Sample.csproj" />
+  <Project Path="MongoDb/MongoDb.Sample.csproj" />
+  <Project Path="PostgreSql/PostgreSql.Sample.csproj" />
+  <Project Path="RabbitMQ/RabbitMQ.Sample.csproj" />
+  <Project Path="Redis/Redis.Sample.csproj" />
   <Project Path="Shared/Shared.csproj" />
 </Solution>

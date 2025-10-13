@@ -19,22 +19,24 @@ namespace Squadron.Samples.RabbitMQ
             _connectionFactory = connectionFactory;
         }
 
-        public void SendEvent(OrderEvent @event)
+        public async Task SendEventAsync(OrderEvent @event)
         {
-            using IConnection connection = _connectionFactory.CreateConnection();
-            using IModel channel = connection.CreateModel();
-            channel.QueueDeclare(
+            await using IConnection connection = await _connectionFactory.CreateConnectionAsync();
+            await using IChannel channel = await connection.CreateChannelAsync();
+
+            await channel.QueueDeclareAsync(
                 QueueName,
                 false,
                 false,
                 false,
                 null);
 
-            channel.BasicPublish(
-                string.Empty,
-                QueueName,
-                null,
-                BuildMessage(@event));
+            await channel.BasicPublishAsync(
+                exchange: string.Empty,
+                routingKey: QueueName,
+                mandatory: false,
+                basicProperties: new BasicProperties(),
+                body: BuildMessage(@event));
         }
 
         private static byte[] BuildMessage(OrderEvent @event)

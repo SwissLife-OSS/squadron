@@ -63,7 +63,7 @@
         <PackageVersion Include="Neo4j.Driver" Version="4.4.0" />
         <PackageVersion Include="RavenDB.Client" Version="4.2.124" />
 
-        <PackageVersion Include="RabbitMQ.Client" Version="7.1.2" />
+        <PackageVersion Include="RabbitMQ.Client" Version="7.0.0" />
         <PackageVersion Include="AlterNats.Hosting" Version="1.0.6" />
 
         <PackageVersion Include="StackExchange.Redis" Version="2.8.37" />

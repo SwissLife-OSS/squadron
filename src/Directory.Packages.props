@@ -56,7 +56,7 @@
         <PackageVersion Include="Polly" Version="8.5.2" />
         <PackageVersion Include="SharpZipLib" Version="1.4.2" />
 
-        <PackageVersion Include="MongoDB.Driver" Version="3.4.0" />
+        <PackageVersion Include="MongoDB.Driver" Version="3.0.0" />
         <PackageVersion Include="MySqlConnector" Version="2.4.0" />
         <PackageVersion Include="Npgsql" Version="8.0.7" />
         <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />

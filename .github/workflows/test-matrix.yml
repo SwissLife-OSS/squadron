@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       include_docker_info:
-        description: 'Whether to include Docker information step'
+        description: "Whether to include Docker information step"
         required: false
         type: boolean
         default: false
@@ -35,14 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     name: ${{ matrix.test_project }} ${{ matrix.framework }}
     strategy:
-      matrix: 
+      matrix:
         test_project: ${{fromJson(needs.prepare.outputs.matrix).test_project}}
         framework: ${{fromJson(needs.prepare.outputs.matrix).framework}}
       fail-fast: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -50,7 +50,7 @@ jobs:
             8
             9
             10
-      
+
       - name: Docker Information
         if: ${{ inputs.include_docker_info }}
         run: |

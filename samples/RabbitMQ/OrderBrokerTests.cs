@@ -34,23 +34,24 @@ namespace Squadron.Samples.RabbitMQ
             var broker = new OrderEventBroker(connectionFactory);
 
             // Act
-            broker.SendEvent(ev);
+            await broker.SendEventAsync(ev);
 
             OrderEvent resultEvent = null;
 
-            using IConnection connection = connectionFactory.CreateConnection();
-            using IModel channel = connection.CreateModel();
-            channel.QueueDeclare(
+            await using IConnection connection = await connectionFactory.CreateConnectionAsync();
+            await using IChannel channel = await connection.CreateChannelAsync();
+
+            await channel.QueueDeclareAsync(
                 OrderEventBroker.QueueName,
                 false,
                 false,
                 false,
                 null);
 
-            BasicGetResult queueResult = channel.BasicGet(OrderEventBroker.QueueName, true);
+            BasicGetResult queueResult = await channel.BasicGetAsync(OrderEventBroker.QueueName, true);
             if (queueResult != null)
             {
-                var json = Encoding.UTF8.GetString(queueResult.Body);
+                var json = Encoding.UTF8.GetString(queueResult.Body.Span);
                 resultEvent = JsonSerializer.Deserialize<OrderEvent>(json);
             }
 

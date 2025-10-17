@@ -1,23 +1,22 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29326.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDb", "MongoDb\MongoDb.csproj", "{F2A5CFCE-3CFE-4C85-BB54-BD59877980C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDb.Sample", "MongoDb\MongoDb.Sample.csproj", "{F2A5CFCE-3CFE-4C85-BB54-BD59877980C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgreSql", "PostgreSql\PostgreSql.csproj", "{1C9A3583-730B-4610-BB19-98DF1CFFA3E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgreSql.Sample", "PostgreSql\PostgreSql.Sample.csproj", "{1C9A3583-730B-4610-BB19-98DF1CFFA3E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericResource", "GenericResource\GenericResource.csproj", "{F0530241-7EF5-4E70-9F26-FA3AE638960A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericResource.Sample", "GenericResource\GenericResource.Sample.csproj", "{F0530241-7EF5-4E70-9F26-FA3AE638960A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{B6D406B2-AF77-45B1-B10B-4FBA4B78C120}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis", "Redis\Redis.csproj", "{64BBAD36-98A3-4888-BF2C-705D24FF131C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis.Sample", "Redis\Redis.Sample.csproj", "{64BBAD36-98A3-4888-BF2C-705D24FF131C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQ", "RabbitMQ\RabbitMQ.csproj", "{00F1791E-FB1F-4BCF-A3FE-DAFE2256012A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQ.Sample", "RabbitMQ\RabbitMQ.Sample.csproj", "{00F1791E-FB1F-4BCF-A3FE-DAFE2256012A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudServiceBus", "AzureCloudServiceBus\AzureCloudServiceBus.csproj", "{386473F2-8FF3-4C21-B046-66851058D851}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCloudServiceBus.Sample", "AzureCloudServiceBus\AzureCloudServiceBus.Sample.csproj", "{386473F2-8FF3-4C21-B046-66851058D851}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compose", "Compose\Compose.csproj", "{FCE153A6-295E-4820-B882-4149841D0230}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compose.Sample", "Compose\Compose.Sample.csproj", "{FCE153A6-295E-4820-B882-4149841D0230}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

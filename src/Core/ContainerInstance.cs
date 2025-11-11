@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Docker.DotNet;
 
 namespace Squadron;
 
@@ -66,7 +67,7 @@ public class ContainerInstance : IDisposable
     /// </value>
     public IList<string> Logs { get; set; } = new List<string>();
 
-    internal Stream? LogStream { get; set; }
+    internal MultiplexedStream? LogStream { get; set; }
 
     public void Dispose()
     {

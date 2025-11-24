@@ -43,7 +43,7 @@ public class DockerContainerManager : IDockerContainerManager
                 null,
                 TimeSpan.FromMinutes(5)
             )
-            .CreateClient(Version.Parse("1.25"));
+            .CreateClient();
         _authConfig = GetAuthConfig();
         _variableResolver = new VariableResolver(_settings.Variables);
     }
@@ -71,10 +71,10 @@ public class DockerContainerManager : IDockerContainerManager
 
             return GetAuthConfig(registryConfig);
         }
-            
+
         return TrySetDefaultAuthConfig(_settings.Image);
     }
-        
+
     private AuthConfig GetAuthConfig(DockerRegistryConfiguration registryConfig)
     {
         return new AuthConfig
@@ -88,13 +88,13 @@ public class DockerContainerManager : IDockerContainerManager
     private AuthConfig TrySetDefaultAuthConfig(string imageName)
     {
         var registryName = "index.docker.io";
-            
+
         try
         {
             registryName = new Uri(imageName).Host;
         }
         catch{}
-            
+
         DockerRegistryConfiguration? registryConfig = _dockerConfiguration
             .Registries
             .FirstOrDefault(x => x.Name.Equals(
@@ -729,9 +729,9 @@ public class DockerContainerManager : IDockerContainerManager
     private async Task RetryAction(Exception exception, TimeSpan t, int retryCount, Context c)
     {
         _settings.Logger.Warning($"Docker command failed {retryCount}. {exception.Message}");
-            
+
         SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
-            
+
         if (systemInfo is { DriverStatus: { Count: > 0 } })
         {
             _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");

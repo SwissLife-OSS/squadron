@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Polly;
-using Version = System.Version;
 
 namespace Squadron;
 
@@ -43,7 +42,7 @@ public class DockerContainerManager : IDockerContainerManager
                 null,
                 TimeSpan.FromMinutes(5)
             )
-            .CreateClient(Version.Parse("1.25"));
+            .CreateClient();
         _authConfig = GetAuthConfig();
         _variableResolver = new VariableResolver(_settings.Variables);
     }
@@ -459,11 +458,11 @@ public class DockerContainerManager : IDockerContainerManager
     {
         void Handler(JSONMessage message)
         {
-            if (!string.IsNullOrEmpty(message.ErrorMessage))
+            if (message.Error != null && !string.IsNullOrEmpty(message.Error.Message))
             {
                 throw new ContainerException(
                     $"Could not pull the image: {_settings.ImageFullname}. " +
-                    $"Error: {message.ErrorMessage}");
+                    $"Error: {message.Error.Message}");
             }
         }
 
@@ -521,7 +520,7 @@ public class DockerContainerManager : IDockerContainerManager
                     }
                     else
                     {
-                        Instance.Address = inspectResponse.NetworkSettings.IPAddress;
+                        Instance.Address = inspectResponse.NetworkSettings.Networks?.Values.FirstOrDefault()?.IPAddress ?? "";
                         Instance.HostPort = _settings.InternalPort;
                     }
 
@@ -739,16 +738,23 @@ public class DockerContainerManager : IDockerContainerManager
     {
         _settings.Logger.Warning($"Docker command failed {retryCount}. {exception.Message}");
 
-        SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
-
-        if (systemInfo is { DriverStatus: { Count: > 0 } })
+        try
         {
-            _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
+            SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
+
+            if (systemInfo is { DriverStatus: { Count: > 0 } })
+            {
+                _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
+            }
+
+            if (systemInfo is { SystemStatus: { Count: > 0 } })
+            {
+                _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
+            }
         }
-
-        if (systemInfo is { SystemStatus: { Count: > 0 } })
+        catch (Exception ex)
         {
-            _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
+            _settings.Logger.Warning($"Failed to get system info: {ex.Message}");
         }
     }
 

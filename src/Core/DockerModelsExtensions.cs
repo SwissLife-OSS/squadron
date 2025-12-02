@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Docker.DotNet.Models;
 
 namespace Squadron;
@@ -16,7 +15,7 @@ internal static class DockerModelsExtensions
             Cmd = command.Command.Split(' ')
         };
     }
-        
+
     internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
         this ICommand command, string user)
     {

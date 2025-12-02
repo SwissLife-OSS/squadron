@@ -32,8 +32,6 @@ public static class ChmodCommand
             AttachStdin = false,
             AttachStdout = true,
             Cmd = cmd.Split(' '),
-            Detach = false,
-            Tty = false,
             Privileged = true,
             User = "root"
         };

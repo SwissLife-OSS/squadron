@@ -16,9 +16,7 @@ internal class SqlCommandBase
             AttachStderr = true,
             AttachStdin = false,
             AttachStdout = true,
-            Cmd = GetCommand(query, settings),
-            Detach = false,
-            Tty = false
+            Cmd = GetCommand(query, settings)
         };
     }
 

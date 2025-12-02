@@ -58,10 +58,10 @@ public class LocalAppOptions : GenericContainerOptions
     {
         void Handler(JSONMessage message)
         {
-            if (!string.IsNullOrEmpty(message.ErrorMessage))
+            if (message.Error != null && !string.IsNullOrEmpty(message.Error.Message))
             {
                 throw new ContainerException(
-                    $"Error: {message.ErrorMessage}");
+                    $"Error: {message.Error.Message}");
             }
         }
 

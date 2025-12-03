@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Docker.DotNet.Models;
 
 namespace Squadron;
@@ -13,12 +12,10 @@ internal static class DockerModelsExtensions
             AttachStderr = true,
             AttachStdin = false,
             AttachStdout = true,
-            Cmd = command.Command.Split(' '),
-            Detach = false,
-            Tty = false
+            Cmd = command.Command.Split(' ')
         };
     }
-        
+
     internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
         this ICommand command, string user)
     {
@@ -28,9 +25,7 @@ internal static class DockerModelsExtensions
             AttachStderr = true,
             AttachStdin = false,
             AttachStdout = true,
-            Cmd = command.Command.Split(' '),
-            Detach = false,
-            Tty = false
+            Cmd = command.Command.Split(' ')
         };
     }
 }

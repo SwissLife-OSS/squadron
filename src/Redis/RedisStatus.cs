@@ -53,7 +53,7 @@ public class RedisStatus : IResourceStatusProvider
         }
         finally
         {
-            redis.Dispose();
+            redis?.Dispose();
         }
     }
 

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Polly;
-using Version = System.Version;
 
 namespace Squadron;
 
@@ -79,8 +78,8 @@ public class DockerContainerManager : IDockerContainerManager
     {
         return new AuthConfig
         {
-            Username = string.IsNullOrEmpty(registryConfig.Username)?null:registryConfig.Username,
-            Password = string.IsNullOrEmpty(registryConfig.Password)?null:registryConfig.Password,
+            Username = string.IsNullOrEmpty(registryConfig.Username) ? null : registryConfig.Username,
+            Password = string.IsNullOrEmpty(registryConfig.Password) ? null : registryConfig.Password,
             ServerAddress = registryConfig.Address
         };
     }
@@ -93,7 +92,7 @@ public class DockerContainerManager : IDockerContainerManager
         {
             registryName = new Uri(imageName).Host;
         }
-        catch{}
+        catch { }
 
         DockerRegistryConfiguration? registryConfig = _dockerConfiguration
             .Registries
@@ -205,9 +204,9 @@ public class DockerContainerManager : IDockerContainerManager
 
             await Client.Containers.ExtractArchiveToContainerAsync(
                 Instance.Id,
-                new ContainerPathStatParameters
+                new CopyToContainerParameters
                 {
-                    AllowOverwriteDirWithFile = true, Path = context.DestinationFolder.Replace("\\", "/")
+                    Path = context.DestinationFolder.Replace("\\", "/")
                 }, archiver.Stream);
         });
     }
@@ -216,7 +215,7 @@ public class DockerContainerManager : IDockerContainerManager
     public async Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters)
     {
         ContainerExecCreateResponse response = await Client.Exec
-            .ExecCreateContainerAsync(Instance.Id, parameters);
+            .CreateContainerExecAsync(Instance.Id, parameters);
 
         if (string.IsNullOrEmpty(response.ID))
         {
@@ -224,7 +223,7 @@ public class DockerContainerManager : IDockerContainerManager
         }
 
         using MultiplexedStream stream =
-            await Client.Exec.StartAndAttachContainerExecAsync(response.ID, false);
+            await Client.Exec.StartContainerExecAsync(response.ID, new ContainerExecStartParameters());
 
         (var stdout, var stderr) = await stream
             .ReadOutputToEndAsync(CancellationToken.None);
@@ -248,12 +247,16 @@ public class DockerContainerManager : IDockerContainerManager
 
         var containerStatsParameters = new ContainerLogsParameters
         {
-            Follow = true, ShowStderr = true, ShowStdout = true
+            Follow = true,
+            ShowStderr = true,
+            ShowStdout = true
         };
 
-        Instance.LogStream = await Client
+        MultiplexedStream multiplexedStream = await Client
             .Containers
             .GetContainerLogsAsync(Instance.Id, containerStatsParameters);
+
+        Instance.LogStream = multiplexedStream;
     }
 
     /// <inheritdoc/>
@@ -455,11 +458,11 @@ public class DockerContainerManager : IDockerContainerManager
     {
         void Handler(JSONMessage message)
         {
-            if (!string.IsNullOrEmpty(message.ErrorMessage))
+            if (message.Error != null && !string.IsNullOrEmpty(message.Error.Message))
             {
                 throw new ContainerException(
                     $"Could not pull the image: {_settings.ImageFullname}. " +
-                    $"Error: {message.ErrorMessage}");
+                    $"Error: {message.Error.Message}");
             }
         }
 
@@ -517,7 +520,7 @@ public class DockerContainerManager : IDockerContainerManager
                     }
                     else
                     {
-                        Instance.Address = inspectResponse.NetworkSettings.IPAddress;
+                        Instance.Address = inspectResponse.NetworkSettings.Networks?.Values.FirstOrDefault()?.IPAddress ?? "";
                         Instance.HostPort = _settings.InternalPort;
                     }
 
@@ -597,41 +600,46 @@ public class DockerContainerManager : IDockerContainerManager
 
         while (true)
         {
-            Task<int> readTask = Instance.LogStream.ReadAsync(buffer, 0, size);
+            // MultiplexedStream uses a different API - read from the stream
+            Task<MultiplexedStream.ReadResult> readTask = Instance.LogStream
+                .ReadOutputAsync(buffer, 0, size, CancellationToken.None);
 
             if (await Task.WhenAny(readTask, timeoutTask) == timeoutTask)
             {
                 break;
             }
 
-            var read = await readTask;
-            if (read <= 0)
+            var readResult = await readTask;
+            if (readResult.EOF)
             {
                 break;
             }
 
-            char[] chunkChars = new char[read * 2];
-
-            int consumed = 0;
-            for (int i = 0; i < read; i++)
+            if (readResult.Count > 0)
             {
-                if (buffer[i] > 31 && buffer[i] < 128)
-                {
-                    chunkChars[consumed++] = (char)buffer[i];
-                }
-                else if (buffer[i] == (byte)'\n')
-                {
-                    chunkChars[consumed++] = '\r';
-                    chunkChars[consumed++] = '\n';
-                }
-                else if (buffer[i] == (byte)'\t')
-                {
-                    chunkChars[consumed++] = '\t';
-                }
-            }
+                char[] chunkChars = new char[readResult.Count * 2];
+                int consumed = 0;
 
-            string chunk = new string(chunkChars, 0, consumed);
-            result.Append(chunk);
+                for (int i = 0; i < readResult.Count; i++)
+                {
+                    if (buffer[i] > 31 && buffer[i] < 128)
+                    {
+                        chunkChars[consumed++] = (char)buffer[i];
+                    }
+                    else if (buffer[i] == (byte)'\n')
+                    {
+                        chunkChars[consumed++] = '\r';
+                        chunkChars[consumed++] = '\n';
+                    }
+                    else if (buffer[i] == (byte)'\t')
+                    {
+                        chunkChars[consumed++] = '\t';
+                    }
+                }
+
+                string chunk = new string(chunkChars, 0, consumed);
+                result.Append(chunk);
+            }
         }
 
         return result.ToString();
@@ -730,16 +738,23 @@ public class DockerContainerManager : IDockerContainerManager
     {
         _settings.Logger.Warning($"Docker command failed {retryCount}. {exception.Message}");
 
-        SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
-
-        if (systemInfo is { DriverStatus: { Count: > 0 } })
+        try
         {
-            _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
+            SystemInfoResponse? systemInfo = await Client.System.GetSystemInfoAsync();
+
+            if (systemInfo is { DriverStatus: { Count: > 0 } })
+            {
+                _settings.Logger.Warning($"Driver status: {string.Join(", ", systemInfo.DriverStatus)}");
+            }
+
+            if (systemInfo is { SystemStatus: { Count: > 0 } })
+            {
+                _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
+            }
         }
-
-        if (systemInfo is { SystemStatus: { Count: > 0 } })
+        catch (Exception ex)
         {
-            _settings.Logger.Warning($"System status: {string.Join(", ", systemInfo.SystemStatus)}");
+            _settings.Logger.Warning($"Failed to get system info: {ex.Message}");
         }
     }
 

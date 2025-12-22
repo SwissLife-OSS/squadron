@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
 
   <PropertyGroup>
     <AssemblyName>Squadron.S3.Tests</AssemblyName>
@@ -14,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\S3\S3.csproj" />
+    <ProjectReference Include="..\..\src\S3\S3.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="xunit.runner.json">

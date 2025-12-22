@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
+
   <PropertyGroup>
     <AssemblyName>Squadron.MariaDB.Tests</AssemblyName>
   </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\MariaDB\MariaDB.csproj" />
+    <ProjectReference Include="..\..\src\MariaDB\MariaDB.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <None Update="Resources\Init2.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -14,4 +16,5 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
 </Project>

@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
 
   <PropertyGroup>
     <AssemblyName>Squadron.RavenDB.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RavenDB\RavenDB.csproj" />
+    <ProjectReference Include="..\..\src\RavenDB\RavenDB.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
 
   <PropertyGroup>
     <AssemblyName>Squadron.Redis.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Redis\Redis.csproj" />
+    <ProjectReference Include="..\..\src\Redis\Redis.csproj" />
   </ItemGroup>
 
   <ItemGroup>

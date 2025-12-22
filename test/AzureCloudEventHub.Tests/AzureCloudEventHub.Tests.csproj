@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
+
   <PropertyGroup>
     <RootNamespace>Squadron.AzureCloudEventHub.Tests</RootNamespace>
     <AssemblyName>Squadron.AzureCloudEventHub.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzureCloudEventHub\AzureCloudEventHub.csproj" />
+    <ProjectReference Include="..\..\src\AzureCloudEventHub\AzureCloudEventHub.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,4 +22,3 @@
   </ItemGroup>
 
 </Project>
-

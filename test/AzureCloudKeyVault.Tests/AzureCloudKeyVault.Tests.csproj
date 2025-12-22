@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
+
   <PropertyGroup>
     <RootNamespace>Squadron.AzureKeyVault.Tests</RootNamespace>
     <AssemblyName>Squadron.AzureKeyVault.Tests</AssemblyName>
@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzureCloudKeyVault.Core\AzureCloudKeyVault.Core.csproj" />
+    <ProjectReference Include="..\..\src\AzureCloudKeyVault.Core\AzureCloudKeyVault.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

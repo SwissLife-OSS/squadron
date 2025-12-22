@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
 
   <PropertyGroup>
     <AssemblyName>Squadron.Typesense.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Typesense\Typesense.csproj" />
+    <ProjectReference Include="..\..\src\Typesense\Typesense.csproj" />
   </ItemGroup>
 
   <ItemGroup>

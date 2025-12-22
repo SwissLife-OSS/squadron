@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')"/>
 
   <PropertyGroup>
     <AssemblyName>Squadron.RabbitMQ.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMQ\RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\src\RabbitMQ\RabbitMQ.csproj" />
   </ItemGroup>
 
   <ItemGroup>

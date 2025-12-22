@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCTestProjectProps)" Condition="Exists('$(CCTestProjectProps)')" />
+
   <PropertyGroup>
     <RootNamespace>Squadron.AzureCloudServiceBus.Tests</RootNamespace>
     <AssemblyName>Squadron.AzureCloudServiceBus.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzureCloudServiceBus\AzureCloudServiceBus.csproj" />
-    <ProjectReference Include="..\AzureCloud\AzureCloud.csproj" />
+    <ProjectReference Include="..\..\src\AzureCloudServiceBus\AzureCloudServiceBus.csproj" />
+    <ProjectReference Include="..\..\src\AzureCloud\AzureCloud.csproj" />
   </ItemGroup>
 
   <ItemGroup>

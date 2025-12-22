@@ -1,6 +1,34 @@
 <Project>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);SYSLIB1006;SYSLIB1015;CS8618;CS8602</NoWarn>
+  </PropertyGroup>
 
   <PropertyGroup>
+    <TestProjectTargetFrameworks>net8.0;net9.0;net10.0</TestProjectTargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>Full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsApp>false</IsApp>
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version Condition="$(Version) == ''">0.0.0</Version>
     <Product>Squadron</Product>
     <Authors>Swiss Life authors and contributors</Authors>
     <Company>Swiss Life</Company>
@@ -10,9 +38,8 @@
     <PackageReleaseNotes>Release notes: https://github.com/SwissLife-OSS/Squadron/releases/$(Version)</PackageReleaseNotes>
     <PackageTags>xUnit SwissLife Container Testing Azure IntegrationTest Test .Net DatabaseTest MessagingTest Database Messaging ServiceBus</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageIconUrl>https://github.com/SwissLife-OSS/Squadron-docs/raw/master/website/static/img/logo_sl_squadron.png</PackageIconUrl>
-    <IsPackable>false</IsPackable>
-    <LangVersion>latest</LangVersion>
+    <PackageIconUrl>https://github.com/SwissLife-OSS/squadron/raw/master/logo.png</PackageIconUrl>
+    <RepositoryType>GIT</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -26,7 +53,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,19 @@
+<Project>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);S2699;RCS1046;IDE0007;RCS1264</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>$(TestProjectTargetFrameworks)</TargetFrameworks>   
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+</Project>

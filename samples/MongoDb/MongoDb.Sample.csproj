@@ -9,9 +9,15 @@
     <ProjectReference Include="..\..\src\Mongo\Mongo.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Snapshooter.Xunit" />
+  </ItemGroup>
+  
   <ItemGroup>
     <None Update="users.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
 </Project>

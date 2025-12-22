@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Snapshooter.Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="__snapshots__\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -34,12 +34,12 @@ jobs:
 
       - name: Build projects
         shell: bash
-        run: dotnet build -c Release
+        run: dotnet build ./all.csproj -c Release
 
       - name: Pack
         shell: bash
         run: |
-          dotnet pack \
+          dotnet pack ./all.csproj \
             -c Release -o \
             ./out --no-build  \
             --include-symbols \

@@ -1,12 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+    <RootNamespace>Squadron.PostgreSql</RootNamespace>
     <AssemblyName>Squadron.PostgreSql</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Npgsql" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
+  
 </Project>

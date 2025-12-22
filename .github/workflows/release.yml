@@ -40,8 +40,9 @@ jobs:
         shell: bash
         run: |
           dotnet pack ./all.csproj \
-            -c Release -o \
-            ./out --no-build  \
+            -c Release \
+            -o ./out \
+            --no-build  \
             --include-symbols \
             --include-source \
             --verbosity Minimal \

@@ -1,9 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+    <RootNamespace>Squadron.ClickHouse</RootNamespace>
     <AssemblyName>Squadron.ClickHouse</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
+
 </Project>

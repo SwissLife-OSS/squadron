@@ -1,10 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+    <RootNamespace>Squadron.Compose</RootNamespace>
     <AssemblyName>Squadron.Compose</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Mongo\Mongo.csproj" />
   </ItemGroup>
+  
 </Project>

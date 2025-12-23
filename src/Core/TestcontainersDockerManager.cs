@@ -173,7 +173,7 @@ public class TestcontainersDockerManager : IDockerContainerManager
         }
 
         Instance.Id = _container.Id;
-        Instance.Name = _container.Name;
+        Instance.Name = _container.Name.TrimStart('/');
         Instance.IsRunning = _container.State == TestcontainersStates.Running;
 
         // Get the mapped port for the main internal port

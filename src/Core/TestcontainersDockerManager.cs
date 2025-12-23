@@ -268,38 +268,61 @@ public class TestcontainersDockerManager : IDockerContainerManager
     }
 
     /// <inheritdoc/>
-    public async Task<string?> InvokeCommandAsync(string[] command)
+    public async Task<string?> InvokeCommandAsync(string[] command, int retryCount = 0, int retryDelayMs = 1000)
     {
         if (_container == null)
         {
             return null;
         }
 
-        try
-        {
-            var result = await _container.ExecAsync(command);
+        Exception? lastException = null;
+        int attempts = retryCount + 1;
 
-            if (result.ExitCode != 0)
+        for (int i = 0; i < attempts; i++)
+        {
+            try
             {
-                var error = new StringBuilder();
-                error.AppendLine($"Error when invoking command \"{string.Join(" ", command)}\"");
-                error.AppendLine($"Exit code: {result.ExitCode}");
-                error.AppendLine(result.Stderr);
+                var result = await _container.ExecAsync(command);
 
-                throw new ContainerException(error.ToString());
+                if (result.ExitCode != 0)
+                {
+                    var error = new StringBuilder();
+                    error.AppendLine($"Error when invoking command \"{string.Join(" ", command)}\"");
+                    error.AppendLine($"Exit code: {result.ExitCode}");
+                    if (!string.IsNullOrWhiteSpace(result.Stderr))
+                    {
+                        error.AppendLine($"Stderr: {result.Stderr}");
+                    }
+                    if (!string.IsNullOrWhiteSpace(result.Stdout))
+                    {
+                        error.AppendLine($"Stdout: {result.Stdout}");
+                    }
+
+                    throw new ContainerException(error.ToString());
+                }
+
+                return result.Stdout;
             }
+            catch (ContainerException ex)
+            {
+                lastException = ex;
+                if (i < attempts - 1)
+                {
+                    await Task.Delay(retryDelayMs);
+                }
+            }
+            catch (Exception ex)
+            {
+                lastException = new ContainerException(
+                    $"Error invoking command: {string.Join(" ", command)}", ex);
+                if (i < attempts - 1)
+                {
+                    await Task.Delay(retryDelayMs);
+                }
+            }
+        }
 
-            return result.Stdout;
-        }
-        catch (ContainerException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new ContainerException(
-                $"Error invoking command: {string.Join(" ", command)}", ex);
-        }
+        throw lastException!;
     }
 
     /// <inheritdoc/>

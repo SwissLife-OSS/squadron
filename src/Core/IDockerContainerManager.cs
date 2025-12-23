@@ -43,11 +43,13 @@ public interface IDockerContainerManager : IDisposable
     Task CreateAndStartContainerAsync();
 
     /// <summary>
-    /// Invokes a command on the container
+    /// Invokes a command on the container with optional retry support
     /// </summary>
     /// <param name="command">The command to execute.</param>
+    /// <param name="retryCount">Number of retry attempts (default: 0).</param>
+    /// <param name="retryDelayMs">Delay between retries in milliseconds (default: 1000).</param>
     /// <exception cref="ContainerException"></exception>
-    Task<string?> InvokeCommandAsync(string[] command);
+    Task<string?> InvokeCommandAsync(string[] command, int retryCount = 0, int retryDelayMs = 1000);
 
     /// <summary>
     /// Removes the container.

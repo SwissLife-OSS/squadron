@@ -1,5 +1,4 @@
 using System.Text;
-using Docker.DotNet.Models;
 
 namespace Squadron;
 
@@ -14,9 +13,10 @@ internal class CreateUserCommand : ICommand
                         $"--email {settings.Username}@local");
     }
 
-    internal static ContainerExecCreateParameters Execute(ContainerResourceSettings settings)
+    internal static string[] Execute(ContainerResourceSettings settings)
     {
-        return new CreateUserCommand(settings).ToContainerExecCreateParameters("1000");
+        // Note: Testcontainers doesn't support user parameter in ExecAsync
+        return new CreateUserCommand(settings).ToCommandArray();
     }
     
     public string Command => _command.ToString();

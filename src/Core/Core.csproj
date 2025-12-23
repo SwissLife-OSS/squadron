@@ -16,10 +16,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Docker.DotNet.Enhanced" />
+    <PackageReference Include="Testcontainers" />
     <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="Polly" />
-    <PackageReference Include="SharpZipLib" />
   </ItemGroup>
 
 </Project>

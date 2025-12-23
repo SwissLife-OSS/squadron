@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Docker.DotNet;
-using Docker.DotNet.Models;
+using DotNet.Testcontainers.Containers;
 
 namespace Squadron;
 
@@ -17,11 +16,11 @@ public interface IDockerContainerManager : IDisposable
     /// The instance.
     /// </value>
     ContainerInstance Instance { get; }
-        
+
     /// <summary>
-    /// The client to interact with docker
+    /// Gets the underlying Testcontainers container.
     /// </summary>
-    DockerClient Client { get; }
+    IContainer Container { get; }
 
     /// <summary>
     /// Consumes container logs
@@ -34,6 +33,7 @@ public interface IDockerContainerManager : IDisposable
     /// Copies files to the container
     /// </summary>
     /// <param name="context">The context.</param>
+    /// <param name="overrideTargetName">Whether to override the target name.</param>
     Task CopyToContainerAsync(CopyContext context, bool overrideTargetName = false);
 
     /// <summary>
@@ -45,9 +45,9 @@ public interface IDockerContainerManager : IDisposable
     /// <summary>
     /// Invokes a command on the container
     /// </summary>
-    /// <param name="parameters">Command parameter</param>
+    /// <param name="command">The command to execute.</param>
     /// <exception cref="ContainerException"></exception>
-    Task<string?> InvokeCommandAsync(ContainerExecCreateParameters parameters);
+    Task<string?> InvokeCommandAsync(string[] command);
 
     /// <summary>
     /// Removes the container.

@@ -1,5 +1,4 @@
 using System.Text;
-using Docker.DotNet.Models;
 
 namespace Squadron;
 
@@ -19,10 +18,10 @@ public class CreateDbCommand : ICommand
         _command.Append(dbname);
     }
 
-    internal static ContainerExecCreateParameters Execute(string name,
+    internal static string[] Execute(string name,
         ContainerResourceSettings settings)
         => new CreateDbCommand(name, settings)
-            .ToContainerExecCreateParameters();
+            .ToCommandArray();
 
     /// <summary>
     /// Command

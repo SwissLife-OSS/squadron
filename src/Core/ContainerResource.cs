@@ -66,7 +66,7 @@ public class ContainerResource<TOptions>
 
         DockerConfiguration dockerConfig = Settings.DockerConfigResolver();
 
-        Manager = new DockerContainerManager(Settings, dockerConfig);
+        Manager = new TestcontainersDockerManager(Settings, dockerConfig);
         Initializer = new ContainerInitializer(Manager, Settings);
     }
 

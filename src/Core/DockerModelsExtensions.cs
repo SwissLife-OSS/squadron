@@ -1,31 +1,23 @@
-using Docker.DotNet.Models;
-
 namespace Squadron;
 
 internal static class DockerModelsExtensions
 {
-    internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
-        this ICommand command)
+    /// <summary>
+    /// Converts an ICommand to a string array for Testcontainers ExecAsync.
+    /// </summary>
+    internal static string[] ToCommandArray(this ICommand command)
     {
-        return new ContainerExecCreateParameters
-        {
-            AttachStderr = true,
-            AttachStdin = false,
-            AttachStdout = true,
-            Cmd = command.Command.Split(' ')
-        };
+        return command.Command.Split(' ');
     }
 
-    internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
-        this ICommand command, string user)
+    /// <summary>
+    /// Converts an ICommand to a string array for Testcontainers ExecAsync.
+    /// User parameter is ignored in Testcontainers - exec runs as container user.
+    /// </summary>
+    internal static string[] ToCommandArray(this ICommand command, string user)
     {
-        return new ContainerExecCreateParameters
-        {
-            User = user,
-            AttachStderr = true,
-            AttachStdin = false,
-            AttachStdout = true,
-            Cmd = command.Command.Split(' ')
-        };
+        // Note: Testcontainers ExecAsync doesn't support specifying a user
+        // If user-specific execution is needed, consider using 'su' command
+        return command.Command.Split(' ');
     }
 }

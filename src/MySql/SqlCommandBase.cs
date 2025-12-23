@@ -1,26 +1,17 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using Docker.DotNet.Models;
 
 namespace Squadron;
 
 internal class SqlCommandBase
 {
-    protected ContainerExecCreateParameters GetContainerExecParameters(
+    protected string[] GetCommandArray(
         string query,
         ContainerResourceSettings settings)
     {
-        return new ContainerExecCreateParameters
-        {
-            AttachStderr = true,
-            AttachStdin = false,
-            AttachStdout = true,
-            Cmd = GetCommand(query, settings)
-        };
+        return GetCommand(query, settings).ToArray();
     }
 
-    private IList<string> GetCommand(
+    private List<string> GetCommand(
         string query,
         ContainerResourceSettings settings)
     {
@@ -34,5 +25,4 @@ internal class SqlCommandBase
             query
         };
     }
-
 }

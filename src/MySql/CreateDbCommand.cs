@@ -1,10 +1,8 @@
-using Docker.DotNet.Models;
-
 namespace Squadron;
 
 internal class CreateDbCommand : SqlCommandBase, ICommand
 {
-    public ContainerExecCreateParameters Parameters { get; }
+    private readonly string[] _commandArray;
 
     private CreateDbCommand(
         string dbname,
@@ -12,7 +10,7 @@ internal class CreateDbCommand : SqlCommandBase, ICommand
         ContainerResourceSettings settings)
     {
         var grantAccess = grant ?? "ALL";
-        Parameters = GetContainerExecParameters(
+        _commandArray = GetCommandArray(
             $@"CREATE DATABASE {dbname};
                    CREATE ROLE developer_{dbname};
                    GRANT {grantAccess}
@@ -21,11 +19,11 @@ internal class CreateDbCommand : SqlCommandBase, ICommand
             settings);
     }
 
-    internal static ContainerExecCreateParameters Execute(
+    internal static string[] Execute(
         string dbName,
         string? grant,
         ContainerResourceSettings settings)
-        => new CreateDbCommand(dbName, grant, settings).Parameters;
+        => new CreateDbCommand(dbName, grant, settings)._commandArray;
 
-    public string Command => string.Join(" ", Parameters.Cmd);
+    public string Command => string.Join(" ", _commandArray);
 }

@@ -267,7 +267,7 @@ public class MongoResource<TOptions> :
                 options.CollectionOptions.DatabaseOptions.DatabaseName,
                 options.CollectionOptions.CollectionName,
                 options.CustomImportArgs)
-            .ToContainerExecCreateParameters());
+            .ToCommandArray());
     }
 
     /// <summary>

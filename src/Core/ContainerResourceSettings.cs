@@ -55,15 +55,6 @@ public class ContainerResourceSettings
     /// </summary>
     public string Tag { get; internal set; }
 
-    /// <summary>
-    /// Gets or sets the name of the Container registry as defined in configuation
-    /// Defauls is DockerHub
-    /// </summary>
-    /// <value>
-    /// The name of the registry.
-    /// </value>
-    public string? RegistryName { get; internal set; }
-
     public ContainerAddressMode AddressMode { get; internal set; }
 
     /// <summary>

@@ -60,18 +60,6 @@ public class ContainerResourceBuilder
         return this;
     }
 
-    /// <summary>
-    /// Container registry name as defined in configurations
-    /// Default is DockerHub
-    /// </summary>
-    /// <param name="registryName">Name of the registry.</param>
-    /// <returns></returns>
-    public ContainerResourceBuilder Registry(string registryName)
-    {
-        _options.RegistryName = registryName;
-        return this;
-    }
-
     public ContainerResourceBuilder AddressMode(ContainerAddressMode mode)
     {
         _options.AddressMode = mode;

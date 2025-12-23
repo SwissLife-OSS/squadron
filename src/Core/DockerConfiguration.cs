@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Squadron;
 
 /// <summary>
@@ -8,14 +6,8 @@ namespace Squadron;
 public class DockerConfiguration
 {
     /// <summary>
-    /// Gets or sets the registries.
+    /// Gets or sets the default address mode for containers.
     /// </summary>
-    /// <value>
-    /// The registries.
-    /// </value>
-    public IList<DockerRegistryConfiguration> Registries { get; set; } =
-        new List<DockerRegistryConfiguration>();
-
     public ContainerAddressMode DefaultAddressMode { get; internal set; } = ContainerAddressMode.Port;
 }
 

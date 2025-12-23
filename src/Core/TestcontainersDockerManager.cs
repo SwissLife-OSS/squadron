@@ -57,7 +57,7 @@ public class TestcontainersDockerManager : IDockerContainerManager
             .WithAutoRemove(false);
 
         // Configure port bindings
-        ConfigurePortBindings(builder);
+        builder = ConfigurePortBindings(builder);
 
         // Configure environment variables
         foreach (var envVar in _settings.EnvironmentVariables)
@@ -109,24 +109,6 @@ public class TestcontainersDockerManager : IDockerContainerManager
                 .WithNetworkAliases(_settings.UniqueContainerName);
         }
 
-        // Configure registry authentication if specified
-        if (!string.IsNullOrEmpty(_settings.RegistryName))
-        {
-            var dockerConfig = _settings.DockerConfigResolver();
-            var registryConfig = dockerConfig.Registries
-                .FirstOrDefault(x => x.Name.Equals(
-                    _settings.RegistryName,
-                    StringComparison.InvariantCultureIgnoreCase));
-
-            if (registryConfig != null &&
-                !string.IsNullOrEmpty(registryConfig.Username) &&
-                !string.IsNullOrEmpty(registryConfig.Password))
-            {
-                // Testcontainers will use Docker's credential helpers or config
-                // For explicit auth, we'd need to configure the registry
-            }
-        }
-
         // Build and start container
         _container = builder.Build();
 
@@ -153,7 +135,7 @@ public class TestcontainersDockerManager : IDockerContainerManager
         }
     }
 
-    private void ConfigurePortBindings(ContainerBuilder builder)
+    private ContainerBuilder ConfigurePortBindings(ContainerBuilder builder)
     {
         var allPorts = new List<ContainerPortMapping>
         {
@@ -171,14 +153,16 @@ public class TestcontainersDockerManager : IDockerContainerManager
             if (portMapping.ExternalPort != 0)
             {
                 // Static port mapping
-                builder.WithPortBinding(portMapping.InternalPort, portMapping.ExternalPort);
+                builder = builder.WithPortBinding(portMapping.InternalPort, portMapping.ExternalPort);
             }
             else
             {
                 // Dynamic port mapping (let Docker choose)
-                builder.WithPortBinding(portMapping.InternalPort, true);
+                builder = builder.WithPortBinding(portMapping.InternalPort, true);
             }
         }
+
+        return builder;
     }
 
     private async Task PopulateInstanceDetailsAsync()

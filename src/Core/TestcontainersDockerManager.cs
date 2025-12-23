@@ -258,7 +258,10 @@ public class TestcontainersDockerManager : IDockerContainerManager
         try
         {
             var fileBytes = await File.ReadAllBytesAsync(context.Source);
-            await _container.CopyAsync(fileBytes, context.Destination);
+            // Set world-readable permissions (0644) so non-root container users can read the file
+            const UnixFileModes fileMode = UnixFileModes.UserRead | UnixFileModes.UserWrite | 
+                                           UnixFileModes.GroupRead | UnixFileModes.OtherRead;
+            await _container.CopyAsync(fileBytes, context.Destination, fileMode);
         }
         catch (Exception ex)
         {

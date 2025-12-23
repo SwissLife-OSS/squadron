@@ -9,7 +9,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tests:
+  discover-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      test-projects: ${{ steps.find-tests.outputs.projects }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8
+            9
+            10
+
+      - name: Find test projects
+        id: find-tests
+        run: |
+          # Use dotnet msbuild to evaluate and list test project references from traversal project
+          dotnet msbuild ./all.csproj -p:BuildTestsOnly=true -t:Restore -v:q -nologo
+
+          # Get the evaluated ProjectReference items using MSBuild
+          projects=$(dotnet msbuild ./all.csproj -p:BuildTestsOnly=true -getItem:ProjectReference 2>/dev/null | \
+            grep -E "Include=" | \
+            sed -E 's/.*Include="([^"]+)".*/\1/' | \
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          # Fallback: parse the glob pattern directly if getItem doesn't work
+          if [ -z "$projects" ] || [ "$projects" == "[]" ]; then
+            projects=$(ls -1 test/**/*Tests.csproj 2>/dev/null | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          fi
+
+          echo "projects=$projects" >> $GITHUB_OUTPUT
+          echo "Found test projects:"
+          echo "$projects" | jq -r '.[]'
+        shell: bash
+
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,6 +61,34 @@ jobs:
             9
             10
 
+      - name: Build projects
+        run: dotnet build ./all.csproj
+        shell: bash
+
+  tests:
+    needs: [discover-tests, build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJson(needs.discover-tests.outputs.test-projects) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8
+            9
+            10
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+
       - name: Docker Information
         run: |
           echo -e "\n\033[0;34mDocker System Info \033[0m"
@@ -31,10 +97,6 @@ jobs:
           docker ps -a
         shell: bash
 
-      - name: Build projects
-        run: dotnet build ./all.csproj
-        shell: bash
-
-      - name: Run tests
-        run: dotnet test ./all.csproj /p:BuildTestsOnly=true
+      - name: Run tests for ${{ matrix.project }}
+        run: dotnet test ${{ matrix.project }} --no-build
         shell: bash

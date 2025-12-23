@@ -28,67 +28,10 @@ jobs:
       - name: Find test projects
         id: find-tests
         run: |
-          set -e
-          
-          echo "::group::Debug Info"
-          echo "Current directory: $(pwd)"
-          echo "Contents of current directory:"
-          ls -la
-          echo ""
-          echo ".NET SDK version:"
-          dotnet --version
-          echo "::endgroup::"
-          
-          echo "::group::Restore traversal project"
-          dotnet msbuild ./all.csproj -p:BuildTestsOnly=true -t:Restore -v:n -nologo || true
-          echo "::endgroup::"
-          
-          echo "::group::Try MSBuild getItem"
-          echo "Running: dotnet msbuild ./all.csproj -p:BuildTestsOnly=true -getItem:ProjectReference"
-          msbuild_output=$(dotnet msbuild ./all.csproj -p:BuildTestsOnly=true -getItem:ProjectReference 2>&1) || true
-          echo "MSBuild output:"
-          echo "$msbuild_output"
-          echo "::endgroup::"
-          
-          echo "::group::Parse MSBuild output"
-          projects=$(echo "$msbuild_output" | \
-            grep -E "Include=" | \
-            sed -E 's/.*Include="([^"]+)".*/\1/' | \
-            jq -R -s -c 'split("\n") | map(select(length > 0))') || true
-          echo "Parsed projects from MSBuild: $projects"
-          echo "::endgroup::"
-          
-          echo "::group::Fallback - glob pattern"
-          if [ -z "$projects" ] || [ "$projects" == "[]" ] || [ "$projects" == "null" ]; then
-            echo "MSBuild getItem did not return projects, using glob fallback..."
-            echo "Looking for test/**/*Tests.csproj"
-            
-            # Try with find instead of ls for better compatibility
-            found_projects=$(find ./test -name "*Tests.csproj" -type f 2>/dev/null || true)
-            echo "Found projects:"
-            echo "$found_projects"
-            
-            if [ -n "$found_projects" ]; then
-              projects=$(echo "$found_projects" | jq -R -s -c 'split("\n") | map(select(length > 0))')
-            else
-              echo "No projects found with find, trying ls..."
-              projects=$(ls -1 test/**/*Tests.csproj 2>/dev/null | jq -R -s -c 'split("\n") | map(select(length > 0))') || projects="[]"
-            fi
-          fi
-          echo "::endgroup::"
-          
-          echo "::group::Final output"
-          echo "Final projects JSON: $projects"
-          
-          if [ -z "$projects" ] || [ "$projects" == "[]" ] || [ "$projects" == "null" ]; then
-            echo "::error::No test projects found!"
-            exit 1
-          fi
-          
+          projects=$(find ./test -name "*Tests.csproj" -type f | jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "projects=$projects" >> $GITHUB_OUTPUT
           echo "Found test projects:"
           echo "$projects" | jq -r '.[]'
-          echo "::endgroup::"
         shell: bash
 
   build:
@@ -127,11 +70,6 @@ jobs:
             8
             9
             10
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output
 
       - name: Docker Information
         run: |

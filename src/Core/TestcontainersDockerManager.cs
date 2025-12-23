@@ -152,12 +152,12 @@ public class TestcontainersDockerManager : IDockerContainerManager
         {
             if (portMapping.ExternalPort != 0)
             {
-                // Static port mapping
-                builder = builder.WithPortBinding(portMapping.InternalPort, portMapping.ExternalPort);
+                // Static port mapping: hostPort, containerPort
+                builder = builder.WithPortBinding(portMapping.ExternalPort, portMapping.InternalPort);
             }
             else
             {
-                // Dynamic port mapping (let Docker choose)
+                // Dynamic port mapping (let Docker choose): containerPort, assignRandomHostPort
                 builder = builder.WithPortBinding(portMapping.InternalPort, true);
             }
         }

@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
+    <RootNamespace>Squadron.MariaDB</RootNamespace>
     <AssemblyName>Squadron.MariaDB</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
  
   <ItemGroup>

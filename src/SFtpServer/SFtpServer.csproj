@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <RootNamespace>Squadron.SFtpServer</RootNamespace>
     <AssemblyName>Squadron.SFtpServer</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,4 +13,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
+  
 </Project>

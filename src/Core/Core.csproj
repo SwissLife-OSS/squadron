@@ -2,8 +2,10 @@
   <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
+    <RootNamespace>Squadron</RootNamespace>
     <AssemblyName>Squadron</AssemblyName>
     <PackageId>Squadron.Core</PackageId>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

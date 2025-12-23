@@ -1,10 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
+    <RootNamespace>Squadron.MySql</RootNamespace>
     <AssemblyName>Squadron.MySql</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
-   <ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MySqlConnector" />
   </ItemGroup>
 

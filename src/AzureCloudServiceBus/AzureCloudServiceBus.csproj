@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(CCResourceProjectProps)" Condition="Exists('$(CCResourceProjectProps)')" />
 
   <PropertyGroup>
+    <RootNamespace>Squadron.AzureCloudServiceBus</RootNamespace>
     <AssemblyName>Squadron.AzureCloudServiceBus</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +16,5 @@
     <ProjectReference Include="..\AzureCloud\AzureCloud.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
-
 
 </Project>

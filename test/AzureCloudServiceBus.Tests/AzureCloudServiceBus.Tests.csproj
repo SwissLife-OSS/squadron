@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Squadron.AzureCloudServiceBus.Tests</RootNamespace>
+    <AssemblyName>Squadron.AzureCloudServiceBus.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AzureCloudServiceBus\AzureCloudServiceBus.csproj" />
+    <ProjectReference Include="..\..\src\AzureCloud\AzureCloud.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.user.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoFixture" />
+  </ItemGroup>
+
+
+</Project>

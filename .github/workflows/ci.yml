@@ -54,6 +54,7 @@ jobs:
 
   tests:
     needs: [discover-tests]
+    name: Test ${{ matrix.project }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

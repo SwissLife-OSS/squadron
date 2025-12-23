@@ -81,5 +81,5 @@ jobs:
         shell: bash
 
       - name: Run tests for ${{ matrix.project }}
-        run: dotnet test ${{ matrix.project }} --no-build
+        run: dotnet test ${{ matrix.project }}
         shell: bash

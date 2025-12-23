@@ -32,7 +32,6 @@ public class TestWebServerOptions : GenericContainerOptions
             .Name("login-samples")
             .InternalPort(4200)
             .ExternalPort(4200)
-            .Image("spcasquadron.azurecr.io/fusion-login-samples:v2")
-            .Registry("myPrivate");
+            .Image("spcasquadron.azurecr.io/fusion-login-samples:v2");
     }
 }

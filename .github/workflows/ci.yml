@@ -9,58 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  discover-tests:
-    runs-on: ubuntu-latest
-    outputs:
-      test-projects: ${{ steps.find-tests.outputs.projects }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: |
-            8
-            9
-            10
-
-      - name: Find test projects
-        id: find-tests
-        run: |
-          projects=$(find ./test -name "*Tests.csproj" -type f | jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "projects=$projects" >> $GITHUB_OUTPUT
-          echo "Found test projects:"
-          echo "$projects" | jq -r '.[]'
-        shell: bash
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: |
-            8
-            9
-            10
-
-      - name: Build projects
-        run: dotnet build ./all.csproj
-        shell: bash
-
   tests:
-    needs: [discover-tests]
-    name: Test ${{ matrix.project }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        project: ${{ fromJson(needs.discover-tests.outputs.test-projects) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -81,6 +31,10 @@ jobs:
           docker ps -a
         shell: bash
 
-      - name: Run tests for ${{ matrix.project }}
-        run: dotnet test ${{ matrix.project }}
+      - name: Build projects
+        run: dotnet build ./all.csproj
+        shell: bash
+
+      - name: Run tests
+        run: dotnet test ./all.csproj /p:BuildTestsOnly=true --no-build
         shell: bash

@@ -8,15 +8,15 @@ internal class CreateUserCommand : ICommand
 
     private CreateUserCommand(ContainerResourceSettings settings)
     {
-        _command.Append("gitea ");
-        _command.Append($"admin user create --admin --username {settings.Username} --password {settings.Password} " +
-                        $"--email {settings.Username}@local");
+        _command.Append($"gitea admin user create --admin --username {settings.Username} " +
+                        $"--password {settings.Password} --email {settings.Username}@local");
     }
 
     internal static string[] Execute(ContainerResourceSettings settings)
     {
-        // Note: Testcontainers doesn't support user parameter in ExecAsync
-        return new CreateUserCommand(settings).ToCommandArray();
+        // Run gitea command as 'git' user since Gitea refuses to run as root
+        var cmd = new CreateUserCommand(settings);
+        return ["su", "-c", cmd.Command, "git"];
     }
     
     public string Command => _command.ToString();

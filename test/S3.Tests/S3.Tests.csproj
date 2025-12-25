@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Squadron.S3.Tests</AssemblyName>
+    <RootNamespace>Squadron.S3.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

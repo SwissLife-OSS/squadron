@@ -36,8 +36,8 @@ jobs:
 
       - name: Build projects
         shell: bash
-        run: dotnet build ./all.csproj
+        run: dotnet build ./all.csproj -f net${{ matrix.dotnet-version }}.0
 
       - name: Run tests
         shell: bash
-        run: dotnet test ./all.csproj /p:BuildTestsOnly=true --no-build -- RunConfiguration.MaxCpuCount=1
+        run: dotnet test ./all.csproj /p:BuildTestsOnly=true --no-build -f net${{ matrix.dotnet-version }}.0 -- RunConfiguration.MaxCpuCount=1

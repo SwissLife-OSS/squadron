@@ -18,4 +18,11 @@
     <PackageReference Include="Snapshooter.Xunit" />
   </ItemGroup>
 
+  <!-- Shared xunit runner configuration -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)xunit.runner.json" Link="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

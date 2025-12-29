@@ -60,12 +60,6 @@ public class ContainerResourceBuilder
         return this;
     }
 
-    public ContainerResourceBuilder AddressMode(ContainerAddressMode mode)
-    {
-        _options.AddressMode = mode;
-        return this;
-    }
-
     /// <summary>
     /// Adds an environment variable.
     /// </summary>
@@ -331,18 +325,6 @@ public class ContainerResourceBuilder
     }
 
     /// <summary>
-    /// Sets the docker configuration resolver.
-    /// </summary>
-    /// <param name="resolver">The resolver.</param>
-    /// <returns></returns>
-    public ContainerResourceBuilder SetDockerConfigResolver(
-        Func<DockerConfiguration> resolver)
-    {
-        _options.DockerConfigResolver = resolver;
-        return this;
-    }
-
-    /// <summary>
     /// Adds a network of which the container should be part of.
     /// </summary>
     /// <param name="network">The network name.</param>
@@ -408,7 +390,6 @@ public class ContainerResourceBuilder
             _logLevel = overriddenLogLevel;
         }
             
-        _options.DockerConfigResolver ??= ContainerResourceOptions.DefaultDockerConfigResolver;
         _options.Logger = new Logger(_logLevel, _options);
         _options.Cmd = _cmd;
         return _options;

@@ -18,7 +18,7 @@ public interface IDockerContainerManager : IDisposable
     ContainerInstance Instance { get; }
 
     /// <summary>
-    /// Gets the underlying Testcontainers container.
+    /// Gets the underlying container.
     /// </summary>
     IContainer Container { get; }
 

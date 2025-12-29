@@ -67,6 +67,5 @@ public class ContainerInstance : IDisposable
 
     public void Dispose()
     {
-        // No longer need to dispose log stream - Testcontainers handles this
     }
 }

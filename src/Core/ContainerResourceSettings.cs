@@ -55,8 +55,6 @@ public class ContainerResourceSettings
     /// </summary>
     public string Tag { get; internal set; }
 
-    public ContainerAddressMode AddressMode { get; internal set; }
-
     /// <summary>
     /// Environment variables
     /// </summary>
@@ -123,14 +121,6 @@ public class ContainerResourceSettings
     /// </summary>
     public IDictionary<string, object> KeyValueStore { get; internal set; }
         = new Dictionary<string, object>();
-
-    /// <summary>
-    /// Gets the docker configuration resolver.
-    /// </summary>
-    /// <value>
-    /// The docker configuration resolver.
-    /// </value>
-    public Func<DockerConfiguration> DockerConfigResolver { get; internal set; }
 
     internal Logger Logger { get; set; }
 }

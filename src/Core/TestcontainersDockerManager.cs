@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ using DotNet.Testcontainers.Networks;
 namespace Squadron;
 
 /// <summary>
-/// Manager to work with docker containers using Testcontainers
+/// Manager to work with docker containers
 /// </summary>
 /// <seealso cref="Squadron.IDockerContainerManager" />
 public class TestcontainersDockerManager : IDockerContainerManager
@@ -31,10 +30,7 @@ public class TestcontainersDockerManager : IDockerContainerManager
     /// Initializes a new instance of the <see cref="TestcontainersDockerManager"/> class.
     /// </summary>
     /// <param name="settings">The settings.</param>
-    /// <param name="dockerConfiguration">The docker configuration (kept for API compatibility).</param>
-    public TestcontainersDockerManager(
-        ContainerResourceSettings settings,
-        DockerConfiguration dockerConfiguration)
+    public TestcontainersDockerManager(ContainerResourceSettings settings)
     {
         _settings = settings;
         _variableResolver = new VariableResolver(_settings.Variables);
@@ -115,11 +111,6 @@ public class TestcontainersDockerManager : IDockerContainerManager
         try
         {
             _settings.Logger.Verbose("Starting container");
-
-            if (_settings.PreferLocalImage)
-            {
-                // Testcontainers handles this automatically with image pull policy
-            }
 
             await _container.StartAsync();
             _settings.Logger.Information("Container started");
@@ -258,7 +249,6 @@ public class TestcontainersDockerManager : IDockerContainerManager
         try
         {
             var fileBytes = await File.ReadAllBytesAsync(context.Source);
-            // Set world-readable permissions (0644) so non-root container users can read the file
             const UnixFileModes fileMode = UnixFileModes.UserRead | UnixFileModes.UserWrite | 
                                            UnixFileModes.GroupRead | UnixFileModes.OtherRead;
             await _container.CopyAsync(fileBytes, context.Destination, fileMode);

@@ -86,8 +86,11 @@ public class S3ResourceTests(S3Resource s3Resource) : IClassFixture<S3Resource>
     private Stream OpenEmbeddedResourceStream(string fileName)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = $"Squadron.{fileName}";
+        var resourceName = $"Squadron.S3.Tests.{fileName}";
 
-        return assembly.GetManifestResourceStream(resourceName);
+        return assembly.GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException(
+                $"Embedded resource '{resourceName}' not found. Available resources: " +
+                string.Join(", ", assembly.GetManifestResourceNames()));
     }
 }

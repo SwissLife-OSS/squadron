@@ -1,5 +1,0 @@
-{
-  "parallelizeTestCollections": true,
-  "maxParallelThreads": 4,
-  "testTimeout": 30000
-}

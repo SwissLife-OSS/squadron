@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Docker.DotNet;
 
 namespace Squadron;
 
-/// <summary>Respresents a created docker container</summary>
+/// <summary>Represents a created docker container</summary>
 public class ContainerInstance : IDisposable
 {
     /// <summary>
@@ -67,10 +65,7 @@ public class ContainerInstance : IDisposable
     /// </value>
     public IList<string> Logs { get; set; } = new List<string>();
 
-    internal MultiplexedStream? LogStream { get; set; }
-
     public void Dispose()
     {
-        LogStream?.Dispose();
     }
 }

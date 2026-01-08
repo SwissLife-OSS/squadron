@@ -1,6 +1,5 @@
 
 using System;
-using Docker.DotNet.Models;
 
 namespace Squadron;
 
@@ -17,7 +16,7 @@ public static class ChmodCommand
     /// <param name="group"><see cref="Permission"/> for group</param>
     /// <param name="public"><see cref="Permission"/> for public</param>
     /// <param name="recursive">Apply recursive</param>
-    public static ContainerExecCreateParameters Set(
+    public static string[] Set(
         string pathInContainer,
         Permission owner = Permission.None,
         Permission group = Permission.None,
@@ -25,28 +24,19 @@ public static class ChmodCommand
         bool recursive = false)
     {
         var cmd = $"chmod {(recursive ? "-R " : "")}{owner:d}{group:d}{@public:d} {pathInContainer}";
-
-        return new ContainerExecCreateParameters
-        {
-            AttachStderr = true,
-            AttachStdin = false,
-            AttachStdout = true,
-            Cmd = cmd.Split(' '),
-            Privileged = true,
-            User = "root"
-        };
+        return cmd.Split(' ');
     }
 
-    public static ContainerExecCreateParameters ReadOnly(string pathInContainer, bool recursive = false)
+    public static string[] ReadOnly(string pathInContainer, bool recursive = false)
         => Set(pathInContainer, Permission.Read, Permission.Read, Permission.Read, recursive);
 
-    public static ContainerExecCreateParameters FullAccess(string pathInContainer, bool recursive = false)
+    public static string[] FullAccess(string pathInContainer, bool recursive = false)
         => Set(pathInContainer, Permission.FullAccess, Permission.FullAccess, Permission.FullAccess, recursive);
 
-    public static ContainerExecCreateParameters Execute(string pathInContainer, bool recursive = false)
+    public static string[] Execute(string pathInContainer, bool recursive = false)
         => Set(pathInContainer, Permission.Execute, Permission.Execute, Permission.Execute, recursive);
 
-    public static ContainerExecCreateParameters ReadWrite(string pathInContainer, bool recursive = false)
+    public static string[] ReadWrite(string pathInContainer, bool recursive = false)
         => Set(pathInContainer, Permission.ReadWrite, Permission.ReadWrite, Permission.ReadWrite, recursive);
 
     [Flags]

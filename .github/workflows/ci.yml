@@ -1,12 +1,22 @@
 name: CI
-run-name: CI ${{ github.event.pull_request.title }}
+run-name: CI 🔍 ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
 
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     runs-on: ubuntu-latest
+    name: Tests dotnet ${{ matrix.dotnet-version }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        dotnet-version: [8, 9, 10]
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -14,10 +24,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: |
-            8
-            9
-            10
+          dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Docker Information
         run: |
@@ -28,9 +35,9 @@ jobs:
         shell: bash
 
       - name: Build projects
-        run: dotnet build ./all.csproj
         shell: bash
+        run: dotnet build ./all.csproj -f net${{ matrix.dotnet-version }}.0
 
       - name: Run tests
-        run: dotnet test ./all.csproj /p:BuildTestOnly=true
         shell: bash
+        run: dotnet test ./all.csproj /p:BuildTestsOnly=true --no-build -f net${{ matrix.dotnet-version }}.0 -- RunConfiguration.MaxCpuCount=1

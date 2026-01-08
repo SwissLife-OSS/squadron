@@ -41,7 +41,7 @@
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
         <PackageVersion Include="xunit" Version="2.9.3" />
         <PackageVersion Include="xunit.core" Version="2.9.3" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.0" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
         <PackageVersion Include="FluentAssertions" Version="7.2.0" />
         <PackageVersion Include="Moq" Version="4.20.72" />
         <PackageVersion Include="coverlet.collector" Version="6.0.4" />
@@ -50,10 +50,16 @@
 
         <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
 
-        <PackageVersion Include="Docker.DotNet.Enhanced" Version="3.131.0" />
+        <PackageVersion Include="Testcontainers" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.MongoDb" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.PostgreSql" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.Redis" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.RabbitMq" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.MySql" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.MsSql" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.Elasticsearch" Version="4.3.0" />
+        <PackageVersion Include="Testcontainers.MariaDb" Version="4.3.0" />
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageVersion Include="Polly" Version="8.5.2" />
-        <PackageVersion Include="SharpZipLib" Version="1.4.2" />
 
         <PackageVersion Include="MongoDB.Driver" Version="3.0.0" />
         <PackageVersion Include="MySqlConnector" Version="2.4.0" />
@@ -83,7 +89,7 @@
         <PackageVersion Include="Typesense" Version="7.33.0" />
 
         <PackageVersion Include="FluentFTP" Version="35.0.4" />
-        <PackageVersion Include="SSH.NET" Version="2023.0.0" />
+        <PackageVersion Include="SSH.NET" Version="2024.2.0" />
 
 
         <PackageVersion Include="ServiceStack.Text" Version="8.8.0" />

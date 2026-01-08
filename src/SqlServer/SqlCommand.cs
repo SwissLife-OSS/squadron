@@ -1,5 +1,4 @@
 using System.Text;
-using Docker.DotNet.Models;
 
 namespace Squadron;
 
@@ -16,17 +15,17 @@ internal class SqlCommand : ICommand
         _command.Append(command);
     }
 
-    internal static ContainerExecCreateParameters ExecuteFile(
+    internal static string[] ExecuteFile(
         string inputFile,
         ContainerResourceSettings settings)
         => new SqlCommand($"-i {inputFile}", settings)
-            .ToContainerExecCreateParameters();
+            .ToCommandArray();
 
-    internal static ContainerExecCreateParameters ExecuteQuery(
+    internal static string[] ExecuteQuery(
         string query,
         ContainerResourceSettings settings)
         => new SqlCommand($"-q '{query}'", settings)
-            .ToContainerExecCreateParameters();
+            .ToCommandArray();
 
     public string Command => _command.ToString();
 }

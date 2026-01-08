@@ -90,11 +90,16 @@ public class GiteaResource<TOptions>
         Url = $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";
         await Initializer.WaitAsync(new GiteaStatus(Url));
         
-        var result = await Manager.InvokeCommandAsync(CreateUserCommand.Execute(Settings));
-        if (!result.Contains("successfully created!"))
+        var result = await Manager.InvokeCommandAsync(
+            CreateUserCommand.Execute(Settings), 
+            retryCount: 5, 
+            retryDelayMs: 1000);
+        
+        if (result == null || !result.Contains("successfully created!"))
         {
             throw new InvalidOperationException($"Failed to create user: {result}");
         }
+        
         Token = await CreateTokenAsync();
     }
 

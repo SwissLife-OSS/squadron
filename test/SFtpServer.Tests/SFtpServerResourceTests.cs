@@ -34,16 +34,19 @@ public class SFtpServerResourceTests(SFtpServerResource sftpServerResource) : IC
     private Stream GetEmbeddedResource(string fileName)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = $"Squadron.{fileName}";
+        var resourceName = $"Squadron.SFtpServer.Tests.{fileName}";
 
-        return assembly.GetManifestResourceStream(resourceName);
+        return assembly.GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException(
+                $"Embedded resource '{resourceName}' not found. Available resources: " +
+                string.Join(", ", assembly.GetManifestResourceNames()));
     }
 
     private byte[] ToByteArray(Stream stream)
     {
         using (MemoryStream memoryStream = new MemoryStream())
         {
-            stream.CopyToAsync(memoryStream);
+            stream.CopyTo(memoryStream);
 
             return memoryStream.ToArray();
         }

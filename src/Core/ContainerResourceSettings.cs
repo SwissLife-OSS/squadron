@@ -56,17 +56,6 @@ public class ContainerResourceSettings
     public string Tag { get; internal set; }
 
     /// <summary>
-    /// Gets or sets the name of the Container registry as defined in configuation
-    /// Defauls is DockerHub
-    /// </summary>
-    /// <value>
-    /// The name of the registry.
-    /// </value>
-    public string? RegistryName { get; internal set; }
-
-    public ContainerAddressMode AddressMode { get; internal set; }
-
-    /// <summary>
     /// Environment variables
     /// </summary>
     public IList<string> EnvironmentVariables { get; internal set; }
@@ -132,14 +121,6 @@ public class ContainerResourceSettings
     /// </summary>
     public IDictionary<string, object> KeyValueStore { get; internal set; }
         = new Dictionary<string, object>();
-
-    /// <summary>
-    /// Gets the docker configuration resolver.
-    /// </summary>
-    /// <value>
-    /// The docker configuration resolver.
-    /// </value>
-    public Func<DockerConfiguration> DockerConfigResolver { get; internal set; }
 
     internal Logger Logger { get; set; }
 }

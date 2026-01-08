@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Squadron.SFtpServer.Tests</AssemblyName>
+    <RootNamespace>Squadron.SFtpServer.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -49,7 +49,6 @@ public class NginxServerOptions : GenericContainerOptions
         builder
             .Name("nginx")
             .InternalPort(80)
-            .ExternalPort(8811)
             .Image("nginx:latest")
             .AddVolume($"{Path.Combine(Directory.GetCurrentDirectory(),"test-volume")}:/usr/share/nginx/html");
     }

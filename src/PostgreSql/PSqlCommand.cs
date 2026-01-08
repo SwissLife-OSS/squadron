@@ -1,6 +1,4 @@
 using System.Text;
-using Docker.DotNet.Models;
-
 
 namespace Squadron;
 
@@ -17,12 +15,12 @@ internal class PSqlCommand : ICommand
         _command.Append(command);
     }
 
-    internal static ContainerExecCreateParameters ExecuteFile(
+    internal static string[] ExecuteFile(
         string inputFile,
         string dbName,
         ContainerResourceSettings settings)
         => new PSqlCommand($"{dbName} -f {inputFile}", settings)
-            .ToContainerExecCreateParameters();
+            .ToCommandArray();
 
     public string Command => _command.ToString();
 }

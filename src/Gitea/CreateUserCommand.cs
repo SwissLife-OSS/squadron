@@ -1,5 +1,4 @@
 using System.Text;
-using Docker.DotNet.Models;
 
 namespace Squadron;
 
@@ -9,14 +8,15 @@ internal class CreateUserCommand : ICommand
 
     private CreateUserCommand(ContainerResourceSettings settings)
     {
-        _command.Append("gitea ");
-        _command.Append($"admin user create --admin --username {settings.Username} --password {settings.Password} " +
-                        $"--email {settings.Username}@local");
+        _command.Append($"gitea admin user create --admin --username {settings.Username} " +
+                        $"--password {settings.Password} --email {settings.Username}@local");
     }
 
-    internal static ContainerExecCreateParameters Execute(ContainerResourceSettings settings)
+    internal static string[] Execute(ContainerResourceSettings settings)
     {
-        return new CreateUserCommand(settings).ToContainerExecCreateParameters("1000");
+        // Run gitea command as 'git' user since Gitea refuses to run as root
+        var cmd = new CreateUserCommand(settings);
+        return ["su", "-c", cmd.Command, "git"];
     }
     
     public string Command => _command.ToString();

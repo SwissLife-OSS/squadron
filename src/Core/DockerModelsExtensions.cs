@@ -1,31 +1,12 @@
-using Docker.DotNet.Models;
-
 namespace Squadron;
 
 internal static class DockerModelsExtensions
 {
-    internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
-        this ICommand command)
+    /// <summary>
+    /// Converts an ICommand to a command array for container execution.
+    /// </summary>
+    internal static string[] ToCommandArray(this ICommand command)
     {
-        return new ContainerExecCreateParameters
-        {
-            AttachStderr = true,
-            AttachStdin = false,
-            AttachStdout = true,
-            Cmd = command.Command.Split(' ')
-        };
-    }
-
-    internal static ContainerExecCreateParameters ToContainerExecCreateParameters(
-        this ICommand command, string user)
-    {
-        return new ContainerExecCreateParameters
-        {
-            User = user,
-            AttachStderr = true,
-            AttachStdin = false,
-            AttachStdout = true,
-            Cmd = command.Command.Split(' ')
-        };
+        return command.Command.Split(' ');
     }
 }

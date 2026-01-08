@@ -1,26 +1,21 @@
-using System.Collections.Generic;
-using System.Text;
-using Docker.DotNet.Models;
-
-
 namespace Squadron;
 
-internal class SqlCommand: SqlCommandBase, ICommand
+internal class SqlCommand : SqlCommandBase, ICommand
 {
-    public ContainerExecCreateParameters Parameters { get; }
+    private readonly string[] _commandArray;
 
     private SqlCommand(
         string command,
         ContainerResourceSettings settings)
     {
-        Parameters = GetContainerExecParameters(command, settings);
+        _commandArray = GetCommandArray(command, settings);
     }
 
-    internal static ContainerExecCreateParameters Execute(
+    internal static string[] Execute(
         string inputFile,
         string dbName,
         ContainerResourceSettings settings)
-        => new SqlCommand($"Use {dbName}; {inputFile}", settings).Parameters;
+        => new SqlCommand($"Use {dbName}; {inputFile}", settings)._commandArray;
 
-    public string Command => string.Join(" ", Parameters.Cmd);
+    public string Command => string.Join(" ", _commandArray);
 }

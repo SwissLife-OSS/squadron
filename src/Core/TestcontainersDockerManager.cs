@@ -251,7 +251,7 @@ public class TestcontainersDockerManager : IDockerContainerManager
             var fileBytes = await File.ReadAllBytesAsync(context.Source);
             const UnixFileModes fileMode = UnixFileModes.UserRead | UnixFileModes.UserWrite | 
                                            UnixFileModes.GroupRead | UnixFileModes.OtherRead;
-            await _container.CopyAsync(fileBytes, context.Destination, fileMode);
+            await _container.CopyAsync(fileBytes, context.Destination, (uint)fileMode);
         }
         catch (Exception ex)
         {

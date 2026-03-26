@@ -16,7 +16,7 @@ public class MongoReplicaSetResource<TOptions> :
     MongoResource<TOptions>
     where TOptions : MongoReplicaSetDefaultOptions, new()
 {
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         var client = new MongoClient(ConnectionString);

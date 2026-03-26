@@ -23,7 +23,7 @@ public class TypesenseResource<TOptions>
     public string ApiKey { get; set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         BaseUrl = $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";

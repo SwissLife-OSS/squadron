@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Squadron.AzureCloud;
 using Xunit;
-using Xunit.Abstractions;
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace Squadron;
 
@@ -136,7 +136,7 @@ public class AzureCloudServiceBusResource<TOptions>
     /// <summary>
     /// Initialize the resource
     /// </summary>
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         BuildOptions();
@@ -222,7 +222,7 @@ public class AzureCloudServiceBusResource<TOptions>
     /// <summary>
     /// Cleans up the resource
     /// </summary>
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         try
         {

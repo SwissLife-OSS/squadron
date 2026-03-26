@@ -45,7 +45,7 @@ public class ContainerResource<TOptions>
     /// <summary>
     /// Initializes the resources
     /// </summary>
-    public virtual async Task InitializeAsync()
+    public virtual async ValueTask InitializeAsync()
     {
         SetupContainerResource();
 
@@ -138,7 +138,7 @@ public class ContainerResource<TOptions>
     /// <summary>
     /// Cleans up the resource
     /// </summary>
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         try
         {

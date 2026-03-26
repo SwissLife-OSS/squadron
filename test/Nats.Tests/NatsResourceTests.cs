@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AlterNats;
 using Squadron;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Nats.Tests;
 

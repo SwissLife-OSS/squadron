@@ -5,7 +5,6 @@ using FluentAssertions;
 using Nest;
 using Squadron;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Elasticsearch.Tests;
 

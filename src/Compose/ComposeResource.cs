@@ -15,7 +15,7 @@ public class ComposeResource<TOptions> : IAsyncLifetime
     protected Dictionary<string, ComposeResourceManager> Managers { get; set; }
         = new Dictionary<string, ComposeResourceManager>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var options = new TOptions();
         var builder = ComposeResourceBuilder.New();
@@ -58,7 +58,7 @@ public class ComposeResource<TOptions> : IAsyncLifetime
         return value;
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         var stopTasks = new List<Task>();
 

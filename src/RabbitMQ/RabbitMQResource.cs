@@ -29,7 +29,7 @@ public class RabbitMQResource<TOptions>
     public string ConnectionString { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         ConnectionString = $"amqp://{Settings.Username}:{Settings.Password}@" +

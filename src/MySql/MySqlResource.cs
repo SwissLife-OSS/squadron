@@ -25,7 +25,7 @@ public class MySqlResource<TOptions> :
     public string ConnectionString { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync().ConfigureAwait(false);
         ConnectionString = BuildConnectionString(Settings.Username, Settings.Password);

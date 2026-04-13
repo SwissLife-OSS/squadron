@@ -47,3 +47,11 @@ jobs:
           -f net${{ matrix.dotnet-version }}.0
           --
           --ignore-exit-code 8
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-net${{ matrix.dotnet-version }}
+          path: "**/TestResults/*.log"
+          if-no-files-found: ignore

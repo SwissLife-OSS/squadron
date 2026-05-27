@@ -5,17 +5,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>$(TestProjectTargetFrameworks)</TargetFrameworks>   
+    <TargetFrameworks>$(TestProjectTargetFrameworks)</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="xunit.v3" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Moq" />
-    <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="Snapshooter.Xunit" />
+    <PackageReference Include="Snapshooter.Xunit3" />
   </ItemGroup>
 
   <!-- Shared xunit runner configuration -->

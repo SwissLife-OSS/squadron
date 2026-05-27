@@ -8,9 +8,9 @@ public interface IComposableResource
 {
     Dictionary<string, string> GetComposeExports();
 
-    Task InitializeAsync();
+    ValueTask InitializeAsync();
 
-    Task DisposeAsync();
+    ValueTask DisposeAsync();
 
     void SetEnvironmentVariables(IEnumerable<string> variables);
 

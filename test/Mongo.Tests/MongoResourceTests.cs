@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Snapshooter.Xunit;
+using Snapshooter.Xunit3;
 using Xunit;
 
 namespace Squadron;

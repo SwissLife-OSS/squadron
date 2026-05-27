@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Squadron.Resources;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Squadron;
 

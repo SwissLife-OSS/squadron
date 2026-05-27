@@ -34,7 +34,7 @@ public partial class SqlServerResource<TOptions>
     protected string _serverConnectionString;
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 

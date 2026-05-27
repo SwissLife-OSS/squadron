@@ -30,7 +30,7 @@ public class ClickHouseResource<TOptions>
     public string ConnectionString { get; private set; } = null!;
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         ConnectionString = BuildConnectionString(Settings.Username);

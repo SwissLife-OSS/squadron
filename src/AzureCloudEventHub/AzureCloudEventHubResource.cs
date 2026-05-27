@@ -16,7 +16,7 @@ public class AzureCloudEventHubResource<TOptions>
     private EventHubNamespaceModel _eventHubModel;
     private EventHubManager _eventHubManager;
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         BuildOptions();
@@ -95,7 +95,7 @@ public class AzureCloudEventHubResource<TOptions>
         await _eventHubManager.CreateEventHubAsync(eventHub);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         try
         {

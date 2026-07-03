@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using Snapshooter.Xunit3;
+using Snapshooter.Xunit;
 using Squadron.Samples.Shared;
 using Xunit;
 

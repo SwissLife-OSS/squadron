@@ -24,7 +24,7 @@ public class SFtpServerResource<TOptions>
     public SFtpServerConfiguration FtpServerConfiguration { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync().ConfigureAwait(false);
         FtpServerConfiguration = BuildConfiguration(Settings.Username, Settings.Password);

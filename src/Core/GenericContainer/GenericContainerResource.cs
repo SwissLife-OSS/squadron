@@ -26,7 +26,7 @@ public class GenericContainerResource<TOptions>
     public ContainerAddress Address { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public async override ValueTask InitializeAsync()
+    public async override Task InitializeAsync()
     {
         await base.InitializeAsync();
         Address = new ContainerAddress

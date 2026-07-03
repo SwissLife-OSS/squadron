@@ -29,7 +29,7 @@ public class AzureStorageBlobResource<TOptions>
     public string ConnectionString { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         ConnectionString = CloudStorageAccountBuilder.GetForBlob(Manager.Instance);

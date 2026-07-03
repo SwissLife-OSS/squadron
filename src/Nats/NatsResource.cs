@@ -22,7 +22,7 @@ public class NatsResource<TOptions>
     public string NatsConnectionString { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         var baseAddressClient =

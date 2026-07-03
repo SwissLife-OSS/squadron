@@ -31,7 +31,7 @@ public class RavenDBResource<TOptions>
     public string ConnectionString { get; private set; }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         ConnectionString = $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";

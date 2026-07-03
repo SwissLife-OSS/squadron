@@ -18,9 +18,9 @@ public class AzureResource<TOptions>
     /// Initialize the resource
     /// </summary>
     /// <returns></returns>
-    public virtual ValueTask InitializeAsync()
+    public virtual Task InitializeAsync()
     {
-        return ValueTask.CompletedTask;
+        return Task.CompletedTask;
     }
 
     /// <summary>

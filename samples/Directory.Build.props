@@ -3,7 +3,7 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Test.props', '$(MSBuildThisFileDirectory)..\test\'))" />
 
   <ItemGroup>
-    <PackageReference Include="xunit.v3.extensibility.core" />
+    <PackageReference Include="xunit.core" />
   </ItemGroup>
   
 </Project>

@@ -24,7 +24,7 @@ public class Neo4jResource<TOptions>
     /// </summary>
     public string ConnectionString { get; private set; }
 
-    public async override ValueTask InitializeAsync()
+    public async override Task InitializeAsync()
     {
         await base.InitializeAsync().ConfigureAwait(false);
 

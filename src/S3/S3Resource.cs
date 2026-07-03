@@ -38,7 +38,7 @@ public class S3Resource<TOptions>
     }
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public async override ValueTask InitializeAsync()
+    public async override Task InitializeAsync()
     {
         await base.InitializeAsync();
 

@@ -84,7 +84,7 @@ public class GiteaResource<TOptions>
     }
     
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         Url = $"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}";

@@ -31,7 +31,7 @@ public class PostgreSqlResource<TOptions>
 
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public async override ValueTask InitializeAsync()
+    public async override Task InitializeAsync()
     {
         await base.InitializeAsync();
         ConnectionString = BuildConnectionString(Settings.Username);

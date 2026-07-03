@@ -24,7 +24,7 @@ public class MongoResource<TOptions> :
     private MongoClient _client;
 
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         ConnectionString =

@@ -18,7 +18,7 @@ public class AzureKeyVaultResource<TOptions>
     /// <summary>
     /// Initialize the resource
     /// </summary>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         BuildOptions();
@@ -50,7 +50,7 @@ public class AzureKeyVaultResource<TOptions>
         VaultUri = await _keyVaultManager.GetUriAsync();
     }
 
-    public async ValueTask DisposeAsync()
+    public async Task DisposeAsync()
     {
         if (_keyVaultModel.ProvisioningMode == KeyVaultProvisioningMode.CreateAndDelete)
         {

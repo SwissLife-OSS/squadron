@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Neo4j.Driver;
-using Snapshooter.Xunit3;
+using Snapshooter.Xunit;
 using Squadron.Neo4j.Models;
 using Xunit;
 using DriverValue = Neo4j.Driver.ValueExtensions;

@@ -38,12 +38,15 @@
 
     <ItemGroup>
         <!-- Test Packages -->
-        <PackageVersion Include="xunit.v3" Version="3.2.0" />
-        <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.0" />
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageVersion Include="xunit" Version="2.9.3" />
+        <PackageVersion Include="xunit.core" Version="2.9.3" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
         <PackageVersion Include="FluentAssertions" Version="7.2.0" />
         <PackageVersion Include="Moq" Version="4.20.72" />
+        <PackageVersion Include="coverlet.collector" Version="6.0.4" />
         <PackageVersion Include="AutoFixture" Version="4.18.1" />
-        <PackageVersion Include="Snapshooter.Xunit3" Version="1.3.1" />
+        <PackageVersion Include="Snapshooter.Xunit" Version="1.0.1" />
 
         <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
 

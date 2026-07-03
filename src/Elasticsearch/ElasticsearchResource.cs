@@ -26,7 +26,7 @@ public class ElasticsearchResource<TOptions>
     where TOptions : ContainerResourceOptions, new()
 {
     /// <inheritdoc cref="IAsyncLifetime"/>
-    public override async ValueTask InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         Uri uri = new Uri($"http://{Manager.Instance.Address}:{Manager.Instance.HostPort}");

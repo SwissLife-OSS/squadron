@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Squadron.AzureServiceBus.Tests;
 

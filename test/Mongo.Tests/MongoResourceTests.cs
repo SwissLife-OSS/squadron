@@ -13,6 +13,62 @@ public class MongoResourceTests(MongoResource mongoResource) : IClassFixture<Mon
     private MongoResource MongoResource { get; } = mongoResource;
 
     [Fact]
+    public async Task IndexBuildMinAvailableDiskSpace_DefaultsTo50Mb()
+    {
+        int result = await GetIndexBuildMinAvailableDiskSpaceAsync();
+
+        Assert.Equal(50, result);
+    }
+
+    [Fact]
+    public async Task SetIndexBuildMinAvailableDiskSpace_UpdatesServerParameter()
+    {
+        try
+        {
+            await MongoResource.Client.SetIndexBuildMinAvailableDiskSpaceAsync(
+                200,
+                TestContext.Current.CancellationToken);
+
+            int result = await GetIndexBuildMinAvailableDiskSpaceAsync();
+
+            Assert.Equal(200, result);
+        }
+        finally
+        {
+            await MongoResource.Client.SetIndexBuildMinAvailableDiskSpaceAsync(
+                50,
+                TestContext.Current.CancellationToken);
+        }
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(8_388_609)]
+    public async Task SetIndexBuildMinAvailableDiskSpace_RejectsUnsupportedValue(int megabytes)
+    {
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            MongoResource.Client.SetIndexBuildMinAvailableDiskSpaceAsync(
+                megabytes,
+                TestContext.Current.CancellationToken));
+    }
+
+    private async Task<int> GetIndexBuildMinAvailableDiskSpaceAsync()
+    {
+        BsonDocument result = await MongoResource.Client
+            .GetDatabase("admin")
+            .RunCommandAsync<BsonDocument>(
+                new BsonDocument
+                {
+                    { "getParameter", 1 },
+                    { "indexBuildMinAvailableDiskSpaceMB", 1 }
+                },
+                readPreference: null,
+                TestContext.Current.CancellationToken);
+
+        return checked((int)result["indexBuildMinAvailableDiskSpaceMB"].AsInt64);
+    }
+
+    [Fact]
     public void CreateAndUseCollection()
     {
         // arrange

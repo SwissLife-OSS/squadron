@@ -19,6 +19,9 @@ public class MongoDefaultOptions : ContainerResourceOptions, IComposableResource
             .Name("mongodb")
             .Image("mongo:latest")
             .InternalPort(27017)
-            .PreferLocalImage();
+            .PreferLocalImage()
+            .AddCmd(
+                "--setParameter",
+                "indexBuildMinAvailableDiskSpaceMB=50");
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3.Model;
 using FluentAssertions;
@@ -16,7 +17,8 @@ public class S3ResourceTests(S3Resource s3Resource) : IClassFixture<S3Resource>
     public async Task CreateBucket_Success()
     {
         // Arrange
-        const string bucketName = "new-bucket";
+        string bucketName = $"new-bucket-{Guid.NewGuid():N}";
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         Amazon.S3.IAmazonS3 client = s3Resource.GetCLient();
         var putBucketRequest = new PutBucketRequest
@@ -25,8 +27,8 @@ public class S3ResourceTests(S3Resource s3Resource) : IClassFixture<S3Resource>
         };
 
         // Act
-        await client.PutBucketAsync(putBucketRequest, default);
-        ListBucketsResponse result = await client.ListBucketsAsync(default);
+        await client.PutBucketAsync(putBucketRequest, cancellationToken);
+        ListBucketsResponse result = await client.ListBucketsAsync(cancellationToken);
 
         // Assert
         result.Buckets.Should().ContainSingle(p => p.BucketName == bucketName);
@@ -36,18 +38,20 @@ public class S3ResourceTests(S3Resource s3Resource) : IClassFixture<S3Resource>
     public async Task DownloadFile_ShouldMatchLocalFile()
     {
         // Arrange
-        const string bucketName = "uploadtest";
+        string bucketName = $"uploadtest-{Guid.NewGuid():N}";
+        string objectKey = $"SampleFile-{Guid.NewGuid():N}.txt";
         const string fileName = "SampleFile.txt";
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         Amazon.S3.IAmazonS3 client = s3Resource.GetCLient();
 
         await client.PutBucketAsync(
             new PutBucketRequest { BucketName = bucketName },
-            default);
+            cancellationToken);
 
         using Stream fileStream = OpenEmbeddedResourceStream(fileName);
 
-        byte[] localFile = await StreamToByteArrayAsync(fileStream);
+        byte[] localFile = await StreamToByteArrayAsync(fileStream, cancellationToken);
 
         fileStream.Position = 0;
 
@@ -56,29 +60,31 @@ public class S3ResourceTests(S3Resource s3Resource) : IClassFixture<S3Resource>
             {
                 InputStream = fileStream,
                 BucketName = bucketName,
-                Key = fileName
+                Key = objectKey
             },
-            default);
+            cancellationToken);
 
         // Act
         GetObjectResponse fileResponse = await client.GetObjectAsync(
             new GetObjectRequest
             {
-                Key = fileName,
+                Key = objectKey,
                 BucketName = bucketName
             },
-            default);
+            cancellationToken);
 
-        byte[] result = await StreamToByteArrayAsync(fileResponse.ResponseStream);
+        byte[] result = await StreamToByteArrayAsync(fileResponse.ResponseStream, cancellationToken);
 
         // Assert
         result.Should().BeEquivalentTo(localFile);
     }
 
-    private async Task<byte[]> StreamToByteArrayAsync(Stream stream)
+    private async Task<byte[]> StreamToByteArrayAsync(
+        Stream stream,
+        CancellationToken cancellationToken)
     {
         using var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream);
+        await stream.CopyToAsync(memoryStream, cancellationToken);
 
         return memoryStream.ToArray();
     }

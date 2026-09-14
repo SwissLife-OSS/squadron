@@ -10,6 +10,23 @@ public class MongoReplicaSetResourceTests(MongoReplicaSetResource mongoRsResourc
     : IClassFixture<MongoReplicaSetResource>
 {
     [Fact]
+    public async Task IndexBuildMinAvailableDiskSpace_DefaultsTo50Mb()
+    {
+        BsonDocument result = await mongoRsResource.Client
+            .GetDatabase("admin")
+            .RunCommandAsync<BsonDocument>(
+                new BsonDocument
+                {
+                    { "getParameter", 1 },
+                    { "indexBuildMinAvailableDiskSpaceMB", 1 }
+                },
+                readPreference: null,
+                TestContext.Current.CancellationToken);
+
+        Assert.Equal(50, result["indexBuildMinAvailableDiskSpaceMB"].AsInt64);
+    }
+
+    [Fact]
     public void CommitTransaction_NoError()
     {
         //Act

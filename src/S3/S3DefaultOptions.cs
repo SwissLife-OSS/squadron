@@ -20,7 +20,7 @@ public class S3DefaultOptions : ContainerResourceOptions
     {
         builder
             .Name("minio")
-            .Image("minio/minio:latest")
+            .Image("quay.io/minio/minio:latest")
             .AddCmd("server", "/data")
             .Username(AccessKey)
             .Password(SecretKey)

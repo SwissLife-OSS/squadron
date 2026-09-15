@@ -27,7 +27,7 @@ public class MongoResourceTests(MongoResource mongoResource) : IClassFixture<Mon
         {
             await MongoResource.Client.SetIndexBuildMinAvailableDiskSpaceAsync(
                 200,
-                TestContext.Current.CancellationToken);
+                CancellationToken.None);
 
             int result = await GetIndexBuildMinAvailableDiskSpaceAsync();
 
@@ -37,7 +37,7 @@ public class MongoResourceTests(MongoResource mongoResource) : IClassFixture<Mon
         {
             await MongoResource.Client.SetIndexBuildMinAvailableDiskSpaceAsync(
                 50,
-                TestContext.Current.CancellationToken);
+                CancellationToken.None);
         }
     }
 
@@ -49,7 +49,7 @@ public class MongoResourceTests(MongoResource mongoResource) : IClassFixture<Mon
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
             MongoResource.Client.SetIndexBuildMinAvailableDiskSpaceAsync(
                 megabytes,
-                TestContext.Current.CancellationToken));
+                CancellationToken.None));
     }
 
     private async Task<int> GetIndexBuildMinAvailableDiskSpaceAsync()
@@ -63,7 +63,7 @@ public class MongoResourceTests(MongoResource mongoResource) : IClassFixture<Mon
                     { "indexBuildMinAvailableDiskSpaceMB", 1 }
                 },
                 readPreference: null,
-                TestContext.Current.CancellationToken);
+                CancellationToken.None);
 
         return checked((int)result["indexBuildMinAvailableDiskSpaceMB"].AsInt64);
     }

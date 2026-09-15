@@ -340,3 +340,4 @@ tools/**
 !tools/packages.config
 *.user.json
 .DS_Store
+**/*.lscache

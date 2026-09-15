@@ -21,7 +21,7 @@ public class MongoReplicaSetResourceTests(MongoReplicaSetResource mongoRsResourc
                     { "indexBuildMinAvailableDiskSpaceMB", 1 }
                 },
                 readPreference: null,
-                TestContext.Current.CancellationToken);
+                CancellationToken.None);
 
         Assert.Equal(50, result["indexBuildMinAvailableDiskSpaceMB"].AsInt64);
     }

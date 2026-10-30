@@ -22,6 +22,17 @@ public class AzureStorageBlobDefaultOptions
             .Name(name)
             .Image("mcr.microsoft.com/azure-storage/azurite")
             .InternalPort(10000)
+            .AddCmd(
+                "azurite",
+                "-l",
+                "/data",
+                "--blobHost",
+                "0.0.0.0",
+                "--queueHost",
+                "0.0.0.0",
+                "--tableHost",
+                "0.0.0.0",
+                "--skipApiVersionCheck")
             .PreferLocalImage();
     }
 }

@@ -20,7 +20,7 @@ public class S3DefaultOptions : ContainerResourceOptions
     {
         builder
             .Name("minio")
-            .Image("alpine/minio:latest-release")
+            .Image("elestio/minio:latest")
             .AddCmd("server", "/data")
             .Username(AccessKey)
             .Password(SecretKey)

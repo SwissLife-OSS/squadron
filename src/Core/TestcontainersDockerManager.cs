@@ -75,6 +75,12 @@ public class TestcontainersDockerManager : IDockerContainerManager
             }
         }
 
+        // Configure entrypoint
+        if (_settings.Entrypoint?.Count > 0)
+        {
+            builder = builder.WithEntrypoint(_settings.Entrypoint.ToArray());
+        }
+
         // Configure command
         if (_settings.Cmd?.Count > 0)
         {

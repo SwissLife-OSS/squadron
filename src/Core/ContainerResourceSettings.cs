@@ -70,6 +70,11 @@ public class ContainerResourceSettings
     public IList<string> Cmd { get; internal set; }
 
     /// <summary>
+    /// Entrypoint that replaces the one defined by the image
+    /// </summary>
+    public IList<string> Entrypoint { get; internal set; }
+
+    /// <summary>
     /// Password to access resource such as database password
     /// </summary>
     public string Password { get; internal set; }

@@ -12,6 +12,7 @@ public class ContainerResourceBuilder
     protected readonly ContainerResourceSettings _options = new ContainerResourceSettings();
 
     private readonly List<string> _cmd = new List<string>();
+    private readonly List<string> _entrypoint = new List<string>();
     private SourceLevels _logLevel = SourceLevels.Information;
 
     /// <summary>
@@ -92,6 +93,19 @@ public class ContainerResourceBuilder
     public ContainerResourceBuilder AddCmd(params string[] cmd)
     {
         _cmd.AddRange(cmd);
+        return this;
+    }
+
+    /// <summary>
+    /// Overrides the entrypoint of the image.
+    /// Calling it again replaces the previous entrypoint.
+    /// </summary>
+    /// <param name="entrypoint">The executable and its arguments.</param>
+    /// <returns></returns>
+    public ContainerResourceBuilder Entrypoint(params string[] entrypoint)
+    {
+        _entrypoint.Clear();
+        _entrypoint.AddRange(entrypoint);
         return this;
     }
 
@@ -392,6 +406,7 @@ public class ContainerResourceBuilder
             
         _options.Logger = new Logger(_logLevel, _options);
         _options.Cmd = _cmd;
+        _options.Entrypoint = _entrypoint;
         return _options;
     }
 }
